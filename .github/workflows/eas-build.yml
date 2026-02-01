@@ -1,18 +1,17 @@
 name: EAS Build (Preview)
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'mobile/**'
-      - '.github/workflows/eas-build.yml'
+  workflow_run:
+    workflows: ["Mobile CI (Quality Check)"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
   build:
     name: Trigger EAS Preview Build
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: 🔍 Check for EXPO_TOKEN
         run: |

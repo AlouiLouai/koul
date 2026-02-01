@@ -86,7 +86,7 @@ const AnalysisResult: React.FC<AnalysisResultProps> = ({ data }) => {
     return "Rod belek 3la sa7tek, na9es mel 'Mokli'.";
   };
 
-  const verdictText = getDerjaVerdict(data.totals, data.health_score);
+  const verdictText = getDerjaVerdict(data.totals, data.health_score ?? 0);
 
   const handleSpeak = () => {
     Speech.speak(verdictText, { language: 'fr-FR' });
