@@ -1,9 +1,5 @@
-import { Platform } from 'react-native';
-
 // --- Configuration Constants ---
 const PROD_API_URL = 'https://nutriscan-api.politepond-83da7402.eastus2.azurecontainerapps.io';
-const LOCAL_ANDROID_URL = 'http://10.0.2.2:3001';
-const LOCAL_IOS_URL = 'http://localhost:3001';
 
 /**
  * Determines the Base URL based on the environment and platform.

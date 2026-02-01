@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'mobile/**'
+      - '.github/workflows/mobile-ci.yml'
   push:
     branches: [ main ]
     paths:
       - 'mobile/**'
+      - '.github/workflows/mobile-ci.yml'
 
 jobs:
   validate:
