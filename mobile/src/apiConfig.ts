@@ -15,7 +15,7 @@ const LOCAL_IOS_URL = 'http://localhost:3001';
 const getBaseUrl = (): string => {
   // 1. Production Environment -> Always PROD
   if (!__DEV__) {
-    return PROD_API_URL;
+    return PROD_API_URL;   
   }
 
   // 2. Development Override (Allow forcing local if needed)
