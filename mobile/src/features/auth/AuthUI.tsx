@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Utensils, ArrowRight } from 'lucide-react-native';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 interface AuthUIProps {
   onGoogleLogin: () => void;
