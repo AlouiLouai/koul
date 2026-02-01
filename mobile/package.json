@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start"
+    "web": "expo start",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-native-google-signin/google-signin": "^16.1.1",
