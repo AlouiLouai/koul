@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
 import { Crown, CheckCircle2, X, Star, Zap, ChefHat } from 'lucide-react-native';
+import { GlassView } from './GlassView';
+import { useTheme } from '../theme/ThemeContext';
 
 const { width, height: screenHeight } = Dimensions.get('window');
 
@@ -11,6 +13,7 @@ interface UpgradeScreenProps {
 
 export const UpgradeScreen = ({ onClose, onUpgrade }: UpgradeScreenProps) => {
   const slideUp = useRef(new Animated.Value(screenHeight)).current;
+  const { colors, mode } = useTheme();
 
   useEffect(() => {
     Animated.spring(slideUp, {
@@ -31,76 +34,82 @@ export const UpgradeScreen = ({ onClose, onUpgrade }: UpgradeScreenProps) => {
 
   return (
     <View style={styles.overlay}>
-      <Animated.View style={[styles.container, { transform: [{ translateY: slideUp }] }]}>
-        
-        {/* Fixed Header */}
-        <View style={styles.header}>
-           <View style={styles.headerDeco} />
-           <Crown size={48} color="#fff" fill="#f59e0b" style={styles.crownIcon} />
-           <TouchableOpacity style={styles.closeBtn} onPress={handleClose}>
-              <X size={24} color="#fff" />
-           </TouchableOpacity>
-        </View>
+      <Animated.View style={[styles.containerWrapper, { transform: [{ translateY: slideUp }] }]}>
+        <GlassView style={styles.container} intensity={95} borderRadius={32} noBorder>
+            
+            {/* Fixed Header */}
+            <View style={[styles.header, { backgroundColor: colors.mode === 'dark' ? '#00000080' : '#18181b' }]}>
+               <View style={[styles.headerDeco, { backgroundColor: colors.warning + '30' }]} />
+               <Crown size={48} color="#fff" fill={colors.warning} style={styles.crownIcon} />
+               <TouchableOpacity style={styles.closeBtn} onPress={handleClose}>
+                  <X size={24} color="#fff" />
+               </TouchableOpacity>
+            </View>
 
-        <ScrollView 
-          style={styles.scrollContainer} 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-           <View style={styles.titleContainer}>
-              <Text style={styles.title}>KOUL <Text style={{color: '#f59e0b'}}>Premium</Text></Text>
-              <Text style={styles.subtitle}>Walli M3allem fi Makeltek!</Text>
-           </View>
+            <ScrollView 
+              style={styles.scrollContainer} 
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+               <View style={styles.titleContainer}>
+                  <Text style={[styles.title, { color: colors.text }]}>KOUL <Text style={{color: colors.warning}}>Premium</Text></Text>
+                  <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Walli M3allem fi Makeltek!</Text>
+               </View>
 
-           <View style={styles.featuresList}>
-              <View style={styles.featureRow}>
-                 <View style={[styles.iconBox, { backgroundColor: '#fff7ed' }]}>
-                    <ChefHat size={20} color="#f97316" />
-                 </View>
-                 <View style={{ flex: 1 }}>
-                    <Text style={styles.featureTitle}>El Menu el Sahri ✨</Text>
-                    <Text style={styles.featureDesc}>Recettes bil 9adhya elli 3andek fel frijider.</Text>
-                 </View>
-              </View>
+               <View style={styles.featuresList}>
+                  <GlassView style={styles.featureRow} intensity={40} borderRadius={20}>
+                     <View style={[styles.iconBox, { backgroundColor: colors.warning + '20' }]}>
+                        <ChefHat size={20} color={colors.warning} />
+                     </View>
+                     <View style={{ flex: 1 }}>
+                        <Text style={[styles.featureTitle, { color: colors.text }]}>El Menu el Sahri ✨</Text>
+                        <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>Recettes bil 9adhya elli 3andek fel frijider.</Text>
+                     </View>
+                  </GlassView>
 
-              <View style={styles.featureRow}>
-                 <View style={[styles.iconBox, { backgroundColor: '#ecfdf5' }]}>
-                    <Zap size={20} color="#10b981" />
-                 </View>
-                 <View style={{ flex: 1 }}>
-                    <Text style={styles.featureTitle}>Coach Personnel (IA) 🤖</Text>
-                    <Text style={styles.featureDesc}>Es2el 'Amel' ay wa9t: "Chnowa ntayeb lyoum?"</Text>
-                 </View>
-              </View>
+                  <GlassView style={styles.featureRow} intensity={40} borderRadius={20}>
+                     <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+                        <Zap size={20} color={colors.primary} />
+                     </View>
+                     <View style={{ flex: 1 }}>
+                        <Text style={[styles.featureTitle, { color: colors.text }]}>Coach Personnel (IA) 🤖</Text>
+                        <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>Es2el 'Amel' ay wa9t: "Chnowa ntayeb lyoum?"</Text>
+                     </View>
+                  </GlassView>
 
-              <View style={styles.featureRow}>
-                 <View style={[styles.iconBox, { backgroundColor: '#eff6ff' }]}>
-                    <Star size={20} color="#3b82f6" />
-                 </View>
-                 <View style={{ flex: 1 }}>
-                    <Text style={styles.featureTitle}>Scan el 9adhya 🛒</Text>
-                    <Text style={styles.featureDesc}>A3ref el produit el ghali w el rkhis w el s7i.</Text>
-                 </View>
-              </View>
-           </View>
+                  <GlassView style={styles.featureRow} intensity={40} borderRadius={20}>
+                     <View style={[styles.iconBox, { backgroundColor: colors.success + '20' }]}>
+                        <Star size={20} color={colors.success} />
+                     </View>
+                     <View style={{ flex: 1 }}>
+                        <Text style={[styles.featureTitle, { color: colors.text }]}>Scan el 9adhya 🛒</Text>
+                        <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>A3ref el produit el ghali w el rkhis w el s7i.</Text>
+                     </View>
+                  </GlassView>
+               </View>
 
-           <View style={styles.pricingContainer}>
-              <Text style={styles.priceLabel}>A partir de</Text>
-              <View style={styles.priceRow}>
-                 <Text style={styles.currency}>TND</Text>
-                 <Text style={styles.price}>5</Text>
-                 <Text style={styles.period}>/ Ch'har</Text>
-              </View>
-              <Text style={styles.cancelAnytime}>Tnajem tbatel wa9t ma t7eb</Text>
-           </View>
+               <GlassView style={[styles.pricingContainer, { borderColor: colors.primary }]} intensity={30} borderRadius={24}>
+                  <Text style={[styles.priceLabel, { color: colors.primary }]}>A partir de</Text>
+                  <View style={styles.priceRow}>
+                     <Text style={[styles.currency, { color: colors.text }]}>TND</Text>
+                     <Text style={[styles.price, { color: colors.text }]}>5</Text>
+                     <Text style={[styles.period, { color: colors.textSecondary }]}>/ Ch'har</Text>
+                  </View>
+                  <Text style={[styles.cancelAnytime, { color: colors.textSecondary }]}>Tnajem tbatel wa9t ma t7eb</Text>
+               </GlassView>
 
-           <TouchableOpacity style={styles.upgradeBtn} onPress={onUpgrade}>
-              <Text style={styles.upgradeBtnText}>Abda 7 Jours Gratuit</Text>
-           </TouchableOpacity>
-           
-           <View style={{ height: 40 }} />
-        </ScrollView>
+               <TouchableOpacity 
+                  style={[styles.upgradeBtn, { backgroundColor: colors.primary }]} 
+                  onPress={onUpgrade}
+                  activeOpacity={0.8}
+               >
+                  <Text style={styles.upgradeBtnText}>Abda 7 Jours Gratuit</Text>
+               </TouchableOpacity>
+               
+               <View style={{ height: 40 }} />
+            </ScrollView>
 
+        </GlassView>
       </Animated.View>
     </View>
   );
@@ -113,16 +122,16 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     zIndex: 1000,
   },
+  containerWrapper: {
+    height: '90%',
+    width: '100%',
+  },
   container: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    height: '90%', // Increased height
+    flex: 1,
     overflow: 'hidden',
   },
   header: {
     height: 140,
-    backgroundColor: '#18181b',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -134,7 +143,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
   },
   crownIcon: {
     shadowColor: '#f59e0b',
@@ -165,27 +173,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#18181b',
   },
   subtitle: {
     fontSize: 16,
-    color: '#71717a',
     marginTop: 4,
     fontWeight: '500',
   },
   featuresList: {
-    gap: 20,
+    gap: 16,
     marginBottom: 32,
   },
   featureRow: {
     flexDirection: 'row',
     gap: 16,
     alignItems: 'center',
-    backgroundColor: '#fafafa',
     padding: 16,
-    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#f4f4f5',
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   iconBox: {
     width: 44,
@@ -197,27 +201,21 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#18181b',
     marginBottom: 2,
   },
   featureDesc: {
     fontSize: 12,
-    color: '#71717a',
     lineHeight: 18,
   },
   pricingContainer: {
     alignItems: 'center',
-    backgroundColor: '#fffbeb',
     padding: 20,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#fcd34d',
+    borderWidth: 2,
     marginBottom: 24,
   },
   priceLabel: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#d97706',
     textTransform: 'uppercase',
     marginBottom: 4,
   },
@@ -229,28 +227,23 @@ const styles = StyleSheet.create({
   currency: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#18181b',
     marginBottom: 6,
   },
   price: {
     fontSize: 48,
     fontWeight: '900',
-    color: '#18181b',
     lineHeight: 54,
   },
   period: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#71717a',
     marginBottom: 10,
   },
   cancelAnytime: {
     fontSize: 12,
-    color: '#a1a1aa',
     marginTop: 4,
   },
   upgradeBtn: {
-    backgroundColor: '#18181b',
     paddingVertical: 20,
     borderRadius: 20,
     alignItems: 'center',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -7,11 +7,16 @@ import {
   Dimensions, 
   Animated, 
   Easing,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView
 } from 'react-native';
-import { Utensils, ArrowRight } from 'lucide-react-native';
+import { Utensils, ArrowRight, Sparkles } from 'lucide-react-native';
+import { LiquidBackground } from '../../components/LiquidBackground';
+import { GlassView } from '../../components/GlassView';
+import { AppLogo } from '../../components/AppLogo';
+import { useTheme } from '../../theme/ThemeContext';
 
-const { height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface AuthUIProps {
   onGoogleLogin: () => void;
@@ -19,242 +24,273 @@ interface AuthUIProps {
 }
 
 export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
-  const [phase, setPhase] = useState<'splash' | 'login'>('splash');
+  const { colors } = useTheme();
   
   // Animations
-  const animScale = useRef(new Animated.Value(1)).current;
-  const animHeight = useRef(new Animated.Value(height * 0.4)).current; 
-  const animFormOpacity = useRef(new Animated.Value(0)).current;
-  const animFormY = useRef(new Animated.Value(50)).current;
+  const animEntrance = useRef(new Animated.Value(0)).current;
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  const orbScale = useRef(new Animated.Value(1)).current;
+  const orbRotate = useRef(new Animated.Value(0)).current;
 
-  // Initial Splash Sequence
   useEffect(() => {
-    if (phase === 'splash') {
-      const timerId = setTimeout(() => {
-        setPhase('login');
-        
-        Animated.parallel([
-          Animated.timing(animHeight, {
-            toValue: height * 0.35,
-            duration: 800,
-            useNativeDriver: false,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          }),
-          Animated.timing(animScale, {
-            toValue: 0.8,
-            duration: 800,
-            useNativeDriver: false,
-          }),
-          Animated.timing(animFormOpacity, {
-            toValue: 1,
-            duration: 600,
-            delay: 300,
-            useNativeDriver: false,
-          }),
-          Animated.timing(animFormY, {
-            toValue: 0,
-            duration: 600,
-            delay: 300,
-            useNativeDriver: false,
-            easing: Easing.out(Easing.back(1.5)),
-          }),
-        ]).start();
-      }, 2000);
-      return () => clearTimeout(timerId);
-    }
-  }, [phase]);
+    // Single Sequence Entrance
+    Animated.timing(animEntrance, {
+      toValue: 1,
+      duration: 1500,
+      useNativeDriver: false, // Animating layout properties later? No, mostly opacity/translate.
+      easing: Easing.out(Easing.exp),
+    }).start();
+
+    // Floating Effect
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: -15, duration: 2500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 2500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
+      ])
+    ).start();
+
+    // Orb Dynamics
+    Animated.loop(
+      Animated.parallel([
+          Animated.sequence([
+              Animated.timing(orbScale, { toValue: 1.3, duration: 5000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+              Animated.timing(orbScale, { toValue: 1, duration: 5000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
+          ]),
+          Animated.timing(orbRotate, { toValue: 1, duration: 30000, useNativeDriver: true, easing: Easing.linear })
+      ])
+    ).start();
+  }, []);
+
+  const spin = orbRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+
+  const logoY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [100, 0] });
+  const formY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
+  const formOpacity = animEntrance.interpolate({ inputRange: [0.5, 1], outputRange: [0, 1] });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.bgDecoration} />
-      
-      <View style={styles.innerContainer}>
+    <LiquidBackground>
+      <View style={styles.container}>
+        
+        {/* Living Background Orb */}
         <Animated.View style={[
-          styles.logoContainer, 
-          { 
-            height: animHeight,
-            transform: [{ scale: animScale }]
-          }
-        ]}>
-          <View style={styles.logoBox}>
-            <Utensils size={phase === 'splash' ? 48 : 32} color="#fff" />
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.logoText}>KOUL</Text>
-            <View style={styles.underline} />
-          </View>
-          {phase === 'splash' && (
-            <Text style={styles.splashTagline}>TBIBAK EL DHKI FI TOUNES</Text>
-          )}
-        </Animated.View>
+            styles.orb, 
+            { 
+                backgroundColor: colors.primary,
+                transform: [{ scale: orbScale }, { rotate: spin }],
+                opacity: 0.12
+            } 
+        ]} />
 
-        {phase === 'login' && (
-          <Animated.View style={[
-            styles.formWrapper,
-            {
-              opacity: animFormOpacity,
-              transform: [{ translateY: animFormY }]
-            }
-          ]}>
-            <View style={styles.card}>
-              <View>
-                <Text style={styles.cardTitle}>Mar7ba Bik</Text>
-                <Text style={styles.cardSubtitle}>
-                  Sajel bach taba3 makletek, t7alel sa7nek, w tousel l'ahdafek.
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            
+            {/* Header Section */}
+            <Animated.View style={[
+              styles.logoContainer, 
+              { 
+                opacity: animEntrance,
+                transform: [{ translateY: Animated.add(logoY, floatAnim) }]
+              }
+            ]}>
+              <View style={styles.logoWrapper}>
+                 <Animated.View style={[styles.glowRing, { borderColor: colors.primary, transform: [{ rotate: spin }] }]} />
+                 <AppLogo size={100} borderRadius={50} intensity={40} />
+              </View>
+              
+              <View style={styles.titleWrapper}>
+                <Text style={[styles.appTitle, { color: colors.text }]}>KOUL</Text>
+                <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+                <Text style={[styles.appYear, { color: colors.primary }]}>2026</Text>
+              </View>
+
+              <GlassView style={styles.tagline} intensity={20} borderRadius={20}>
+                  <Text style={[styles.taglineText, { color: colors.text }]}>THE FUTURE OF HEALTH</Text>
+              </GlassView>
+            </Animated.View>
+
+            {/* Combined Login Section */}
+            <Animated.View style={[
+              styles.formContainer,
+              {
+                opacity: formOpacity,
+                transform: [{ translateY: formY }]
+              }
+            ]}>
+              <View style={styles.welcomeText}>
+                <Text style={[styles.headerText, { color: colors.text }]}>Mar7ba Bik.</Text>
+                <Text style={[styles.subHeaderText, { color: colors.textSecondary }]}>
+                   Sawar sahnek, Erwi 3rougek.
                 </Text>
               </View>
 
               <TouchableOpacity
-                style={[styles.googleBtn, isLoading && styles.googleBtnDisabled]}
                 onPress={onGoogleLogin}
                 disabled={isLoading}
+                activeOpacity={0.8}
               >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <>
-                    <View style={styles.gIcon}>
-                      <Text style={{fontSize: 18, fontWeight: 'bold', color: '#10b981'}}>G</Text>
-                    </View>
-                    <Text style={styles.googleBtnText}>Kamel b'Google</Text>
-                    <ArrowRight size={20} color="#fff" style={{ marginLeft: 'auto' }} />
-                  </>
-                )}
+                <GlassView style={[styles.googleBtn, { backgroundColor: colors.text }]} intensity={20} borderRadius={24}>
+                    {isLoading ? (
+                      <ActivityIndicator color={colors.background[0]} />
+                    ) : (
+                      <>
+                        <View style={styles.iconCircle}>
+                           <Text style={{fontSize: 20, fontWeight: 'bold', color: colors.text}}>G</Text>
+                        </View>
+                        <Text style={[styles.btnText, { color: colors.background[0] }]}>Login with Google</Text>
+                        <ArrowRight size={20} color={colors.background[0]} />
+                      </>
+                    )}
+                </GlassView>
               </TouchableOpacity>
               
-              <Text style={styles.termsText}>
-                Ki tkamel, ya3ni mouafre9 3ala chourout l'isti3mél mté3na.
+              <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+                © 2026 KOUL AI • Tunisia
               </Text>
-            </View>
-          </Animated.View>
-        )}
+            </Animated.View>
+
+        </ScrollView>
       </View>
-    </View>
+    </LiquidBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFBF7',
   },
-  innerContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
+  scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingBottom: 40,
   },
-  bgDecoration: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#FFFBF7',
+  orb: {
+      position: 'absolute',
+      top: -width * 0.5,
+      left: -width * 0.2,
+      width: width * 1.4,
+      height: width * 1.4,
+      borderRadius: width * 0.7,
+      zIndex: 0,
   },
   logoContainer: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 60,
   },
-  logoBox: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#10b981',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
-    marginBottom: 16,
+  logoWrapper: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
   },
-  logoText: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#18181b',
-    letterSpacing: -1,
+  logoGlass: {
+      width: 100,
+      height: 100,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.5)',
   },
-  underline: {
-    height: 4,
-    width: 40,
-    backgroundColor: '#10b981',
-    borderRadius: 2,
-    marginTop: 4,
-    opacity: 0.5,
+  glowRing: {
+      position: 'absolute',
+      width: 140,
+      height: 140,
+      borderRadius: 70,
+      borderWidth: 2,
+      borderStyle: 'dashed',
+      opacity: 0.4,
   },
-  splashTagline: {
-    marginTop: 24,
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#a1a1aa',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+  titleWrapper: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
   },
-  formWrapper: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-    justifyContent: 'center',
+  appTitle: {
+      fontSize: 72,
+      fontWeight: '900',
+      letterSpacing: -4,
+      lineHeight: 80,
   },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 32,
-    padding: 32,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 5,
-    gap: 32,
+  dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#2563eb',
+      marginTop: 50,
+      marginHorizontal: 4,
   },
-  cardTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#18181b',
-    marginBottom: 8,
-    textAlign: 'center',
+  appYear: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginTop: 12,
+      letterSpacing: 2,
   },
-  cardSubtitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#71717a',
-    textAlign: 'center',
-    lineHeight: 22,
+  tagline: {
+      paddingHorizontal: 20,
+      paddingVertical: 8,
+      marginTop: 10,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.2)',
+  },
+  taglineText: {
+      fontSize: 10,
+      fontWeight: '900',
+      letterSpacing: 4,
+  },
+  formContainer: {
+      paddingHorizontal: 24,
+      width: '100%',
+  },
+  loginCard: {
+      padding: 32,
+      gap: 32,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.8)',
+  },
+  welcomeText: {
+      gap: 8,
+      marginBottom: 32,
+      alignItems: 'center',
+  },
+  headerText: {
+      fontSize: 36,
+      fontWeight: '900',
+      letterSpacing: -1,
+  },
+  subHeaderText: {
+      fontSize: 16,
+      fontWeight: '600',
+      opacity: 0.7,
   },
   googleBtn: {
-    backgroundColor: '#18181b',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    gap: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 64,
+      paddingHorizontal: 8,
+      gap: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.2,
+      shadowRadius: 20,
+      elevation: 10,
   },
-  googleBtnDisabled: {
-    opacity: 0.7,
+  iconCircle: {
+      width: 48,
+      height: 48,
+      borderRadius: 20,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
   },
-  gIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  btnText: {
+      fontSize: 17,
+      fontWeight: '800',
+      flex: 1,
   },
-  googleBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  termsText: {
-    fontSize: 12,
-    color: '#a1a1aa',
-    textAlign: 'center',
-    lineHeight: 18,
+  footerText: {
+      fontSize: 11,
+      textAlign: 'center',
+      opacity: 0.5,
+      fontWeight: '700',
+      marginTop: 40,
   },
 });

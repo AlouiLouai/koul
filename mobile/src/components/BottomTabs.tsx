@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet, Platform } from 'react-native';
 import { Home, PieChart, User as UserIcon } from 'lucide-react-native';
+import { GlassView } from './GlassView';
+import { useTheme } from '../theme/ThemeContext';
 
 interface BottomTabsProps {
   activeTab: string;
@@ -8,6 +10,8 @@ interface BottomTabsProps {
 }
 
 export const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
+  const { colors } = useTheme();
+
   const TabButton = ({ name, icon: Icon, isActive, onPress }: any) => {
     const scale = useRef(new Animated.Value(1)).current;
 
@@ -29,12 +33,12 @@ export const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
       >
         <Animated.View style={[
           tabStyles.tabIconContainer, 
-          isActive && tabStyles.activeTabContainer,
+          isActive && { backgroundColor: colors.primary + '20' }, // 20 opacity
           { transform: [{ scale }] }
         ]}>
           <Icon 
             size={24} 
-            color={isActive ? '#10b981' : '#a1a1aa'} 
+            color={isActive ? colors.primary : colors.textSecondary} 
             strokeWidth={isActive ? 2.5 : 2}
           />
         </Animated.View>
@@ -44,7 +48,11 @@ export const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
 
   return (
     <View style={tabStyles.container}>
-      <View style={tabStyles.dockContainer}>
+      <GlassView 
+        style={tabStyles.dockContainer} 
+        intensity={60} 
+        borderRadius={32}
+      >
         <TabButton 
           name="home" 
           icon={Home} 
@@ -63,7 +71,7 @@ export const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
           isActive={activeTab === 'profile'} 
           onPress={() => onTabChange('profile')} 
         />
-      </View>
+      </GlassView>
     </View>
   );
 };
@@ -79,21 +87,12 @@ const tabStyles = StyleSheet.create({
   },
   dockContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.95)', // Slight glass effect
-    borderRadius: 32,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 10,
     justifyContent: 'space-between',
     width: 'auto',
     minWidth: 220,
     gap: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.6)',
   },
   tabButtonWrapper: {
     alignItems: 'center',
@@ -108,13 +107,5 @@ const tabStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
-  },
-  activeTabContainer: {
-    backgroundColor: '#ecfdf5',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
   },
 });

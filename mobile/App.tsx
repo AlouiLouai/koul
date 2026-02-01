@@ -1,7 +1,7 @@
 import React, { useState, Suspense, lazy, useCallback, useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView, Text, ActivityIndicator } from 'react-native';
-import { Utensils, Scan } from 'lucide-react-native';
+import { StyleSheet, View, SafeAreaView, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Utensils, Scan, Sun, Moon } from 'lucide-react-native';
 
 // --- Critical Imports (Loaded Immediately) ---
 import { AuthContainer } from './src/features/auth';
@@ -9,6 +9,9 @@ import { BottomTabs } from './src/components/BottomTabs';
 import { LogSuccessModal } from './src/components/LogSuccessModal';
 import { UpgradeScreen } from './src/components/UpgradeScreen';
 import { useStats } from './src/hooks/useStats';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { LiquidBackground } from './src/components/LiquidBackground';
+import { GlassView } from './src/components/GlassView';
 
 // --- Lazy Imports (Code Splitting for Performance) ---
 const HomeContainer = lazy(() => import('./src/features/home').then(module => ({ default: module.HomeContainer })));
@@ -20,36 +23,52 @@ type Tab = 'home' | 'stats' | 'profile';
 
 // --- Sub-Components (Memoized for Render Performance) ---
 
-const LoadingFallback = () => (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#10b981" />
-  </View>
-);
-
-const Header = React.memo(() => (
-  <View style={styles.header}>
-    <View style={styles.headerLeft}>
-      <View style={styles.headerLogoContainer}>
-        <View style={styles.logoOverlay}>
-          <Utensils size={14} color="#10b981" strokeWidth={3} />
-        </View>
-        <Scan size={26} color="#10b981" strokeWidth={2} />
-      </View>
-      <View>
-        <Text style={styles.headerTitle}>KOUL</Text>
-      </View>
+const LoadingFallback = () => {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color={colors.primary} />
     </View>
-  </View>
-));
+  );
+};
 
-// --- Main Application ---
+import { AppLogo } from './src/components/AppLogo';
 
-export default function App() {
+// ... (skipping some imports)
+
+const Header = React.memo(() => {
+  const { colors, mode, toggleTheme } = useTheme();
+  return (
+    <View style={styles.header}>
+      <View style={styles.headerLeft}>
+        <AppLogo size={40} borderRadius={12} intensity={50} />
+        <View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>KOUL</Text>
+        </View>
+      </View>
+      
+      <TouchableOpacity onPress={toggleTheme} activeOpacity={0.7}>
+        <GlassView style={styles.themeToggle} intensity={30} borderRadius={20}>
+          {mode === 'dark' ? (
+             <Sun size={20} color={colors.warning} fill={colors.warning} />
+          ) : (
+             <Moon size={20} color={colors.textSecondary} fill={colors.textSecondary} />
+          )}
+        </GlassView>
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+// --- Main Application Content ---
+
+const AppContent = () => {
   // Navigation State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showLogSuccess, setShowLogSuccess] = useState(false);
+  const { mode } = useTheme();
 
   // Global Data State (Shared across tabs)
   const { logMeal, dailyScans, incrementScans, isPro, upgradeToPro } = useStats();
@@ -129,53 +148,66 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
-      
-      {/* Main Content Area */}
-      <View style={styles.mainAppContainer}>
-        {/* Persistent Header */}
-        <View style={styles.contentPadding}>
-          <Header />
-        </View>
-
-        {/* Dynamic Content with Suspense */}
-        <Suspense fallback={<LoadingFallback />}>
-             <View style={styles.tabContentContainer}>
-               {renderContent}
-             </View>
-        </Suspense>
+    <LiquidBackground>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
         
-        {/* Navigation */}
-        <BottomTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)} />
-      </View>
+        {/* Main Content Area */}
+        <View style={styles.mainAppContainer}>
+          {/* Persistent Header */}
+          <View style={styles.contentPadding}>
+            <Header />
+          </View>
 
-      {/* Overlays / Modals */}
-      {showUpgrade && (
-        <View style={styles.absoluteContainer}>
-           <UpgradeScreen 
-              onClose={() => setShowUpgrade(false)} 
-              onUpgrade={handleUpgradeSuccess}
-           />
+          {/* Dynamic Content with Suspense */}
+          <Suspense fallback={<LoadingFallback />}>
+              <View style={styles.tabContentContainer}>
+                {renderContent}
+              </View>
+          </Suspense>
+          
+          {/* Navigation */}
+          <BottomTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)} />
         </View>
-      )}
 
-      <LogSuccessModal 
-        visible={showLogSuccess} 
-        onClose={handleCloseModal}
-        onViewStats={handleViewStats}
-      />
+        {/* Overlays / Modals */}
+        {showUpgrade && (
+          <View style={styles.absoluteContainer}>
+            <UpgradeScreen 
+                onClose={() => setShowUpgrade(false)} 
+                onUpgrade={handleUpgradeSuccess}
+            />
+          </View>
+        )}
 
-    </SafeAreaView>
+        <LogSuccessModal 
+          visible={showLogSuccess} 
+          onClose={handleCloseModal}
+          onViewStats={handleViewStats}
+        />
+
+      </SafeAreaView>
+    </LiquidBackground>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
 // --- Styles ---
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#FFFBF7',
+    // Background color removed in favor of LiquidBackground
   },
   mainAppContainer: {
     flex: 1,
@@ -215,17 +247,8 @@ const styles = StyleSheet.create({
   headerLogoContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#10b981',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#f0fdf4',
     position: 'relative',
   },
   logoOverlay: {
@@ -235,7 +258,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#27272a',
     letterSpacing: -0.5,
+  },
+  themeToggle: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

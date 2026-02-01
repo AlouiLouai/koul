@@ -1,41 +1,88 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Animated, Easing, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, Upload, Loader2 } from 'lucide-react-native';
+import { Camera, Scan, Sparkles, Aperture } from 'lucide-react-native';
+import { GlassView } from './GlassView';
+import { useTheme } from '../theme/ThemeContext';
 
 interface ImageUploadProps {
   onImageSelected: (uri: string, type: string, fileName: string) => void;
   isLoading?: boolean;
 }
 
+const { width } = Dimensions.get('window');
+
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading }) => {
   const [isPressing, setIsPressing] = useState(false);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const { colors, mode } = useTheme();
+  
+  // Animations
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const rotateSlow = useRef(new Animated.Value(0)).current;
+  const rotateFast = useRef(new Animated.Value(0)).current;
+  const scannerY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!isLoading) {
-      const pulse = Animated.loop(
-        Animated.sequence([
-          Animated.timing(scaleAnim, {
-            toValue: 1.02,
-            duration: 1500,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          Animated.timing(scaleAnim, {
-            toValue: 1,
-            duration: 1500,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ])
-      );
-      pulse.start();
-      return () => pulse.stop();
-    } else {
-      scaleAnim.setValue(1);
-    }
-  }, [isLoading]);
+    // 1. Idle Pulse (Breathing effect)
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 3000,
+          useNativeDriver: true,
+          easing: Easing.ease,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+          easing: Easing.ease,
+        }),
+      ])
+    ).start();
+
+    // 2. Slow Rotation (Outer Ring)
+    Animated.loop(
+      Animated.timing(rotateSlow, {
+        toValue: 1,
+        duration: 12000,
+        useNativeDriver: true,
+        easing: Easing.linear,
+      })
+    ).start();
+
+    // 3. Fast Rotation (Inner HUD)
+    Animated.loop(
+      Animated.timing(rotateFast, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+        easing: Easing.linear,
+      })
+    ).start();
+
+    // 4. Scanner Line
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scannerY, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+          easing: Easing.ease,
+        }),
+        Animated.timing(scannerY, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+          easing: Easing.ease,
+        })
+      ])
+    ).start();
+  }, []);
+
+  const spinSlow = rotateSlow.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const spinFast = rotateFast.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] }); // Counter-rotate
+  const scanTranslate = scannerY.interpolate({ inputRange: [0, 1], outputRange: [-60, 60] });
 
   const pickImage = async () => {
     try {
@@ -46,10 +93,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const type = asset.type === 'image' ? 'image/jpeg' : 'image/jpeg'; 
-        const fileName = asset.fileName || 'upload.jpg';
-        onImageSelected(asset.uri, type, fileName);
+        onImageSelected(result.assets[0].uri, 'image/jpeg', result.assets[0].fileName || 'upload.jpg');
       }
     } catch (error) {
       Alert.alert('Error', 'Could not pick image');
@@ -58,9 +102,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
 
   const takePhoto = async () => {
       try {
-        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-        if (permissionResult.granted === false) {
-            Alert.alert("Permission to access camera is required!");
+        const { granted } = await ImagePicker.requestCameraPermissionsAsync();
+        if (!granted) {
+            Alert.alert("Permission required", "Lazmek ta3tina permission l'camera.");
             return;
         }
 
@@ -70,10 +114,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
         });
 
         if (!result.canceled && result.assets && result.assets.length > 0) {
-            const asset = result.assets[0];
-            const type = 'image/jpeg';
-            const fileName = 'camera_capture.jpg';
-            onImageSelected(asset.uri, type, fileName);
+            onImageSelected(result.assets[0].uri, 'image/jpeg', 'camera_capture.jpg');
         }
       } catch (error) {
           Alert.alert('Error', 'Could not take photo');
@@ -82,57 +123,113 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
 
   const handlePress = () => {
       Alert.alert(
-          "Ekhtar Taswira",
-          "Mnin tحب tjibha?",
+          "Sawar Sahnek 📸",
+          "Kifech t7eb t3adiha?",
           [
-              { text: "Kamera", onPress: takePhoto },
-              { text: "Galerie", onPress: pickImage },
+              { text: "Camera (Sawar)", onPress: takePhoto },
+              { text: "Galerie (Telechargi)", onPress: pickImage },
               { text: "Batel", style: "cancel" }
           ]
       );
   }
 
-  const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
   return (
     <View style={styles.container}>
-      <AnimatedTouchableOpacity
+      <TouchableOpacity
         onPress={handlePress}
         disabled={isLoading}
-        activeOpacity={0.9}
+        activeOpacity={1}
         onPressIn={() => setIsPressing(true)}
         onPressOut={() => setIsPressing(false)}
-        style={[
-          styles.uploadBox,
-          isPressing && styles.uploadBoxPressed,
-          isLoading && styles.uploadBoxLoading,
-          { transform: [{ scale: isPressing ? 0.98 : scaleAnim }] }
-        ]}
       >
-        {/* Decorative elements */}
-        <View style={styles.decoTopRight} />
-        <View style={styles.decoBottomLeft} />
+        <GlassView 
+            style={[styles.lensContainer, { borderColor: colors.glassBorder }]}
+            intensity={90}
+            borderRadius={48}
+            noBorder
+        >
+            {/* --- LAYERS OF HOLOGRAPHIC LENS --- */}
 
-        <View style={[
-          styles.iconContainer,
-          isPressing && styles.iconContainerPressed
-        ]}>
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#10b981" />
-          ) : (
-            <Camera size={32} color={isPressing ? "#fff" : "#a1a1aa"} strokeWidth={1.5} />
-          )}
-        </View>
+            {/* 1. Base Grid (Static Background) */}
+            <View style={styles.gridOverlay}>
+                <View style={[styles.gridLineVertical, { backgroundColor: colors.textSecondary + '10' }]} />
+                <View style={[styles.gridLineHorizontal, { backgroundColor: colors.textSecondary + '10' }]} />
+            </View>
 
-        <View style={styles.textContainer}>
-          <Text style={styles.titleText}>
-            {isLoading ? "Ka3ed Y7allel..." : "Enzel Bach Tsawer"}
-          </Text>
-          <Text style={styles.subtitleText}>
-            {isLoading ? "Yhadher fel AI..." : "Sawar wala telechargi"}
-          </Text>
-        </View>
-      </AnimatedTouchableOpacity>
+            {/* 2. Rotating Outer HUD Ring (Dashed) */}
+            <Animated.View style={[
+                styles.hudRingOuter, 
+                { 
+                    borderColor: colors.textSecondary,
+                    transform: [{ rotate: spinSlow }, { scale: pulseAnim }],
+                    opacity: 0.15
+                }
+            ]} />
+
+            {/* 3. Rotating Inner HUD Ring (Techy) */}
+            <Animated.View style={[
+                styles.hudRingInner, 
+                { 
+                    borderTopColor: colors.primary,
+                    borderBottomColor: colors.primary,
+                    borderLeftColor: 'transparent',
+                    borderRightColor: 'transparent',
+                    transform: [{ rotate: spinFast }],
+                    opacity: isLoading ? 0.8 : 0.4
+                }
+            ]} />
+
+            {/* 4. Scanning Laser Line */}
+            <Animated.View style={[
+                styles.scanLine,
+                {
+                    backgroundColor: colors.primary,
+                    transform: [{ translateY: scanTranslate }],
+                    opacity: isLoading ? 0 : 0.6 // Hide scanner when loading
+                }
+            ]} />
+
+            {/* 5. Main Aperture Button (Center) */}
+            <Animated.View style={[
+                styles.shutterBtn,
+                { 
+                    backgroundColor: isPressing ? colors.primary : colors.glass,
+                    borderColor: colors.glassBorder,
+                    transform: [{ scale: isPressing ? 0.9 : 1 }],
+                    shadowColor: colors.primary,
+                }
+            ]}>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color={colors.primary} />
+                ) : (
+                    <View style={styles.lensReflection}>
+                        <Camera size={36} color={isPressing ? '#fff' : colors.text} strokeWidth={1.5} />
+                    </View>
+                )}
+            </Animated.View>
+
+            {/* 6. Context Text (Right Side) */}
+            <View style={styles.infoContainer}>
+                <View style={[styles.badge, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '40' }]}>
+                    <Sparkles size={10} color={colors.primary} />
+                    <Text style={[styles.badgeText, { color: colors.primary }]}>AI VISION v2.0</Text>
+                </View>
+                <Text style={[styles.mainText, { color: colors.text }]}>
+                    {isLoading ? "ANALYSING..." : "SAWAR SAHNEK"}
+                </Text>
+                <Text style={[styles.subText, { color: colors.textSecondary }]}>
+                    {isLoading ? "Jarry el t7lil..." : "Toucher la lentille"}
+                </Text>
+            </View>
+
+            {/* 7. Corner Brackets (HUD Look) */}
+            <View style={[styles.corner, styles.tl, { borderColor: colors.primary }]} />
+            <View style={[styles.corner, styles.tr, { borderColor: colors.primary }]} />
+            <View style={[styles.corner, styles.bl, { borderColor: colors.primary }]} />
+            <View style={[styles.corner, styles.br, { borderColor: colors.primary }]} />
+
+        </GlassView>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -140,86 +237,139 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 12,
   },
-  uploadBox: {
-    width: '100%',
-    aspectRatio: 4 / 3,
-    borderRadius: 32,
-    borderWidth: 3,
-    borderColor: '#e4e4e7', // zinc-200
-    borderStyle: 'dashed',
-    backgroundColor: '#ffffff',
+  lensContainer: {
+    height: 160,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 24,
     position: 'relative',
     overflow: 'hidden',
+    borderWidth: 1,
   },
-  uploadBoxPressed: {
-    borderColor: '#34d399', // emerald-400
-    backgroundColor: 'rgba(16, 185, 129, 0.05)', // emerald-50/10
-  },
-  uploadBoxLoading: {
-    backgroundColor: '#fafafa', // zinc-50
-    opacity: 0.8,
-  },
-  decoTopRight: {
+  // HUD Elements
+  hudRingOuter: {
     position: 'absolute',
-    top: -40,
-    right: -40,
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-    backgroundColor: 'rgba(16, 185, 129, 0.05)', // emerald-500/5
+    left: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    zIndex: 0,
   },
-  decoBottomLeft: {
+  hudRingInner: {
     position: 'absolute',
-    bottom: -32,
-    left: -32,
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: 'rgba(249, 115, 22, 0.05)', // orange-500/5
+    left: -10,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 4,
+    zIndex: 1,
   },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
-    backgroundColor: '#fafafa', // zinc-50
+  gridOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 0,
+  },
+  gridLineVertical: {
+    width: 1,
+    height: '100%',
+    position: 'absolute',
+  },
+  gridLineHorizontal: {
+    width: '100%',
+    height: 1,
+    position: 'absolute',
+  },
+  scanLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 2,
+    zIndex: 2,
+    shadowColor: '#fff',
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  // Shutter
+  shutterBtn: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-        width: 0,
-        height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 1.41,
-    elevation: 2,
+    borderWidth: 1,
+    zIndex: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
   },
-  iconContainerPressed: {
-    backgroundColor: '#10b981', // emerald-500
-    transform: [{ rotate: '3deg' }],
-  },
-  textContainer: {
+  lensReflection: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 36,
     alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  // Text
+  infoContainer: {
+    flex: 1,
+    paddingLeft: 40, // Space for the rings
+    justifyContent: 'center',
     zIndex: 10,
   },
-  titleText: {
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  mainText: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#18181b', // zinc-900
     letterSpacing: -0.5,
+    marginBottom: 4,
   },
-  subtitleText: {
+  subText: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#a1a1aa', // zinc-400
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 8,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
+  // Corners
+  corner: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderWidth: 2,
+    zIndex: 20,
+    opacity: 0.5,
+  },
+  tl: { top: 16, left: 16, borderRightWidth: 0, borderBottomWidth: 0 },
+  tr: { top: 16, right: 16, borderLeftWidth: 0, borderBottomWidth: 0 },
+  bl: { bottom: 16, left: 16, borderRightWidth: 0, borderTopWidth: 0 },
+  br: { bottom: 16, right: 16, borderLeftWidth: 0, borderTopWidth: 0 },
 });
 
 export default ImageUpload;
