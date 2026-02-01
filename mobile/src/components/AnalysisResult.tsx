@@ -65,7 +65,7 @@ const AnalysisResult: React.FC<AnalysisResultProps> = ({ data }) => {
     if (score >= 5) return '#f59e0b';
     return '#ef4444';
   };
-  const verdictColor = getScoreTheme(data.health_score);
+  const verdictColor = getScoreTheme(data.health_score ?? 0);
 
   // Logic for "Mokli Meter"
   const isHighFat = data.totals.fat > 20;

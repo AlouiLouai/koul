@@ -41,7 +41,7 @@ const BarChart = ({ data, labels, activeIndex }: { data: number[], labels: strin
   
   return (
     <View style={styles.chartContainer}>
-      <View style={[styles.targetLine, { bottom: (TARGET_CALS / max) * 100 + '%' }]} />
+      <View style={[styles.targetLine, { bottom: ((TARGET_CALS / max) * 100 + '%') as any }]} />
       <View style={styles.chartRow}>
         {data.map((val, i) => {
           const height = (val / max) * 100;

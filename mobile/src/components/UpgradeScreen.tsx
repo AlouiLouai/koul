@@ -6,9 +6,10 @@ const { width, height: screenHeight } = Dimensions.get('window');
 
 interface UpgradeScreenProps {
   onClose: () => void;
+  onUpgrade: () => void;
 }
 
-export const UpgradeScreen = ({ onClose }: UpgradeScreenProps) => {
+export const UpgradeScreen = ({ onClose, onUpgrade }: UpgradeScreenProps) => {
   const slideUp = useRef(new Animated.Value(screenHeight)).current;
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export const UpgradeScreen = ({ onClose }: UpgradeScreenProps) => {
               <Text style={styles.cancelAnytime}>Tnajem tbatel wa9t ma t7eb</Text>
            </View>
 
-           <TouchableOpacity style={styles.upgradeBtn} onPress={() => {}}>
+           <TouchableOpacity style={styles.upgradeBtn} onPress={onUpgrade}>
               <Text style={styles.upgradeBtnText}>Abda 7 Jours Gratuit</Text>
            </TouchableOpacity>
            

@@ -4,13 +4,13 @@ import { ProfileUI } from './ProfileUI';
 interface ProfileContainerProps {
   onLogout: () => void;
   onShowUpgrade: () => void;
+  isPro: boolean;
 }
 
-export const ProfileContainer = ({ onLogout, onShowUpgrade }: ProfileContainerProps) => {
+export const ProfileContainer = ({ onLogout, onShowUpgrade, isPro }: ProfileContainerProps) => {
   // Logic: In a real app, this would come from a useUser() hook
   const [user, setUser] = useState({
     name: 'John Doe',
-    isPro: false, // Set to false to show the Sales Pitch
   });
 
   return (
@@ -18,7 +18,7 @@ export const ProfileContainer = ({ onLogout, onShowUpgrade }: ProfileContainerPr
       onLogout={onLogout}
       onShowUpgrade={onShowUpgrade}
       userName={user.name}
-      isPro={user.isPro}
+      isPro={isPro}
     />
   );
 };
