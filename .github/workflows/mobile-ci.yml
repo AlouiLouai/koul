@@ -7,10 +7,9 @@ on:
       - 'mobile/**'
       - '.github/workflows/mobile-ci.yml'
   push:
-    branches: [ main ]
-    paths:
-      - 'mobile/**'
-      - '.github/workflows/mobile-ci.yml'
+    tags:
+      - '*'
+  workflow_dispatch:
 
 jobs:
   validate:
