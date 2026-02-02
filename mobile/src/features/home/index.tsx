@@ -10,6 +10,8 @@ interface HomeContainerProps {
   incrementScans: () => void;
   isPro: boolean;
   onShowUpgrade: () => void;
+  isGuest?: boolean;
+  onTriggerAuth?: () => void;
 }
 
 export const HomeContainer = ({ 
@@ -18,7 +20,9 @@ export const HomeContainer = ({
   dailyScans, 
   incrementScans, 
   isPro, 
-  onShowUpgrade 
+  onShowUpgrade,
+  isGuest = false,
+  onTriggerAuth
 }: HomeContainerProps) => {
   const [showQuotaModal, setShowQuotaModal] = useState(false);
 
@@ -34,7 +38,13 @@ export const HomeContainer = ({
 
   // Intercept the image selection to check limits
   const handleImageSelected = useCallback((uri: string, type: string, fileName: string) => {
-    // FREEMIUM GUARD
+    // 1. GUEST GUARD (Lazy Auth)
+    if (isGuest) {
+      if (onTriggerAuth) onTriggerAuth();
+      return;
+    }
+
+    // 2. FREEMIUM GUARD
     if (!isPro && dailyScans >= 3) {
       setShowQuotaModal(true);
       return;
@@ -43,7 +53,7 @@ export const HomeContainer = ({
     // Proceed if allowed
     incrementScans();
     analyzeImage(uri, type, fileName);
-  }, [isPro, dailyScans, incrementScans, analyzeImage]);
+  }, [isPro, dailyScans, incrementScans, analyzeImage, isGuest, onTriggerAuth]);
 
   // Handlers
   const handleLogMeal = useCallback(() => {

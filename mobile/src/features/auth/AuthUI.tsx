@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   ScrollView
 } from 'react-native';
-import { Utensils, ArrowRight, Sparkles } from 'lucide-react-native';
+import { Utensils, ArrowRight, Sparkles, Leaf } from 'lucide-react-native';
 import { LiquidBackground } from '../../components/LiquidBackground';
 import { GlassView } from '../../components/GlassView';
 import { AppLogo } from '../../components/AppLogo';
@@ -37,14 +37,14 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
     Animated.timing(animEntrance, {
       toValue: 1,
       duration: 1500,
-      useNativeDriver: false, // Animating layout properties later? No, mostly opacity/translate.
+      useNativeDriver: false,
       easing: Easing.out(Easing.exp),
     }).start();
 
     // Floating Effect
     Animated.loop(
       Animated.sequence([
-        Animated.timing(floatAnim, { toValue: -15, duration: 2500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(floatAnim, { toValue: -10, duration: 2500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
         Animated.timing(floatAnim, { toValue: 0, duration: 2500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
       ])
     ).start();
@@ -53,61 +53,38 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
     Animated.loop(
       Animated.parallel([
           Animated.sequence([
-              Animated.timing(orbScale, { toValue: 1.3, duration: 5000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
-              Animated.timing(orbScale, { toValue: 1, duration: 5000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
+              Animated.timing(orbScale, { toValue: 1.2, duration: 6000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+              Animated.timing(orbScale, { toValue: 1, duration: 6000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
           ]),
-          Animated.timing(orbRotate, { toValue: 1, duration: 30000, useNativeDriver: true, easing: Easing.linear })
+          Animated.timing(orbRotate, { toValue: 1, duration: 40000, useNativeDriver: true, easing: Easing.linear })
       ])
     ).start();
   }, []);
 
   const spin = orbRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
-  const logoY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [100, 0] });
-  const formY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
+  const logoY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [50, 0] });
+  const formY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [100, 0] });
   const formOpacity = animEntrance.interpolate({ inputRange: [0.5, 1], outputRange: [0, 1] });
 
   return (
     <LiquidBackground>
       <View style={styles.container}>
         
-        {/* Living Background Orb */}
+        {/* Living Background Orb - Matching Main Screen Blue */}
         <Animated.View style={[
             styles.orb, 
             { 
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary, 
                 transform: [{ scale: orbScale }, { rotate: spin }],
-                opacity: 0.12
+                opacity: 0.1
             } 
         ]} />
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             
-            {/* Header Section */}
-            <Animated.View style={[
-              styles.logoContainer, 
-              { 
-                opacity: animEntrance,
-                transform: [{ translateY: Animated.add(logoY, floatAnim) }]
-              }
-            ]}>
-              <View style={styles.logoWrapper}>
-                 <Animated.View style={[styles.glowRing, { borderColor: colors.primary, transform: [{ rotate: spin }] }]} />
-                 <AppLogo size={100} borderRadius={50} intensity={40} />
-              </View>
-              
-              <View style={styles.titleWrapper}>
-                <Text style={[styles.appTitle, { color: colors.text }]}>KOUL</Text>
-                <View style={[styles.dot, { backgroundColor: colors.primary }]} />
-                <Text style={[styles.appYear, { color: colors.primary }]}>2026</Text>
-              </View>
+            <View style={{ height: 80 }} />
 
-              <GlassView style={styles.tagline} intensity={20} borderRadius={20}>
-                  <Text style={[styles.taglineText, { color: colors.text }]}>THE FUTURE OF HEALTH</Text>
-              </GlassView>
-            </Animated.View>
-
-            {/* Combined Login Section */}
             <Animated.View style={[
               styles.formContainer,
               {
@@ -116,6 +93,11 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
               }
             ]}>
               <View style={styles.welcomeText}>
+                {/* Centered Inverted Logo - Refined Size */}
+                <View style={styles.brandingHeader}>
+                   <AppLogo size={64} borderRadius={20} inverted />
+                </View>
+
                 <Text style={[styles.headerText, { color: colors.text }]}>Mar7ba Bik.</Text>
                 <Text style={[styles.subHeaderText, { color: colors.textSecondary }]}>
                    Sawar sahnek, Erwi 3rougek.
@@ -126,24 +108,35 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
                 onPress={onGoogleLogin}
                 disabled={isLoading}
                 activeOpacity={0.8}
+                style={{ alignSelf: 'center' }}
               >
-                <GlassView style={[styles.googleBtn, { backgroundColor: colors.text }]} intensity={20} borderRadius={24}>
+                <GlassView style={[styles.googleBtn, { backgroundColor: colors.text, width: 280 }]} intensity={20} borderRadius={32}>
                     {isLoading ? (
-                      <ActivityIndicator color={colors.background[0]} />
+                      <View style={styles.loadingWrapper}>
+                        <ActivityIndicator color={colors.background[0]} size="small" />
+                        <Text style={[styles.btnText, { color: colors.background[0], flex: 0 }]}>Lahtha...</Text>
+                      </View>
                     ) : (
                       <>
                         <View style={styles.iconCircle}>
                            <Text style={{fontSize: 20, fontWeight: 'bold', color: colors.text}}>G</Text>
                         </View>
-                        <Text style={[styles.btnText, { color: colors.background[0] }]}>Login with Google</Text>
+                        <Text style={[styles.btnText, { color: colors.background[0] }]}>Connecti b' Google</Text>
                         <ArrowRight size={20} color={colors.background[0]} />
                       </>
                     )}
                 </GlassView>
               </TouchableOpacity>
               
+              <View style={styles.healthTagline}>
+                  <Sparkles size={14} color={colors.primary} />
+                  <Text style={[styles.footerText, { color: colors.textSecondary, marginTop: 0 }]}>
+                    KOUL MLI7, T3ICH MLI7
+                  </Text>
+              </View>
+
               <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-                © 2026 KOUL AI • Tunisia
+                © 2026 KOUL AI • Tounes
               </Text>
             </Animated.View>
 
@@ -171,95 +164,51 @@ const styles = StyleSheet.create({
       borderRadius: width * 0.7,
       zIndex: 0,
   },
-  logoContainer: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 60,
-  },
-  logoWrapper: {
-      position: 'relative',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 20,
-  },
-  logoGlass: {
-      width: 100,
-      height: 100,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.5)',
-  },
-  glowRing: {
-      position: 'absolute',
-      width: 140,
-      height: 140,
-      borderRadius: 70,
-      borderWidth: 2,
-      borderStyle: 'dashed',
-      opacity: 0.4,
-  },
-  titleWrapper: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-  },
-  appTitle: {
-      fontSize: 72,
-      fontWeight: '900',
-      letterSpacing: -4,
-      lineHeight: 80,
-  },
-  dot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: '#2563eb',
-      marginTop: 50,
-      marginHorizontal: 4,
-  },
-  appYear: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginTop: 12,
-      letterSpacing: 2,
-  },
-  tagline: {
-      paddingHorizontal: 20,
-      paddingVertical: 8,
-      marginTop: 10,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.2)',
-  },
-  taglineText: {
-      fontSize: 10,
-      fontWeight: '900',
-      letterSpacing: 4,
-  },
   formContainer: {
       paddingHorizontal: 24,
       width: '100%',
   },
-  loginCard: {
-      padding: 32,
-      gap: 32,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.8)',
+  brandingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 24,
+  },
+  titleWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
+  appTitle: {
+      fontSize: 32,
+      fontWeight: '900',
+      letterSpacing: -1,
+  },
+  leafIcon: {
+      marginLeft: -2,
+      marginTop: -10,
   },
   welcomeText: {
-      gap: 8,
+      gap: 4,
       marginBottom: 32,
       alignItems: 'center',
   },
   headerText: {
       fontSize: 36,
-      fontWeight: '900',
-      letterSpacing: -1,
+      fontWeight: '800',
+      letterSpacing: -0.5,
   },
   subHeaderText: {
       fontSize: 16,
       fontWeight: '600',
       opacity: 0.7,
+  },
+  healthTagline: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      marginTop: 32,
   },
   googleBtn: {
       flexDirection: 'row',
@@ -273,6 +222,13 @@ const styles = StyleSheet.create({
       shadowRadius: 20,
       elevation: 10,
   },
+  loadingWrapper: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+  },
   iconCircle: {
       width: 48,
       height: 48,
@@ -283,14 +239,14 @@ const styles = StyleSheet.create({
   },
   btnText: {
       fontSize: 17,
-      fontWeight: '800',
+      fontWeight: '700',
       flex: 1,
   },
   footerText: {
       fontSize: 11,
       textAlign: 'center',
       opacity: 0.5,
-      fontWeight: '700',
+      fontWeight: '600',
       marginTop: 40,
   },
 });

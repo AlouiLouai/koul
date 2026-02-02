@@ -1,10 +1,11 @@
 import React, { useState, Suspense, lazy, useCallback, useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, SafeAreaView, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { Utensils, Scan, Sun, Moon } from 'lucide-react-native';
+import { Sun, Moon } from 'lucide-react-native';
 
-// --- Critical Imports (Loaded Immediately) ---
+// --- Critical Imports ---
 import { AuthContainer } from './src/features/auth';
+import { SplashScreen } from './src/components/SplashScreen';
 import { BottomTabs } from './src/components/BottomTabs';
 import { LogSuccessModal } from './src/components/LogSuccessModal';
 import { UpgradeScreen } from './src/components/UpgradeScreen';
@@ -12,16 +13,14 @@ import { useStats } from './src/hooks/useStats';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { LiquidBackground } from './src/components/LiquidBackground';
 import { GlassView } from './src/components/GlassView';
+import { AppLogo } from './src/components/AppLogo';
 
-// --- Lazy Imports (Code Splitting for Performance) ---
+// --- Lazy Imports ---
 const HomeContainer = lazy(() => import('./src/features/home').then(module => ({ default: module.HomeContainer })));
 const StatsContainer = lazy(() => import('./src/features/stats').then(module => ({ default: module.StatsContainer })));
 const ProfileContainer = lazy(() => import('./src/features/profile').then(module => ({ default: module.ProfileContainer })));
 
-// --- Types ---
 type Tab = 'home' | 'stats' | 'profile';
-
-// --- Sub-Components (Memoized for Render Performance) ---
 
 const LoadingFallback = () => {
   const { colors } = useTheme();
@@ -32,51 +31,74 @@ const LoadingFallback = () => {
   );
 };
 
-import { AppLogo } from './src/components/AppLogo';
+import { User, LogIn } from 'lucide-react-native';
 
-// ... (skipping some imports)
+// ... (previous imports)
 
-const Header = React.memo(() => {
+// Updated Header Component
+const Header = React.memo(({ isAuthenticated, onLogin }: { isAuthenticated: boolean; onLogin: () => void }) => {
   const { colors, mode, toggleTheme } = useTheme();
   return (
     <View style={styles.header}>
+      {/* Left: Brand */}
       <View style={styles.headerLeft}>
-        <AppLogo size={40} borderRadius={12} intensity={50} />
+        <AppLogo size={36} borderRadius={10} intensity={50} />
         <View>
           <Text style={[styles.headerTitle, { color: colors.text }]}>KOUL</Text>
         </View>
       </View>
       
-      <TouchableOpacity onPress={toggleTheme} activeOpacity={0.7}>
-        <GlassView style={styles.themeToggle} intensity={30} borderRadius={20}>
-          {mode === 'dark' ? (
-             <Sun size={20} color={colors.warning} fill={colors.warning} />
-          ) : (
-             <Moon size={20} color={colors.textSecondary} fill={colors.textSecondary} />
-          )}
-        </GlassView>
-      </TouchableOpacity>
+      {/* Right: Actions */}
+      <View style={styles.headerRight}>
+        <TouchableOpacity onPress={toggleTheme} activeOpacity={0.7} style={{ marginRight: 8 }}>
+            <GlassView style={styles.iconBtn} intensity={20} borderRadius={20}>
+            {mode === 'dark' ? (
+                <Sun size={18} color={colors.warning} fill={colors.warning} />
+            ) : (
+                <Moon size={18} color={colors.textSecondary} fill={colors.textSecondary} />
+            )}
+            </GlassView>
+        </TouchableOpacity>
+
+        {isAuthenticated ? (
+            // Authenticated: User Avatar
+            <GlassView style={styles.userAvatar} intensity={30} borderRadius={20}>
+                <Text style={{ fontWeight: 'bold', color: colors.primary }}>U</Text>
+            </GlassView>
+        ) : (
+            // Guest: Smart "Connect" Call-to-Action
+            <TouchableOpacity onPress={onLogin} activeOpacity={0.8}>
+                <GlassView style={[styles.connectBtn, { backgroundColor: colors.primary }]} intensity={80} borderRadius={20}>
+                    <User size={14} color="#fff" />
+                    <Text style={styles.connectText}>Connecti</Text>
+                </GlassView>
+            </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 });
 
-// --- Main Application Content ---
-
 const AppContent = () => {
-  // Navigation State
+  // Navigation & Splash State
+  const [showSplash, setShowSplash] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('home');
+  
+  // Modals
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showLogSuccess, setShowLogSuccess] = useState(false);
-  const { mode } = useTheme();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Global Data State (Shared across tabs)
+  // Global Data
   const { logMeal, dailyScans, incrementScans, isPro, upgradeToPro } = useStats();
+  const { mode } = useTheme();
 
   // --- Handlers ---
   
   const handleAuthenticated = useCallback((user: any) => {
     setIsAuthenticated(true);
+    setShowLoginModal(false);
   }, []);
 
   const handleLogout = useCallback(() => {
@@ -84,27 +106,13 @@ const AppContent = () => {
     setActiveTab('home');
   }, []);
 
+  const handleTriggerAuth = useCallback(() => {
+    setShowLoginModal(true);
+  }, []);
+
   const handleLogMeal = useCallback((totals: any) => {
     logMeal(totals);
   }, [logMeal]);
-
-  const handleShowLogSuccess = useCallback(() => {
-    setShowLogSuccess(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setShowLogSuccess(false);
-  }, []);
-
-  const handleViewStats = useCallback(() => {
-    setShowLogSuccess(false);
-    setActiveTab('stats');
-  }, []);
-
-  const handleUpgradeSuccess = useCallback(() => {
-    upgradeToPro();
-    // Keep the upgrade screen open for a moment to show success message
-  }, [upgradeToPro]);
 
   // --- Render Helpers ---
 
@@ -114,11 +122,13 @@ const AppContent = () => {
         return (
           <HomeContainer 
              onLogMeal={handleLogMeal}
-             onShowLogSuccess={handleShowLogSuccess}
+             onShowLogSuccess={() => setShowLogSuccess(true)}
              dailyScans={dailyScans}
              incrementScans={incrementScans}
              isPro={isPro}
              onShowUpgrade={() => setShowUpgrade(true)}
+             isGuest={!isAuthenticated}
+             onTriggerAuth={handleTriggerAuth}
           />
         );
       case 'stats':
@@ -139,12 +149,10 @@ const AppContent = () => {
       default:
         return null;
     }
-  }, [activeTab, handleLogMeal, handleShowLogSuccess, handleLogout, dailyScans, incrementScans, isPro]);
+  }, [activeTab, isAuthenticated, handleLogMeal, handleTriggerAuth, dailyScans, incrementScans, isPro]);
 
-  // --- Main Render ---
-
-  if (!isAuthenticated) {
-    return <AuthContainer onAuthenticated={handleAuthenticated} />;
+  if (showSplash) {
+      return <SplashScreen onFinish={() => setShowSplash(false)} />;
   }
 
   return (
@@ -152,38 +160,43 @@ const AppContent = () => {
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
         
-        {/* Main Content Area */}
+        {/* Main App */}
         <View style={styles.mainAppContainer}>
-          {/* Persistent Header */}
           <View style={styles.contentPadding}>
-            <Header />
+            <Header isAuthenticated={isAuthenticated} onLogin={handleTriggerAuth} />
           </View>
 
-          {/* Dynamic Content with Suspense */}
           <Suspense fallback={<LoadingFallback />}>
               <View style={styles.tabContentContainer}>
                 {renderContent}
               </View>
           </Suspense>
           
-          {/* Navigation */}
           <BottomTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)} />
         </View>
 
-        {/* Overlays / Modals */}
+        {/* Modals & Overlays */}
         {showUpgrade && (
-          <View style={styles.absoluteContainer}>
+          <View style={styles.absoluteContainer} pointerEvents="box-none">
             <UpgradeScreen 
                 onClose={() => setShowUpgrade(false)} 
-                onUpgrade={handleUpgradeSuccess}
+                onUpgrade={upgradeToPro}
             />
           </View>
         )}
 
         <LogSuccessModal 
           visible={showLogSuccess} 
-          onClose={handleCloseModal}
-          onViewStats={handleViewStats}
+          onClose={() => setShowLogSuccess(false)}
+          onViewStats={() => { setShowLogSuccess(false); setActiveTab('stats'); }}
+        />
+
+        {/* The Lazy Auth Modal */}
+        <AuthContainer 
+           onAuthenticated={handleAuthenticated} 
+           isModal={true} 
+           visible={showLoginModal} 
+           onClose={() => setShowLoginModal(false)}
         />
 
       </SafeAreaView>
@@ -243,6 +256,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
+  iconBtn: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+  userAvatar: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+  connectBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      gap: 6,
+  },
+  connectText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 13,
   },
   headerLogoContainer: {
     width: 40,

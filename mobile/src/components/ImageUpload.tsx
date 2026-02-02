@@ -8,11 +8,12 @@ import { useTheme } from '../theme/ThemeContext';
 interface ImageUploadProps {
   onImageSelected: (uri: string, type: string, fileName: string) => void;
   isLoading?: boolean;
+  onPressStart?: () => void;
 }
 
 const { width } = Dimensions.get('window');
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, onPressStart }) => {
   const [isPressing, setIsPressing] = useState(false);
   const { colors, mode } = useTheme();
   
@@ -79,49 +80,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
       ])
     ).start();
   }, []);
-
-  const spinSlow = rotateSlow.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-  const spinFast = rotateFast.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] }); // Counter-rotate
-  const scanTranslate = scannerY.interpolate({ inputRange: [0, 1], outputRange: [-60, 60] });
-
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        onImageSelected(result.assets[0].uri, 'image/jpeg', result.assets[0].fileName || 'upload.jpg');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Could not pick image');
-    }
-  };
-
-  const takePhoto = async () => {
-      try {
-        const { granted } = await ImagePicker.requestCameraPermissionsAsync();
-        if (!granted) {
-            Alert.alert("Permission required", "Lazmek ta3tina permission l'camera.");
-            return;
-        }
-
-        const result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            quality: 0.8,
-        });
-
-        if (!result.canceled && result.assets && result.assets.length > 0) {
-            onImageSelected(result.assets[0].uri, 'image/jpeg', 'camera_capture.jpg');
-        }
-      } catch (error) {
-          Alert.alert('Error', 'Could not take photo');
-      }
-  }
-
+  
   const handlePress = () => {
+      if (onPressStart) {
+          onPressStart();
+          return;
+      }
+      // Default Fallback
       Alert.alert(
           "Sawar Sahnek 📸",
           "Kifech t7eb t3adiha?",
@@ -132,6 +97,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
           ]
       );
   }
+
+  const spinSlow = rotateSlow.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const spinFast = rotateFast.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
+  const scanTranslate = scannerY.interpolate({ inputRange: [0, 1], outputRange: [-60, 60] });
 
   return (
     <View style={styles.container}>
@@ -210,15 +179,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading })
 
             {/* 6. Context Text (Right Side) */}
             <View style={styles.infoContainer}>
-                <View style={[styles.badge, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '40' }]}>
-                    <Sparkles size={10} color={colors.primary} />
-                    <Text style={[styles.badgeText, { color: colors.primary }]}>AI VISION v2.0</Text>
-                </View>
+                {/* Removed AI Badge per request */}
                 <Text style={[styles.mainText, { color: colors.text }]}>
-                    {isLoading ? "ANALYSING..." : "SAWAR SAHNEK"}
+                    {isLoading ? "Jarry el t7lil..." : "Sawrelna sa7nek"}
                 </Text>
                 <Text style={[styles.subText, { color: colors.textSecondary }]}>
-                    {isLoading ? "Jarry el t7lil..." : "Toucher la lentille"}
+                    {isLoading ? "Moments..." : "Khanchoufou (Click)"}
                 </Text>
             </View>
 
@@ -256,20 +222,20 @@ const styles = StyleSheet.create({
   // HUD Elements
   hudRingOuter: {
     position: 'absolute',
-    left: -40,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    left: -20,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
     borderWidth: 2,
     borderStyle: 'dashed',
     zIndex: 0,
   },
   hudRingInner: {
     position: 'absolute',
-    left: -10,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    left: 5,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     borderWidth: 4,
     zIndex: 1,
   },
@@ -302,9 +268,9 @@ const styles = StyleSheet.create({
   },
   // Shutter
   shutterBtn: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -317,7 +283,7 @@ const styles = StyleSheet.create({
   lensReflection: {
     width: '100%',
     height: '100%',
-    borderRadius: 36,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

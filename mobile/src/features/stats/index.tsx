@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Lock } from 'lucide-react-native';
 import { StatsUI } from './StatsUI';
+import { useTheme } from '../../theme/ThemeContext';
 
 // --- Logic / Mock Data ---
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -15,13 +16,16 @@ const HISTORY_ITEMS = [
   { date: 'Sat, 24 Jan', cals: 2200, p: 175, score: 8.9, status: 'On Track' },
 ];
 
+export type TimeFrame = 'Week' | 'Month' | '3M' | '6M' | 'Year';
+
 interface StatsContainerProps {
   isPro: boolean;
   onShowUpgrade: () => void;
 }
 
 export const StatsContainer = ({ isPro, onShowUpgrade }: StatsContainerProps) => {
-  const [timeframe, setTimeframe] = useState<'Week' | 'Month'>('Week');
+  const { colors } = useTheme();
+  const [timeframe, setTimeframe] = useState<TimeFrame>('Week');
   const [selectedDay, setSelectedDay] = useState(6);
 
   // Locked State
@@ -33,21 +37,21 @@ export const StatsContainer = ({ isPro, onShowUpgrade }: StatsContainerProps) =>
               timeframe={timeframe}
               onTimeframeChange={setTimeframe}
               selectedDayIndex={selectedDay}
-              weeklyData={WEEKLY_DATA} // Mock data visible but blurred/covered
+              weeklyData={WEEKLY_DATA} 
               daysLabels={DAYS.map(d => d[0])}
               historyItems={HISTORY_ITEMS}
            />
-           <View style={styles.overlay} />
+           <View style={[styles.overlay, { backgroundColor: colors.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }]} />
         </View>
         
-        <View style={styles.lockCard}>
-           <View style={styles.iconBg}>
-              <Lock size={32} color="#f59e0b" fill="#f59e0b" />
+        <View style={[styles.lockCard, { backgroundColor: colors.background[1] }]}>
+           <View style={[styles.iconBg, { backgroundColor: colors.warning + '20', borderColor: colors.warning }]}>
+              <Lock size={32} color={colors.warning} fill={colors.warning} />
            </View>
-           <Text style={styles.lockTitle}>Statistiques Msekra</Text>
-           <Text style={styles.lockDesc}>Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay.</Text>
-           <TouchableOpacity style={styles.upgradeBtn} onPress={onShowUpgrade}>
-              <Text style={styles.upgradeBtnText}>Walli Premium (5 TND)</Text>
+           <Text style={[styles.lockTitle, { color: colors.text }]}>Statistiques Msekra</Text>
+           <Text style={[styles.lockDesc, { color: colors.textSecondary }]}>Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay.</Text>
+           <TouchableOpacity style={[styles.upgradeBtn, { backgroundColor: colors.text }]} onPress={onShowUpgrade}>
+              <Text style={[styles.upgradeBtnText, { color: colors.background[0] }]}>Walli Premium (5 TND)</Text>
            </TouchableOpacity>
         </View>
       </View>
