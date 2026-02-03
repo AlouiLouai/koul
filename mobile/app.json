@@ -13,18 +13,9 @@
       "bundleIdentifier": "com.makelti.app"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.makelti.app"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
-      }
     },
     "plugins": [
       [
@@ -51,6 +42,11 @@
         }
       ]
     ],
+    "extra": {
+      "eas": {
+        "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
+      }
+    },
     "owner": "mnm89"
   }
 }
