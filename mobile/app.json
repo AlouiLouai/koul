@@ -26,9 +26,6 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.makelti.app"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
