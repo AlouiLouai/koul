@@ -10,7 +10,7 @@ import { LogSuccessModal } from '../../components/LogSuccessModal';
 import type { AnalysisResponse } from '../../types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const TAB_BAR_HEIGHT = 100; // Estimated footer/tab height
+const TAB_BAR_HEIGHT = 100;
 
 interface ScanUIProps {
   loading: boolean;
@@ -29,7 +29,6 @@ export const ScanUI = ({
   loading, 
   result, 
   currentImage, 
-  error, 
   onImageSelected, 
   onReset, 
   onLogMeal,
