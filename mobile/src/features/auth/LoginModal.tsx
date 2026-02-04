@@ -1,21 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Modal, 
-  TouchableOpacity, 
-  Dimensions, 
-  Animated,
-  ActivityIndicator,
-  TouchableWithoutFeedback
-} from 'react-native';
-import { X, ArrowRight, ShieldCheck } from 'lucide-react-native';
-import { GlassView } from '../../components/GlassView';
+import React from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { X, ShieldCheck, ArrowRight } from 'lucide-react-native';
+import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { AppLogo } from '../../components/AppLogo';
 import { useTheme } from '../../theme/ThemeContext';
-
-const { height } = Dimensions.get('window');
 
 interface LoginModalProps {
   visible: boolean;
@@ -25,131 +13,79 @@ interface LoginModalProps {
 }
 
 export const LoginModal = ({ visible, onClose, onLogin, isLoading }: LoginModalProps) => {
-  const { colors } = useTheme();
-  const slideAnim = useRef(new Animated.Value(height)).current;
-
-  useEffect(() => {
-    if (visible) {
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        damping: 20,
-        stiffness: 100,
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: height,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [visible]);
+  const { colors, mode } = useTheme();
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      statusBarTranslucent
-    >
-      <View style={styles.overlay}>
-        {/* Close on tapping background */}
-        <TouchableWithoutFeedback onPress={onClose}>
-            <View style={styles.backdrop} />
-        </TouchableWithoutFeedback>
+    <BottomSheetModal visible={visible} onClose={onClose}>
+        <View style={styles.header}>
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                <X size={24} color={colors.textSecondary} />
+            </TouchableOpacity>
+        </View>
 
-        {/* Bottom Sheet */}
-        <Animated.View style={[
-            styles.sheet, 
-            { 
-                backgroundColor: colors.background[1], // Slightly lighter than base
-                transform: [{ translateY: slideAnim }] 
-            }
-        ]}>
+        <View style={styles.content}>
+            <AppLogo size={64} borderRadius={20} inverted={true} />
             
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                    <X size={24} color={colors.textSecondary} />
-                </TouchableOpacity>
+            <View style={styles.textGroup}>
+                <Text style={[styles.title, { color: colors.text }]}>
+                    Connecti Bch Tkamml
+                </Text>
+                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                    Bch tnajjem tsawer w tkhabi ma3loumetek, lazmek compte!
+                </Text>
             </View>
 
-            {/* Content */}
-            <View style={styles.content}>
-                <AppLogo size={64} borderRadius={20} inverted />
-                
-                <View style={styles.textGroup}>
-                    <Text style={[styles.title, { color: colors.text }]}>
-                        Connecti Bch Tkamml
-                    </Text>
-                    <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                        Bch tnajjem tsawer w tkhabi ma3loumetek, lazmek compte!
-                    </Text>
-                </View>
+            <View style={[styles.secureNote, { backgroundColor: colors.accent + '15' }]}>
+                <ShieldCheck size={16} color={colors.accent} />
+                <Text style={[styles.secureText, { color: colors.accent }]}>Données mte3ek mahfoutha 100%</Text>
+            </View>
 
-                {/* Secure Note */}
-                <View style={styles.secureNote}>
-                    <ShieldCheck size={16} color={colors.success} />
-                    <Text style={[styles.secureText, { color: colors.success }]}>Données mte3ek mahfoutha 100%</Text>
-                </View>
-
-                {/* Action Button */}
-                <TouchableOpacity
-                    onPress={onLogin}
-                    disabled={isLoading}
-                    activeOpacity={0.8}
-                    style={{ width: '100%' }}
-                >
-                    <GlassView style={[styles.googleBtn, { backgroundColor: colors.text }]} intensity={20} borderRadius={24}>
-                        {isLoading ? (
-                        <View style={styles.loadingWrapper}>
-                            <ActivityIndicator color={colors.background[0]} size="small" />
-                            <Text style={[styles.btnText, { color: colors.background[0], flex: 0 }]}>Lahtha...</Text>
-                        </View>
-                        ) : (
+            <TouchableOpacity
+                onPress={onLogin}
+                disabled={isLoading}
+                activeOpacity={0.8}
+                style={styles.googleBtnWrapper}
+            >
+                <View style={[
+                    styles.googleBtn, 
+                    { 
+                        backgroundColor: mode === 'dark' ? '#18181b' : '#fff',
+                        borderColor: colors.text + '20',
+                        borderWidth: 1,
+                        shadowColor: colors.accent,
+                    }
+                ]}>
+                    {isLoading ? (
+                        <ActivityIndicator color={colors.text} />
+                    ) : (
                         <>
-                            <View style={styles.iconCircle}>
-                                <Text style={{fontSize: 20, fontWeight: 'bold', color: colors.text}}>G</Text>
+                            <View style={[styles.iconCircle, { shadowColor: '#000', elevation: 2 }]}>
+                                {/* Using distinct colors for the G parts would require SVG, 
+                                    falling back to a very clean branded look. */}
+                                <Text style={{fontSize: 24, fontWeight: '900', color: '#4285F4'}}>G</Text>
                             </View>
-                            <Text style={[styles.btnText, { color: colors.background[0] }]}>Connecti b' Google</Text>
-                            <ArrowRight size={20} color={colors.background[0]} />
+                            <Text style={[
+                                styles.btnText, 
+                                { color: colors.text }
+                            ]}>
+                                Connecti b' Google
+                            </Text>
+                            <ArrowRight size={20} color={colors.text} opacity={0.4} />
                         </>
-                        )}
-                    </GlassView>
-                </TouchableOpacity>
-            </View>
-        </Animated.View>
-      </View>
-    </Modal>
+                    )}
+                </View>
+            </TouchableOpacity>
+        </View>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  backdrop: {
-      ...StyleSheet.absoluteFillObject,
-  },
-  sheet: {
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    padding: 24,
-    paddingBottom: 48,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 20,
-  },
   header: {
       width: '100%',
       flexDirection: 'row',
       justifyContent: 'flex-end',
-      marginBottom: 0,
+      marginBottom: -10,
   },
   closeBtn: {
       padding: 8,
@@ -157,12 +93,11 @@ const styles = StyleSheet.create({
   content: {
       width: '100%',
       alignItems: 'center',
-      gap: 24,
+      gap: 20,
   },
   textGroup: {
       alignItems: 'center',
       gap: 8,
-      marginBottom: 8,
   },
   title: {
       fontSize: 24,
@@ -174,48 +109,61 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: '500',
       lineHeight: 22,
-      maxWidth: '80%',
+      maxWidth: '85%',
   },
   secureNote: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      backgroundColor: 'rgba(16, 185, 129, 0.1)', // Light green
+      backgroundColor: 'rgba(16, 185, 129, 0.1)',
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 12,
-      marginBottom: 8,
   },
   secureText: {
       fontSize: 12,
       fontWeight: '700',
   },
+  googleBtnWrapper: {
+      width: '100%',
+      marginTop: 10,
+  },
   googleBtn: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: 60,
+      height: 64,
       paddingHorizontal: 8,
+      borderRadius: 24,
       gap: 16,
-      width: '100%',
-  },
-  loadingWrapper: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 12,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 5,
   },
   iconCircle: {
       width: 44,
       height: 44,
-      borderRadius: 18,
+      borderRadius: 22,
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
   },
   btnText: {
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: '700',
       flex: 1,
   },
+  googleGContainer: {
+      position: 'relative',
+  },
+  gText: {
+      fontSize: 22,
+      fontWeight: '900',
+  },
+  gOverlay: {
+      ...StyleSheet.absoluteFillObject,
+  }
 });

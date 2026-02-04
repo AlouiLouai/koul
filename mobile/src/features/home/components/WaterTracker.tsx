@@ -1,27 +1,33 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
-import { Droplets, Plus } from 'lucide-react-native';
+import { Droplets, Plus, Check } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
+const CARD_HEIGHT = 340;
+
 export const WaterTracker = ({ 
-    onGoalReached, 
     isGuest = false, 
     onTriggerAuth 
 }: { 
-    onGoalReached: () => void; 
     isGuest?: boolean; 
     onTriggerAuth?: () => void;
 }) => {
   const [cups, setCups] = useState(0); // Start at 0L
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const target = 12; // 3L goal
+  const isComplete = cups >= target;
   
   // Animation Values
   const fillAnim = useRef(new Animated.Value(0)).current; 
   const bubble1 = useRef(new Animated.Value(0)).current;
   const bubble2 = useRef(new Animated.Value(0)).current;
   const bubble3 = useRef(new Animated.Value(0)).current;
+  const cardFillAnim = useRef(new Animated.Value(0)).current; // Now used for background fade
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const waveAnim = useRef(new Animated.Value(0)).current;
+  const pulseLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const waveLoopRef = useRef<Animated.CompositeAnimation | null>(null);
 
   // ... (Keep existing effects)
 
@@ -43,7 +49,7 @@ export const WaterTracker = ({
   }, []);
 
   useEffect(() => {
-     const progress = cups / target;
+     const progress = Math.min(cups / target, 1);
      Animated.spring(fillAnim, {
          toValue: progress,
          useNativeDriver: true,
@@ -51,11 +57,40 @@ export const WaterTracker = ({
          tension: 30
      }).start();
 
-     // Smart Notification when Goal Reached
-     if (cups === target) {
-         onGoalReached();
-     }
-  }, [cups]);
+     // Animate card background ONLY when complete
+     Animated.timing(cardFillAnim, {
+         toValue: isComplete ? 1 : 0,
+         duration: 600,
+         easing: Easing.out(Easing.quad),
+         useNativeDriver: true,
+     }).start();
+  }, [cups, isComplete]);
+
+  useEffect(() => {
+    pulseLoopRef.current?.stop();
+    waveLoopRef.current?.stop();
+
+    if (isComplete) {
+      pulseAnim.setValue(0);
+      waveAnim.setValue(0);
+
+      pulseLoopRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1, duration: 1200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        ])
+      );
+      pulseLoopRef.current.start();
+
+      waveLoopRef.current = Animated.loop(
+        Animated.timing(waveAnim, { toValue: 1, duration: 2200, easing: Easing.inOut(Easing.quad), useNativeDriver: true })
+      );
+      waveLoopRef.current.start();
+    } else {
+      pulseAnim.setValue(0);
+      waveAnim.setValue(0);
+    }
+  }, [isComplete, pulseAnim, waveAnim]);
 
   const addWater = () => {
     // GUEST GUARD
@@ -70,14 +105,24 @@ export const WaterTracker = ({
   };
 
   const getWaterMessage = () => {
-      if (cups >= target) return "M3allem! 3L kamla. 💧";
-      if (cups >= target / 2) return "Mazel chtar! Courage.";
-      return "0.5L bch tebda el nhar?";
+      if (cups >= target) return "M3allem! 3L Safia! 🌊";
+      if (cups >= target / 2) return "Chtar el thneya! Zidha gorgan. 🚰";
+      return "Dabouza 0.5L 3asbeh? 💧";
   };
 
   const waterTranslateY = fillAnim.interpolate({
       inputRange: [0, 1],
       outputRange: [140, 0] // Adjusted for taller bottle
+  });
+
+  const pulseOpacity = pulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.25, 0.6],
+  });
+
+  const waveTranslateX = waveAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-40, 40],
   });
 
   const getBubbleStyle = (anim: Animated.Value, left: number) => ({
@@ -95,69 +140,135 @@ export const WaterTracker = ({
   });
 
   return (
-    <GlassView style={styles.waterCard} intensity={30} borderRadius={32}>
+    <View style={[styles.waterCard, { borderRadius: 32, overflow: 'hidden' }]}>
+      
+      {/* Background Fill (Blue when complete) */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.cardFill,
+          {
+            backgroundColor: colors.primary,
+            opacity: cardFillAnim, // Fades in when complete
+          },
+        ]}
+      />
+
+      {isComplete && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.cardPulse,
+            {
+              backgroundColor: colors.primary,
+              opacity: pulseOpacity,
+            },
+          ]}
+        />
+      )}
+      {isComplete && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.cardWave,
+            {
+              backgroundColor: colors.primary + '60',
+              transform: [{ translateX: waveTranslateX }],
+            },
+          ]}
+        />
+      )}
+      
       <View style={styles.waterContent}>
         <View style={styles.waterTextSection}>
-           <View style={[styles.waterIconBg, { backgroundColor: colors.primary + '20' }]}>
-             <Droplets size={18} color={colors.primary} fill={colors.primary} />
+           <View style={[styles.waterIconBg, { backgroundColor: isComplete ? 'rgba(255,255,255,0.2)' : colors.primary + '20' }]}>
+             <Droplets size={18} color={isComplete ? '#fff' : colors.primary} fill={isComplete ? '#fff' : colors.primary} />
            </View>
-           <Text style={[styles.waterTitle, { color: colors.text }]}>Erwi 3rougek</Text>
-           <Text style={[styles.waterDesc, { color: colors.textSecondary }]}>
+           <Text style={[styles.waterTitle, { color: isComplete ? '#fff' : colors.text }]}>Erwi 3rougek</Text>
+           <Text style={[styles.waterDesc, { color: isComplete ? 'rgba(255,255,255,0.85)' : colors.textSecondary }]}>
              {getWaterMessage()}
            </Text>
         </View>
 
         <View style={styles.jugContainer}>
             {/* Taller 3L Bottle Shape */}
-            <View style={[styles.jugBody, { borderColor: colors.glassBorder, height: 140, backgroundColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
+            <View style={[styles.jugBody, { borderColor: isComplete ? 'rgba(255,255,255,0.5)' : colors.glassBorder, height: 140, backgroundColor: mode === 'dark' || isComplete ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
                 <View style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
                     <Animated.View style={[
                         styles.liquid, 
                         { 
                             transform: [{ translateY: waterTranslateY }],
-                            backgroundColor: '#3b82f6', // Clearer Water Blue
-                            opacity: 0.8
+                            backgroundColor: isComplete ? '#fff' : '#3b82f6', // White liquid when bg is blue, else blue
+                            opacity: isComplete ? 0.9 : 0.8
                         }
                     ]}> 
-                       <Animated.View style={getBubbleStyle(bubble1, 15)} />
-                       <Animated.View style={getBubbleStyle(bubble2, 30)} />
-                       <Animated.View style={getBubbleStyle(bubble3, 45)} />
+                       <Animated.View style={[getBubbleStyle(bubble1, 15), { backgroundColor: isComplete ? colors.primary : 'rgba(255,255,255,0.4)' }]} />
+                       <Animated.View style={[getBubbleStyle(bubble2, 30), { backgroundColor: isComplete ? colors.primary : 'rgba(255,255,255,0.4)' }]} />
+                       <Animated.View style={[getBubbleStyle(bubble3, 45), { backgroundColor: isComplete ? colors.primary : 'rgba(255,255,255,0.4)' }]} />
                     </Animated.View>
                 </View>
                 
                 {/* Bottle Label */}
-                <View style={[styles.bottleLabel, { backgroundColor: colors.background[0] }]}>
-                   <Text style={[styles.labelText, { color: colors.primary }]}>3L</Text>
+                <View style={[styles.bottleLabel, { backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : colors.background[0] }]}>
+                   <Text style={[styles.labelText, { color: isComplete ? '#fff' : colors.primary }]}>3L</Text>
                 </View>
 
                 {/* Measure Lines */}
-                <View style={[styles.measureLine, { bottom: '25%', backgroundColor: 'rgba(255,255,255,0.3)' }]} />
-                <View style={[styles.measureLine, { bottom: '50%', backgroundColor: 'rgba(255,255,255,0.3)' }]} />
-                <View style={[styles.measureLine, { bottom: '75%', backgroundColor: 'rgba(255,255,255,0.3)' }]} />
+                <View style={[styles.measureLine, { bottom: '25%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
+                <View style={[styles.measureLine, { bottom: '50%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
+                <View style={[styles.measureLine, { bottom: '75%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
             </View>
 
             {/* Bottle Neck & Cap */}
-            <View style={[styles.jugNeck, { borderColor: colors.glassBorder, backgroundColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
-            <View style={[styles.jugCap, { backgroundColor: colors.primary }]} />
+            <View style={[styles.jugNeck, { borderColor: isComplete ? 'rgba(255,255,255,0.5)' : colors.glassBorder, backgroundColor: isComplete ? 'rgba(255,255,255,0.2)' : (mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)') }]} />
+            <View style={[styles.jugCap, { backgroundColor: isComplete ? '#fff' : colors.primary }]} />
             
             <TouchableOpacity 
-                style={[styles.addWaterFab, { backgroundColor: colors.primary }]} 
+                style={[styles.addWaterFab, { backgroundColor: isComplete ? '#fff' : colors.accent }]} 
                 onPress={addWater}
                 activeOpacity={0.8}
+                disabled={isComplete}
             >
-                <Plus size={20} color="#fff" strokeWidth={3} />
+                {isComplete ? (
+                    <Check size={20} color={colors.primary} strokeWidth={3} />
+                ) : (
+                    <Plus size={20} color="#fff" strokeWidth={3} />
+                )}
             </TouchableOpacity>
         </View>
       </View>
       <View style={styles.waterFooter}>
-          <Text style={[styles.waterCount, { color: colors.primary }]}>{(cups * 0.25).toFixed(1)}L<Text style={{fontSize: 12, color: colors.textSecondary}}> / 3L Goal</Text></Text>
+          <Text style={[styles.waterCount, { color: isComplete ? '#fff' : colors.primary }]}>
+            {(cups * 0.25).toFixed(1)}L
+            <Text style={{ fontSize: 12, color: isComplete ? 'rgba(255,255,255,0.85)' : colors.textSecondary }}>
+              {' '} / 3L Goal
+            </Text>
+          </Text>
       </View>
-    </GlassView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  waterCard: { width: '100%', height: 340, padding: 20, position: 'relative', justifyContent: 'space-between' },
+  waterCard: { width: '100%', height: CARD_HEIGHT, padding: 20, position: 'relative', justifyContent: 'space-between' },
+  cardFill: { position: 'absolute', left: 0, right: 0, bottom: 0, height: CARD_HEIGHT, borderRadius: 32 },
+  cardFillLabel: {
+    position: 'absolute',
+    top: 14,
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+  },
+  cardFillLabelText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.2,
+  },
+  cardPulse: { position: 'absolute', left: -10, right: -10, top: -10, bottom: -10, borderRadius: 36 },
+  cardWave: { position: 'absolute', left: 0, right: 0, height: 46, top: 70, borderRadius: 28, opacity: 0.6 },
   waterContent: { flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 },
   waterTextSection: { alignItems: 'center', gap: 8 },
   waterIconBg: { padding: 8, borderRadius: 12 },

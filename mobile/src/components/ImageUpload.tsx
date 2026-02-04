@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Animated, Easing, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Animated, Easing } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, Scan, Sparkles, Aperture } from 'lucide-react-native';
-import { GlassView } from './GlassView';
+import { Camera } from 'lucide-react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ImageUploadProps {
@@ -11,11 +10,9 @@ interface ImageUploadProps {
   onPressStart?: () => void;
 }
 
-const { width } = Dimensions.get('window');
-
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, onPressStart }) => {
   const [isPressing, setIsPressing] = useState(false);
-  const { colors, mode } = useTheme();
+  const { colors } = useTheme();
   
   // Animations
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -81,6 +78,57 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
     ).start();
   }, []);
   
+  const normalizeAsset = (asset: ImagePicker.ImagePickerAsset) => ({
+    uri: asset.uri,
+    type: asset.mimeType ?? 'image/jpeg',
+    fileName: asset.fileName ?? `upload-${Date.now()}.jpg`,
+  });
+
+  const takePhoto = async () => {
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("Permission required", "Lazmek ta3tina permission l'camera.");
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.7,
+        aspect: [4, 3],
+      });
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const payload = normalizeAsset(result.assets[0]);
+        onImageSelected(payload.uri, payload.type, payload.fileName);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not take photo');
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const hasAccess = permission.granted || permission.accessPrivileges === 'limited';
+      if (!hasAccess) {
+        Alert.alert("Permission required", "Lazmek ta3tina permission l'galerie.");
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.7,
+        aspect: [4, 3],
+      });
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const payload = normalizeAsset(result.assets[0]);
+        onImageSelected(payload.uri, payload.type, payload.fileName);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not pick image');
+    }
+  };
+
   const handlePress = () => {
       if (onPressStart) {
           onPressStart();
@@ -111,11 +159,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
         onPressIn={() => setIsPressing(true)}
         onPressOut={() => setIsPressing(false)}
       >
-        <GlassView 
-            style={[styles.lensContainer, { borderColor: colors.glassBorder }]}
-            intensity={90}
-            borderRadius={48}
-            noBorder
+        <View 
+            style={[styles.lensContainer, { borderColor: colors.glassBorder, borderRadius: 48, overflow: 'hidden' }]}
         >
             {/* --- LAYERS OF HOLOGRAPHIC LENS --- */}
 
@@ -152,7 +197,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
             <Animated.View style={[
                 styles.scanLine,
                 {
-                    backgroundColor: colors.primary,
+                    backgroundColor: colors.accent,
                     transform: [{ translateY: scanTranslate }],
                     opacity: isLoading ? 0 : 0.6 // Hide scanner when loading
                 }
@@ -162,10 +207,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
             <Animated.View style={[
                 styles.shutterBtn,
                 { 
-                    backgroundColor: isPressing ? colors.primary : colors.glass,
+                    backgroundColor: isPressing ? colors.accent : colors.glass,
                     borderColor: colors.glassBorder,
                     transform: [{ scale: isPressing ? 0.9 : 1 }],
-                    shadowColor: colors.primary,
+                    shadowColor: colors.accent,
                 }
             ]}>
                 {isLoading ? (
@@ -181,10 +226,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
             <View style={styles.infoContainer}>
                 {/* Removed AI Badge per request */}
                 <Text style={[styles.mainText, { color: colors.text }]}>
-                    {isLoading ? "Jarry el t7lil..." : "Sawrelna sa7nek"}
+                    {isLoading ? "Jarry el t7lil..." : "Warina Sa7nek 📸"}
                 </Text>
                 <Text style={[styles.subText, { color: colors.textSecondary }]}>
-                    {isLoading ? "Moments..." : "Khanchoufou (Click)"}
+                    {isLoading ? "Moments..." : "Chnoua tayyebt lyoum?"}
                 </Text>
             </View>
 
@@ -194,7 +239,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelected, isLoading, o
             <View style={[styles.corner, styles.bl, { borderColor: colors.primary }]} />
             <View style={[styles.corner, styles.br, { borderColor: colors.primary }]} />
 
-        </GlassView>
+        </View>
       </TouchableOpacity>
     </View>
   );

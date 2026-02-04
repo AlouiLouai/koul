@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing } from 'react-native';
-import { Droplets, CheckCircle2, Waves, Trophy, Sparkles } from 'lucide-react-native';
+import { Droplets, Waves, Trophy, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassView } from './GlassView';
 import { useTheme } from '../theme/ThemeContext';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface WaterSuccessModalProps {
   visible: boolean;

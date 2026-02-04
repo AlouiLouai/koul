@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Switch } from 'react-native';
-import { User as UserIcon, Sparkles, Settings, Bell, History, LogOut, Zap, ChevronRight, Star, ChefHat, Crown, Flame, Target, Trophy } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { User as UserIcon, Settings, Bell, History, LogOut, Zap, ChevronRight, Crown, Flame, Target, Trophy } from 'lucide-react-native';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 
@@ -91,7 +91,7 @@ export const ProfileUI = ({
             
             <View style={[styles.rankBadge, { backgroundColor: colors.warning + '10', borderColor: colors.warning }]}>
                 <Trophy size={14} color={colors.warning} fill={colors.warning} />
-                <Text style={[styles.rankText, { color: colors.warning }]}>Sultan el Koujina 👑</Text>
+                <Text style={[styles.rankText, { color: colors.warning }]}>Chef El 7ouma 👑</Text>
             </View>
 
             {/* Level Progress */}
@@ -109,7 +109,7 @@ export const ProfileUI = ({
         {/* Quick Impact Stats */}
         <View style={styles.statsRow}>
             <StatItem label="Ayyém" value="12" icon={Flame} color="#f97316" />
-            <StatItem label="Scans" value="42" icon={Target} color={colors.primary} />
+            <StatItem label="Scans" value="42" icon={Target} color={colors.accent} />
             <StatItem label="Kou'ous" value="8" icon={Trophy} color={colors.warning} />
         </View>
 
@@ -125,18 +125,18 @@ export const ProfileUI = ({
                         <View style={styles.proTextSection}>
                             <View style={styles.proHeader}>
                                 <Crown size={20} color={colors.warning} fill={colors.warning} />
-                                <Text style={[styles.proTitle, { color: '#fff' }]}>KOUL Premium</Text>
+                                <Text style={[styles.proTitle, { color: '#fff' }]}>KOUL VIP 💎</Text>
                             </View>
-                            <Text style={[styles.proSubtitle, { color: '#a1a1aa' }]}>Walli M3allem w sayer l'AI</Text>
+                            <Text style={[styles.proSubtitle, { color: '#a1a1aa' }]}>Walli Sultan w sayer l'AI</Text>
                             
                             <View style={styles.proBulletList}>
-                                <Text style={styles.proBullet}>• Menu Sahri (Fridge Chef)</Text>
-                                <Text style={styles.proBullet}>• Coach Personnel 🤖</Text>
+                                <Text style={styles.proBullet}>• Dabarli (Fridge Chef)</Text>
+                                <Text style={styles.proBullet}>• Coach Klem 🤖</Text>
                             </View>
                         </View>
                         
                         <View style={styles.priceSection}>
-                            <Text style={[styles.priceVal, { color: colors.warning }]}>5 TND</Text>
+                            <Text style={[styles.priceVal, { color: colors.accent }]}>5 TND</Text>
                             <Text style={styles.priceSub}>/ ch'har</Text>
                             <View style={[styles.unlockBtn, { backgroundColor: colors.primary }]}>
                                 <Text style={styles.unlockText}>Unlock</Text>

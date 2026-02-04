@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { AppLogo } from './AppLogo'; // Assumes AppLogo is in same folder or adjust import
 import { useTheme } from '../theme/ThemeContext';
 
-const { width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
       gap: 32,
   },
   logoWrapper: {
-      shadowColor: colors => colors?.primary || '#000',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 10 },
       shadowOpacity: 0.15,
       shadowRadius: 20,

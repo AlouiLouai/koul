@@ -18,16 +18,16 @@ export const GlassView: React.FC<GlassViewProps> = ({
   borderRadius = 24,
   noBorder = false,
 }) => {
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
 
   // Combine borders with theme colors
-  const borderStyle = !noBorder ? {
+  const borderStyle = noBorder === false ? {
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    borderTopColor: colors.mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
-    borderLeftColor: colors.mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
-    borderRightColor: colors.mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
-    borderBottomColor: colors.mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
+    borderTopColor: mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
+    borderLeftColor: mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
+    borderRightColor: mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
+    borderBottomColor: mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
   } : {};
 
   return (
@@ -40,7 +40,8 @@ export const GlassView: React.FC<GlassViewProps> = ({
     ]}>
       <BlurView 
         intensity={intensity} 
-        tint={colors.tint} 
+        tint={colors.tint}
+        experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : 'none'}
         style={StyleSheet.absoluteFill} 
       />
       {children}

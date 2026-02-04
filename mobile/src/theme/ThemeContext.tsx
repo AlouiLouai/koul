@@ -10,6 +10,7 @@ interface ThemeColors {
   text: string;
   textSecondary: string;
   primary: string;
+  accent: string; // Tunisian Red / Hot Action
   success: string;
   warning: string;
   error: string;
@@ -25,12 +26,13 @@ interface ThemeContextType {
 
 // "Crystal Morning" - Crisp, airy, pearlescent
 const LightColors: ThemeColors = {
-  background: ['#f0f9ff', '#e0f2fe', '#bae6fd'], // Cool Blue/Sky gradient base
-  glass: 'rgba(255, 255, 255, 0.70)', 
-  glassBorder: 'rgba(255, 255, 255, 0.8)',
+  background: ['#fdfcf0', '#f1f5f9', '#e0f2fe'], // Warmer "Sahara/Oasis" vibe
+  glass: 'rgba(255, 255, 255, 0.05)', 
+  glassBorder: 'rgba(255, 255, 255, 0.2)',
   text: '#0f172a', // Slate 900
   textSecondary: '#475569', // Slate 600
   primary: '#2563eb', // Blue 600 - The new App Color
+  accent: '#e11d48', // Tunisian Red
   success: '#10b981', // Emerald 500
   warning: '#f59e0b', // Amber 500
   error: '#ef4444', // Red 500
@@ -45,6 +47,7 @@ const DarkColors: ThemeColors = {
   text: '#f1f5f9', // Slate 100
   textSecondary: '#94a3b8', // Slate 400
   primary: '#38bdf8', // Sky 400 - Glowing accent
+  accent: '#fb7185', // Softer red for dark mode
   success: '#34d399', // Emerald 400 - Bioluminescent green
   warning: '#fbbf24', // Amber 400
   error: '#f87171', // Red 400

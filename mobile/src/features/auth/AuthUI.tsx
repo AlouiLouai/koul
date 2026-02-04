@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   ScrollView
 } from 'react-native';
-import { Utensils, ArrowRight, Sparkles, Leaf } from 'lucide-react-native';
+import { ArrowRight, Sparkles } from 'lucide-react-native';
 import { LiquidBackground } from '../../components/LiquidBackground';
 import { GlassView } from '../../components/GlassView';
 import { AppLogo } from '../../components/AppLogo';
@@ -24,7 +24,7 @@ interface AuthUIProps {
 }
 
 export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   
   // Animations
   const animEntrance = useRef(new Animated.Value(0)).current;
@@ -63,7 +63,6 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
 
   const spin = orbRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
-  const logoY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [50, 0] });
   const formY = animEntrance.interpolate({ inputRange: [0, 1], outputRange: [100, 0] });
   const formOpacity = animEntrance.interpolate({ inputRange: [0.5, 1], outputRange: [0, 1] });
 
@@ -108,21 +107,29 @@ export const AuthUI = ({ onGoogleLogin, isLoading }: AuthUIProps) => {
                 onPress={onGoogleLogin}
                 disabled={isLoading}
                 activeOpacity={0.8}
-                style={{ alignSelf: 'center' }}
+                style={{ alignSelf: 'center', width: 280 }}
               >
-                <GlassView style={[styles.googleBtn, { backgroundColor: colors.text, width: 280 }]} intensity={20} borderRadius={32}>
+                <GlassView style={[
+                    styles.googleBtn, 
+                    { 
+                        backgroundColor: mode === 'dark' ? '#18181b' : '#fff',
+                        borderColor: colors.text + '20',
+                        borderWidth: 1,
+                        shadowColor: colors.accent,
+                    }
+                ]} intensity={20} borderRadius={24}>
                     {isLoading ? (
                       <View style={styles.loadingWrapper}>
-                        <ActivityIndicator color={colors.background[0]} size="small" />
-                        <Text style={[styles.btnText, { color: colors.background[0], flex: 0 }]}>Lahtha...</Text>
+                        <ActivityIndicator color={colors.text} size="small" />
+                        <Text style={[styles.btnText, { color: colors.text, flex: 0 }]}>Lahtha...</Text>
                       </View>
                     ) : (
                       <>
-                        <View style={styles.iconCircle}>
-                           <Text style={{fontSize: 20, fontWeight: 'bold', color: colors.text}}>G</Text>
+                        <View style={[styles.iconCircle, { shadowColor: '#000', elevation: 2 }]}>
+                           <Text style={{fontSize: 24, fontWeight: '900', color: '#4285F4'}}>G</Text>
                         </View>
-                        <Text style={[styles.btnText, { color: colors.background[0] }]}>Connecti b' Google</Text>
-                        <ArrowRight size={20} color={colors.background[0]} />
+                        <Text style={[styles.btnText, { color: colors.text }]}>Connecti b' Google</Text>
+                        <ArrowRight size={20} color={colors.text} opacity={0.4} />
                       </>
                     )}
                 </GlassView>
@@ -230,12 +237,15 @@ const styles = StyleSheet.create({
       gap: 12,
   },
   iconCircle: {
-      width: 48,
-      height: 48,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
   },
   btnText: {
       fontSize: 17,

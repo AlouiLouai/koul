@@ -12,10 +12,10 @@ export const TipCard = memo(() => {
         <View style={[styles.tipIconBox, { backgroundColor: colors.warning + '20' }]}>
           <Lightbulb size={18} color={colors.warning} fill={colors.warning} />
         </View>
-        <Text style={[styles.tipTitle, { color: colors.text }]}>Nasi7a</Text>
+        <Text style={[styles.tipTitle, { color: colors.text }]}>Klem Kbar (Pro Tip) 💡</Text>
       </View>
       <Text style={[styles.tipText, { color: colors.textSecondary }]} numberOfLines={3}>
-        "Zit zitouna behi, ama rod belek mel quantité!"
+        "El zit zitouna dhheb, ama mgharfa barka tekfi! Ma tgharraghach. 🫒"
       </Text>
     </GlassView>
   );

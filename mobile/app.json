@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
+    "scheme": "koul",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,6 +32,16 @@
         "projectId": "a112d6ab-b5cc-4bf2-b31d-aa73eeaf92f1"
       }
     },
-    "owner": "mnm89"
+    "owner": "mnm89",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Bach takhtar taswira men galerie mta3ek! 🖼️",
+          "cameraPermission": "Bach nsawrou sa7nek w n9ouloulek chnoua fih! 📸"
+        }
+      ]
+    ]
   }
 }

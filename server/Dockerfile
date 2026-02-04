@@ -8,6 +8,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Copy source and build
+ARG BUILD_TIMESTAMP # FORCE_REBUILD_2
 COPY . .
 RUN npm run build
 

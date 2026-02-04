@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing } from 'react-native';
-import { Trophy, Sparkles, Check } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
+import { Trophy, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassView } from './GlassView';
 import { useTheme } from '../theme/ThemeContext';
-
-const { width } = Dimensions.get('window');
 
 export interface SuccessModalProps {
   visible: boolean;
@@ -34,13 +32,12 @@ export const SuccessModal = ({
 }: SuccessModalProps) => {
   const { colors } = useTheme();
   
-  // Animations
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (visible) {
+    if (visible === true) {
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -80,7 +77,7 @@ export const SuccessModal = ({
       }
   };
 
-  if (!visible) return null;
+  if (visible === false) return null;
 
   return (
     <View style={styles.overlay}>
@@ -90,9 +87,8 @@ export const SuccessModal = ({
           { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }
         ]}
       >
-        <GlassView style={styles.modalContainer} intensity={95} borderRadius={32} noBorder>
+        <GlassView style={styles.modalContainer} intensity={95} borderRadius={32} noBorder={true}>
             
-            {/* Header Icon */}
             <Animated.View style={[styles.headerWrapper, { transform: [{ translateY: floatAnim }] }]}>
                 <LinearGradient
                     colors={[colors.primary, '#60a5fa']}
@@ -105,15 +101,17 @@ export const SuccessModal = ({
                 </LinearGradient>
             </Animated.View>
 
-            {/* Content Section */}
             <View style={styles.textSection}>
                 <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-                <Text style={[styles.message, { color: colors.textSecondary }]}>
-                   {message}
-                </Text>
+                <View style={styles.messageContainer}>
+                   {typeof message === 'string' ? (
+                     <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
+                   ) : (
+                     message
+                   )}
+                </View>
             </View>
 
-            {/* Badges */}
             {badges.length > 0 && (
                 <View style={styles.badgeRow}>
                     {badges.map((badge, idx) => (
@@ -124,7 +122,6 @@ export const SuccessModal = ({
                 </View>
             )}
 
-            {/* Action Buttons */}
             <View style={{ width: '100%', gap: 12 }}>
                 <TouchableOpacity 
                     style={styles.primaryBtnWrapper} 
@@ -163,12 +160,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 3000,
-    padding: 32, // More breathing room outside
+    padding: 32,
   },
   containerWrapper: {
     width: '100%',
     alignItems: 'center',
-    maxWidth: 320, // Constrain width for "less bigger" look
+    maxWidth: 320,
   },
   modalContainer: {
     width: '100%',
@@ -179,7 +176,7 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
       marginBottom: 20,
-      marginTop: -40, // Pull up to overlap top edge slightly for dynamic look
+      marginTop: -40,
       zIndex: 10,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 8 },
@@ -188,13 +185,13 @@ const styles = StyleSheet.create({
       elevation: 10,
   },
   mainCircle: {
-      width: 88, // Smaller
+      width: 88,
       height: 88,
       borderRadius: 44,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 4,
-      borderColor: '#fff', // White border to separate from glass
+      borderColor: '#fff',
   },
   sparkleOverlay: {
       position: 'absolute',
@@ -205,11 +202,14 @@ const styles = StyleSheet.create({
       zIndex: 10,
   },
   title: {
-    fontSize: 22, // Smaller font
+    fontSize: 22,
     fontWeight: '900',
     marginBottom: 8,
     textAlign: 'center',
     letterSpacing: -0.5,
+  },
+  messageContainer: {
+    alignItems: 'center',
   },
   message: {
     fontSize: 14,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     width: '100%',
-    paddingVertical: 14, // Slimmer button
+    paddingVertical: 14,
     borderRadius: 18,
     alignItems: 'center',
   },

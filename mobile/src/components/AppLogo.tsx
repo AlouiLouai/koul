@@ -21,7 +21,7 @@ export const AppLogo = ({ size = 40, intensity = 50, borderRadius = 12, inverted
   const strokeWidth = Math.max(2, size / 20); 
 
   // Colors
-  const iconColor = inverted ? '#ffffff' : colors.primary;
+  const iconColor = inverted === true ? '#ffffff' : colors.primary;
   const secondaryColor = colors.warning; // Always yellow for consistency
   
   const Content = () => (
@@ -52,7 +52,7 @@ export const AppLogo = ({ size = 40, intensity = 50, borderRadius = 12, inverted
     </View>
   );
 
-  if (inverted) {
+  if (inverted === true) {
       return (
           <LinearGradient
             colors={[colors.primary, '#60a5fa']}
@@ -73,6 +73,7 @@ export const AppLogo = ({ size = 40, intensity = 50, borderRadius = 12, inverted
       style={[styles.container, { width: size, height: size }]} 
       intensity={intensity} 
       borderRadius={borderRadius}
+      noBorder={false}
     >
       <Content />
     </GlassView>

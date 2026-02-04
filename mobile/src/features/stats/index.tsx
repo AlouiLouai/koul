@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Lock } from 'lucide-react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Crown } from 'lucide-react-native';
 import { StatsUI } from './StatsUI';
 import { useTheme } from '../../theme/ThemeContext';
+import { useStats } from '../../hooks/useStats';
+import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { ActionButton } from '../../components/ActionButton';
 
 // --- Logic / Mock Data ---
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -21,119 +24,79 @@ export type TimeFrame = 'Week' | 'Month' | '3M' | '6M' | 'Year';
 interface StatsContainerProps {
   isPro: boolean;
   onShowUpgrade: () => void;
+  isUpgradeVisible?: boolean;
 }
 
-export const StatsContainer = ({ isPro, onShowUpgrade }: StatsContainerProps) => {
+export const StatsContainer = ({ isPro, onShowUpgrade, isUpgradeVisible }: StatsContainerProps) => {
   const { colors } = useTheme();
+  const { todayStats } = useStats();
   const [timeframe, setTimeframe] = useState<TimeFrame>('Week');
-  const [selectedDay, setSelectedDay] = useState(6);
-
-  // Locked State
-  if (!isPro) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.blurContainer}>
-           <StatsUI 
-              timeframe={timeframe}
-              onTimeframeChange={setTimeframe}
-              selectedDayIndex={selectedDay}
-              weeklyData={WEEKLY_DATA} 
-              daysLabels={DAYS.map(d => d[0])}
-              historyItems={HISTORY_ITEMS}
-           />
-           <View style={[styles.overlay, { backgroundColor: colors.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }]} />
-        </View>
-        
-        <View style={[styles.lockCard, { backgroundColor: colors.background[1] }]}>
-           <View style={[styles.iconBg, { backgroundColor: colors.warning + '20', borderColor: colors.warning }]}>
-              <Lock size={32} color={colors.warning} fill={colors.warning} />
-           </View>
-           <Text style={[styles.lockTitle, { color: colors.text }]}>Statistiques Msekra</Text>
-           <Text style={[styles.lockDesc, { color: colors.textSecondary }]}>Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay.</Text>
-           <TouchableOpacity style={[styles.upgradeBtn, { backgroundColor: colors.text }]} onPress={onShowUpgrade}>
-              <Text style={[styles.upgradeBtnText, { color: colors.background[0] }]}>Walli Premium (5 TND)</Text>
-           </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  const [selectedDay] = useState(6);
 
   return (
-    <StatsUI 
-       timeframe={timeframe}
-       onTimeframeChange={setTimeframe}
-       selectedDayIndex={selectedDay}
-       weeklyData={WEEKLY_DATA}
-       daysLabels={DAYS.map(d => d[0])}
-       historyItems={HISTORY_ITEMS}
-    />
+    <>
+      <StatsUI 
+         timeframe={timeframe}
+         onTimeframeChange={setTimeframe}
+         selectedDayIndex={selectedDay}
+         weeklyData={WEEKLY_DATA}
+         daysLabels={DAYS.map(d => d[0])}
+         historyItems={HISTORY_ITEMS}
+         todayStats={todayStats}
+      />
+
+      <BottomSheetModal visible={!isPro && !isUpgradeVisible} onClose={() => {}}>
+          <View style={styles.content}>
+              <View style={[styles.iconBg, { backgroundColor: colors.warning + '20', borderColor: colors.warning }]}>
+                  <Crown size={40} color={colors.warning} fill={colors.warning} />
+              </View>
+              
+              <Text style={[styles.title, { color: colors.text }]}>Statistiques Msekra</Text>
+              <Text style={[styles.message, { color: colors.textSecondary }]}>
+                  Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay.
+              </Text>
+
+              <View style={styles.actions}>
+                  <ActionButton 
+                      text="Walli Premium" 
+                      variant="primary" 
+                      onPress={onShowUpgrade} 
+                      flex={1}
+                  />
+              </View>
+          </View>
+      </BottomSheetModal>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  blurContainer: {
-    flex: 1,
-    opacity: 0.3, // "Blurred" look
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    zIndex: 10,
-  },
-  lockCard: {
-    position: 'absolute',
-    top: '30%',
-    left: 20,
-    right: 20,
-    backgroundColor: '#fff',
-    borderRadius: 32,
-    padding: 32,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    elevation: 10,
-    zIndex: 20,
+  content: {
+      alignItems: 'center',
   },
   iconBg: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#fffbeb',
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#fcd34d',
   },
-  lockTitle: {
-    fontSize: 22,
+  title: {
+    fontSize: 24,
     fontWeight: '900',
-    color: '#18181b',
     marginBottom: 8,
   },
-  lockDesc: {
+  message: {
     fontSize: 14,
-    color: '#71717a',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
     lineHeight: 20,
+    maxWidth: '85%',
   },
-  upgradeBtn: {
-    backgroundColor: '#18181b',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 20,
+  actions: {
+    flexDirection: 'row',
     width: '100%',
-    alignItems: 'center',
-  },
-  upgradeBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });

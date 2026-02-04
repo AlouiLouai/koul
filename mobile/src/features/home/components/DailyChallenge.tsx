@@ -13,14 +13,14 @@ export const DailyChallenge = () => {
       activeOpacity={0.9} 
       onPress={() => setCompleted(!completed)}
     >
-      <GlassView style={[styles.challengeCard, completed && { backgroundColor: colors.primary }]} intensity={completed ? 80 : 40} borderRadius={28}>
+      <GlassView style={[styles.challengeCard, completed && { backgroundColor: colors.accent }]} intensity={completed ? 80 : 40} borderRadius={28}>
         <View style={{ alignItems: 'center' }}>
-          <View style={[styles.challengeIconBox, { backgroundColor: completed ? 'rgba(255,255,255,0.2)' : colors.warning + '20' }]}> 
-            {completed ? <CheckCircle2 size={24} color="#fff" /> : <Flame size={24} color={colors.warning} fill={colors.warning} />}
+          <View style={[styles.challengeIconBox, { backgroundColor: completed ? 'rgba(255,255,255,0.2)' : colors.accent + '20' }]}> 
+            {completed ? <CheckCircle2 size={24} color="#fff" /> : <Flame size={24} color={colors.accent} fill={colors.accent} />}
           </View>
           <Text style={[styles.challengeLabel, completed ? styles.textWhite : { color: colors.textSecondary }]}>Tahadi l'Youm 🔥</Text>
           <Text style={[styles.challengeTitle, completed ? styles.textWhite : { color: colors.text }]}>
-              {completed ? "M3allem!" : "Na9es khobz"}
+              {completed ? "W7ach! 🦁" : "Na9es Khobz, Zid Prot 🥩"}
           </Text>
           {completed && (
             <View style={styles.rewardBadge}> 

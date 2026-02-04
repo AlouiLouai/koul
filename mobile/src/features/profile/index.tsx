@@ -9,7 +9,7 @@ interface ProfileContainerProps {
 
 export const ProfileContainer = ({ onLogout, onShowUpgrade, isPro }: ProfileContainerProps) => {
   // Logic: In a real app, this would come from a useUser() hook
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: 'John Doe',
   });
 

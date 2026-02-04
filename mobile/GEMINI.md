@@ -1,40 +1,48 @@
 # Mobile Project Context for AI Assistants
 
 ## Overview
-"KOUL" is a React Native (Expo) mobile application for food tracking and calorie counting, specifically tailored for the Tunisian market. It allows users to take pictures of their food to get instant nutritional analysis using AI.
+"KOUL" is a React Native (Expo) mobile application for food tracking and calorie counting, specifically tailored for the Tunisian market. It leverages AI to provide instant nutritional analysis from food images, with a heavy focus on local Tunisian cuisine and culture.
 
 ## Tech Stack
 - **Framework:** React Native with Expo (Managed Workflow).
-- **Language:** TypeScript.
-- **Styling:** Tailwind CSS (via `clsx` and `tailwind-merge`) + `lucide-react-native` for icons.
-- **Navigation:** Custom state-based navigation (conditionally rendering components in `App.tsx`).
+- **Navigation:** Expo Router (File-based routing in `app/`).
+- **Language:** TypeScript (Strict mode).
+- **State Management:** 
+  - **Global/App State:** `zustand` with `react-native-mmkv` for persistence (see `src/store/`).
+  - **Server State:** `@tanstack/react-query` (React Query) for API mutations and caching.
+- **Styling:** `StyleSheet.create` using standard React Native styles. 
+- **Theming:** Custom `ThemeContext` (see `src/theme/`) providing `colors`, `spacing`, and `mode` (dark/light).
+- **UI Components:** 
+  - `expo-blur` for "Glassmorphism" effects (`GlassView`).
+  - `lucide-react-native` for icons.
+  - `expo-image-picker` & `expo-image-manipulator` for media handling.
 
 ## Core Architecture
 ### Directory Structure
-- `src/components/`: UI Components (Views and reusable elements).
-- `src/hooks/`: Business logic and API integration custom hooks.
-- `src/apiConfig.ts`: API endpoint configuration (handles Android Emulator localhost vs Production).
+- `app/`: Expo Router screens and layouts.
+- `src/features/`: Feature-based logic (e.g., `home`, `stats`, `profile`, `auth`).
+  - `index.tsx`: Feature container (logic, hooks).
+  - `xxxUI.tsx`: Pure UI component for the feature.
+  - `components/`: Sub-components specific to this feature.
+- `src/components/`: Reusable, atomic UI elements (GlassView, AppLogo, etc.).
+- `src/hooks/`: Shared business logic and API integration hooks.
+- `src/store/`: Zustand stores for global persistence.
+- `src/theme/`: Theme configuration and context.
 
-### Key Components
-- `App.tsx`: Main entry point. Handles "Navigation" state (`activeTab`, `isAuthenticated`).
-- `HomeView.tsx`: Main screen for image capture/upload.
-- `StatsView.tsx`: Displays nutritional statistics.
-- `ProfileView.tsx` & `UpgradeScreen.tsx`: User management and monetization.
+### Key Patterns
+1. **Container/UI Separation:** Large screens in `src/features/` are split into a logic container (`index.tsx`) and a presentation component (`xxxUI.tsx`).
+2. **Persistence:** Use `useStatsStore` for user data that must survive app restarts.
+3. **API Logic:** Encapsulated in hooks using React Query `useMutation` or `useQuery`.
+4. **Localization:** UI text is primarily in **Tunisian Arabic (Derja)** or French, reflecting the local culture.
 
-### Data Flow
-1. **Image Capture:** User selects image in `HomeView`.
-2. **Analysis:** `useImageAnalysis` hook sends image to backend.
-3. **Result:** Backend returns nutritional data (calories, macros).
-4. **Logging:** User confirms, data is passed to `useStats` to update daily totals.
+## Development Guidelines for AI
+- **Strict Typing:** Always define interfaces for component props and API responses in `src/types.ts`.
+- **Styling:** Do NOT use Tailwind classes (they are not configured). Use `StyleSheet` and pull colors from `useTheme()`.
+- **Visual Style:** Maintain the "Modern/Glassmorphic" aesthetic. Use `GlassView` for cards and overlays.
+- **Tunisian Context:** When generating UI text or examples, prioritize Tunisian food names (e.g., "Kousksi", "Brik", "Slata Mechouia") and local dialect.
+- **Component Creation:** Prefer functional components with explicit prop types. Use `lucide-react-native` for all iconography.
 
 ## API Integration
-- **Endpoint:** `POST /api/analyze`
-- **Content-Type:** `multipart/form-data` (field: `image`)
-- **Response Type:** `AnalysisResponse` (see `src/types.ts`)
-- **Base URL:** Defined in `src/apiConfig.ts`.
-
-## Development Guidelines
-- **Styling:** Use Tailwind classes.
-- **Icons:** Use `lucide-react-native`.
-- **State:** Keep state simple (hooks/Context). Avoid Redux unless necessary.
-- **Type Safety:** Strict TypeScript usage.
+- **Base URL:** Configured in `src/apiConfig.ts`.
+- **Analyze Image:** `POST /api/analyze` (multipart/form-data).
+- **Mocking:** For new features, favor React Query's `initialData` or local state before finalizing API integration.

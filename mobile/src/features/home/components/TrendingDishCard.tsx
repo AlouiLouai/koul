@@ -9,11 +9,11 @@ export const TrendingDishCard = memo(() => {
   return (
     <GlassView style={styles.dishCard} intensity={60} borderRadius={28}>
       <View style={styles.dishContent}>
-          <View style={[styles.dishBadge, { backgroundColor: colors.primary + '20' }]}>
-              <Text style={[styles.dishBadgeText, { color: colors.primary }]}>TOP #1</Text>
+          <View style={[styles.dishBadge, { backgroundColor: colors.accent + '20' }]}>
+              <Text style={[styles.dishBadgeText, { color: colors.accent }]}>BNEEN 🔥</Text>
           </View>
-          <Text style={[styles.dishTitle, { color: colors.text }]}>Couscous Bel 7out</Text>
-          <Text style={[styles.dishDesc, { color: colors.textSecondary }]}>Bnin w s7i, ama kather m'lkhodhra!</Text>
+          <Text style={[styles.dishTitle, { color: colors.text }]}>Kafteji Royal 🌶️</Text>
+          <Text style={[styles.dishDesc, { color: colors.textSecondary }]}>7ar w mcharwret, ama rod belek 3al zit!</Text>
       </View>
       <View style={[styles.dishIconBox, { borderColor: colors.glassBorder }]}>
           <Utensils size={32} color={colors.text} />

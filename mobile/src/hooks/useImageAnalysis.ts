@@ -1,56 +1,67 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { API_CONFIG } from '../apiConfig';
 import type { AnalysisResponse } from '../types';
 
 export const useImageAnalysis = () => {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const analyzeImage = async (uri: string, type: string, fileName: string) => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    setCurrentImage(uri);
+  const { data: result } = useQuery<AnalysisResponse | null>({
+    queryKey: ['analysis', 'last'],
+    queryFn: async () => null,
+    initialData: null,
+    enabled: false,
+  });
 
-    const formData = new FormData();
-    formData.append('image', {
-      uri,
-      type,
-      name: fileName,
-    } as any);
+  const mutation = useMutation({
+    mutationFn: async ({ uri, type, fileName }: { uri: string; type: string; fileName: string }) => {
+      const formData = new FormData();
+      formData.append('image', {
+        uri,
+        type,
+        name: fileName,
+      } as any);
 
-    try {
       console.log('Sending request to:', `${API_CONFIG.BASE_URL}/api/analyze`);
       const response = await axios.post(`${API_CONFIG.BASE_URL}/api/analyze`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 30000, 
+        timeout: 30000,
       });
 
-      setResult(response.data);
-    } catch (err: any) {
-      console.error('API Error:', err);
-      setError('Could not analyze image. Check your connection.');
-    } finally {
-      setLoading(false);
+      return response.data as AnalysisResponse;
+    },
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['analysis', 'last'], data);
+    },
+  });
+
+  const analyzeImage = async (uri: string, type: string, fileName: string) => {
+    mutation.reset();
+    setCurrentImage(uri);
+    queryClient.setQueryData(['analysis', 'last'], null);
+    try {
+      await mutation.mutateAsync({ uri, type, fileName });
+    } catch {
+      // Error state is surfaced via mutation.isError.
     }
   };
 
   const resetAnalysis = () => {
-    setResult(null);
+    queryClient.setQueryData(['analysis', 'last'], null);
     setCurrentImage(null);
-    setError(null);
   };
 
   return {
-    loading,
+    loading: mutation.isPending,
     result,
     currentImage,
-    error,
+    error: mutation.isError ? 'Could not analyze image. Check your connection.' : null,
     analyzeImage,
     resetAnalysis
   };

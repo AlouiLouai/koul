@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
-import { Circle, Svg, Defs, LinearGradient, Stop, Path } from 'react-native-svg';
-import { Flame, TrendingUp, Activity, ArrowUpRight, ChevronRight, Calendar, Info, Zap, Dumbbell, Share2, Watch, Lightbulb } from 'lucide-react-native';
+import { FlashList } from '@shopify/flash-list';
+import { Circle, Svg } from 'react-native-svg';
+import { Flame, Zap, Dumbbell, Share2, Watch, Lightbulb } from 'lucide-react-native';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 import type { TimeFrame } from './index';
@@ -11,7 +12,7 @@ const SCORE_SIZE = width * 0.65;
 const STROKE_WIDTH = 20;
 const RADIUS = (SCORE_SIZE - STROKE_WIDTH) / 2;
 // 220 degrees arc for Speedometer look
-const ARC_ANGLE = 220; 
+const ARC_ANGLE = 220;
 const ARC_LENGTH = (2 * Math.PI * RADIUS) * (ARC_ANGLE / 360);
 
 const Speedometer = ({ score }: { score: number }) => {
@@ -28,8 +29,8 @@ const Speedometer = ({ score }: { score: number }) => {
 
     // Calculate color based on gym levels - Unified Blue Palette
     const getScoreColor = () => {
-        if (score >= 9) return colors.primary; // Brand Blue (Beast Mode)
-        if (score >= 7) return colors.primary + 'CC'; // Slightly lighter Blue (Forma)
+        if (score >= 9) return colors.accent; // Brand Red (Beast Mode)
+        if (score >= 7) return colors.primary; // Blue (Forma)
         if (score >= 5) return colors.warning; // Yellow (Average)
         return colors.textSecondary; // Gray (Weak)
     };
@@ -37,8 +38,8 @@ const Speedometer = ({ score }: { score: number }) => {
     const getScoreLabel = () => {
         if (score >= 9) return 'W7ACH 🦁';
         if (score >= 7) return 'FORMA 💪';
-        if (score >= 5) return 'CA VA 😐';
-        return 'KABESS 📉';
+        if (score >= 5) return 'LABES 🌤️';
+        return 'TE3EB 😴';
     };
     
     const scoreColor = getScoreColor();
@@ -99,169 +100,206 @@ interface StatsUIProps {
   weeklyData: number[];
   daysLabels: string[];
   historyItems: any[];
+  todayStats: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
 export const StatsUI = ({
   timeframe,
   onTimeframeChange,
-  historyItems
+  historyItems,
+  todayStats
 }: StatsUIProps) => {
   const { colors } = useTheme();
-  const avgScore = 8.7;
+  // Simple score calculation for demo: (Protein/150)*10 capped at 10
+  const avgScore = Math.min(10, Math.round((todayStats.protein / 150) * 10 * 10) / 10) || 0.1;
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-      
+  const renderHistoryItem = ({ item }: { item: any }) => (
+    <GlassView style={styles.historyRow} intensity={25} borderRadius={16}>
+      <View style={styles.rowLeft}>
+        <View
+          style={[
+            styles.statusDot,
+            { backgroundColor: item.score >= 7 ? colors.primary : colors.warning }
+          ]}
+        />
+        <View>
+          <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
+          <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{item.status}</Text>
+        </View>
+      </View>
+
+      <View style={styles.rowRight}>
+        <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
+        <View
+          style={[
+            styles.scoreBadge,
+            { backgroundColor: item.score >= 7 ? colors.primary + '20' : colors.warning + '20' }
+          ]}
+        >
+          <Text
+            style={[
+              styles.scoreBadgeText,
+              { color: item.score >= 7 ? colors.primary : colors.warning }
+            ]}
+          >
+            {item.score}
+          </Text>
+        </View>
+      </View>
+    </GlassView>
+  );
+
+  const listHeader = (
+    <>
       {/* --- HEADER --- */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma 🏋️‍♂️</Text>
-            <View style={[styles.streakBadge, { backgroundColor: colors.primary + '20' }]}>
-                <Flame size={16} color={colors.primary} fill={colors.primary} />
-                <Text style={[styles.streakText, { color: colors.primary }]}>5 Jours</Text>
-            </View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma 🏋️‍♂️</Text>
+          <View style={[styles.streakBadge, { backgroundColor: colors.primary + '20' }]}>
+            <Flame size={16} color={colors.primary} fill={colors.primary} />
+            <Text style={[styles.streakText, { color: colors.primary }]}>5 Jours</Text>
+          </View>
         </View>
 
-        <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
-            contentContainerStyle={styles.tabsScroll}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsScroll}
         >
-           {['Week', 'Month', '3M', '6M', 'Year'].map((t) => (
-             <TouchableOpacity 
-               key={t} 
-               style={[styles.tabBtn, timeframe === t && { backgroundColor: colors.text, borderColor: colors.text }]}
-               onPress={() => onTimeframeChange(t as TimeFrame)}
-             >
-               <Text style={[
-                   styles.tabText, 
-                   { color: timeframe === t ? colors.background[0] : colors.textSecondary }
-               ]}>
-                   {t}
-               </Text>
-             </TouchableOpacity>
-           ))}
+          {['Week', 'Month', '3M', '6M', 'Year'].map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.tabBtn, timeframe === t && { backgroundColor: colors.text, borderColor: colors.text }]}
+              onPress={() => onTimeframeChange(t as TimeFrame)}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  { color: timeframe === t ? colors.background[0] : colors.textSecondary }
+                ]}
+              >
+                {t}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
 
       {/* --- HERO DASHBOARD --- */}
       <View style={styles.heroSection}>
-          <GlassView style={styles.heroCard} intensity={20} borderRadius={40}>
-              {/* Share Button (Gamification) */}
-              <TouchableOpacity style={[styles.shareBtn, { backgroundColor: colors.glassBorder }]}>
-                  <Share2 size={20} color={colors.text} />
-              </TouchableOpacity>
+        <GlassView style={styles.heroCard} intensity={20} borderRadius={40}>
+          {/* Share Button (Gamification) */}
+          <TouchableOpacity style={[styles.shareBtn, { backgroundColor: colors.glassBorder }]}>
+            <Share2 size={20} color={colors.text} />
+          </TouchableOpacity>
 
-              <View style={styles.ringWrapper}>
-                 <Speedometer score={avgScore} />
+          <View style={styles.ringWrapper}>
+            <Speedometer score={avgScore} />
+          </View>
+
+          {/* Gym-Specific Summary - 2026 Trends */}
+          <View style={styles.gymGrid}>
+            {/* Protein Dominance (Full Width) */}
+            <View
+              style={[
+                styles.gymCard,
+                styles.proteinCard,
+                { backgroundColor: colors.primary + '10', borderColor: colors.primary + '30', borderWidth: 1 }
+              ]}
+            >
+              <View style={styles.cardRow}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={[styles.iconBoxSmall, { backgroundColor: colors.primary }]}>
+                    <Dumbbell size={16} color="#fff" />
+                  </View>
+                  <Text style={[styles.gymLabel, { color: colors.text }]}>El Bnai (Prot)</Text>
+                </View>
+                {/* Efficiency Badge */}
+                <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
+                  <Text style={[styles.badgeText, { color: colors.primary }]}>High Efficiency</Text>
+                </View>
               </View>
 
-              {/* Gym-Specific Summary - 2026 Trends */}
-              <View style={styles.gymGrid}>
-                  
-                  {/* Protein Dominance (Full Width) */}
-                  <View style={[styles.gymCard, styles.proteinCard, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '30', borderWidth: 1 }]}>
-                      <View style={styles.cardRow}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                              <View style={[styles.iconBoxSmall, { backgroundColor: colors.primary }]}>
-                                  <Dumbbell size={16} color="#fff" />
-                              </View>
-                              <Text style={[styles.gymLabel, { color: colors.text }]}>El Bnai (Prot)</Text>
-                          </View>
-                          {/* Efficiency Badge */}
-                          <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
-                              <Text style={[styles.badgeText, { color: colors.primary }]}>High Efficiency</Text>
-                          </View>
-                      </View>
-                      
-                      <View style={[styles.cardRow, { marginTop: 8, alignItems: 'flex-end' }]}>
-                          <Text style={[styles.gymValueLarge, { color: colors.text }]}>180g</Text>
-                          <Text style={[styles.gymTarget, { color: colors.textSecondary }]}>/ 200g Goal</Text>
-                      </View>
-                      
-                      <View style={styles.miniBarTrack}>
-                          <View style={[styles.miniBarFill, { width: '90%', backgroundColor: colors.primary }]} />
-                      </View>
-                  </View>
-
-                  {/* Net Calories & Wearable Sync */}
-                  <View style={styles.dualRow}>
-                      <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
-                          <View style={styles.cardHeaderSmall}>
-                              <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>W7ach Ghodwa?</Text>
-                              <Zap size={14} color={colors.warning} fill={colors.warning} />
-                          </View>
-                          <Text style={[styles.gymValueSmall, { color: colors.text }]}>Ready ⚡</Text>
-                      </View>
-
-                      <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
-                          <View style={styles.cardHeaderSmall}>
-                              <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>Net Cals</Text>
-                              <Watch size={14} color={colors.primary} />
-                          </View>
-                          <Text style={[styles.gymValueSmall, { color: colors.text }]}>1,850</Text>
-                          <Text style={{ fontSize: 9, color: colors.textSecondary }}>-450 Active</Text>
-                      </View>
-                  </View>
-
+              <View style={[styles.cardRow, { marginTop: 8, alignItems: 'flex-end' }]}>
+                <Text style={[styles.gymValueLarge, { color: colors.text }]}>{Math.round(todayStats.protein)}g</Text>
+                <Text style={[styles.gymTarget, { color: colors.textSecondary }]}>/ 200g Goal</Text>
               </View>
-          </GlassView>
+
+              <View style={styles.miniBarTrack}>
+                <View
+                  style={[
+                    styles.miniBarFill,
+                    { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }
+                  ]}
+                />
+              </View>
+            </View>
+
+            {/* Net Calories & Wearable Sync */}
+            <View style={styles.dualRow}>
+              <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
+                <View style={styles.cardHeaderSmall}>
+                  <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>W7ach Ghodwa?</Text>
+                  <Zap size={14} color={colors.warning} fill={colors.warning} />
+                </View>
+                <Text style={[styles.gymValueSmall, { color: colors.text }]}>{avgScore >= 7 ? 'Ready ⚡' : 'Kamal Pro 🥩'}</Text>
+              </View>
+
+              <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
+                <View style={styles.cardHeaderSmall}>
+                  <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>Total Cals</Text>
+                  <Watch size={14} color={colors.primary} />
+                </View>
+                <Text style={[styles.gymValueSmall, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
+                <Text style={{ fontSize: 9, color: colors.textSecondary }}>Kcal lyoum</Text>
+              </View>
+            </View>
+          </View>
+        </GlassView>
       </View>
 
       {/* --- SMART INSIGHT (Klem Coach) --- */}
       <View style={styles.section}>
-         <GlassView style={styles.insightCard} intensity={40} borderRadius={24}>
-             <View style={[styles.insightIcon, { backgroundColor: colors.primary }]}>
-                 <Lightbulb size={20} color="#fff" fill="#fff" />
-             </View>
-             <View style={{ flex: 1 }}>
-                 <Text style={[styles.insightTitle, { color: colors.primary }]}>Nasi7a (Tip)</Text>
-                 <Text style={[styles.insightText, { color: colors.text }]}>
-                    Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{fontWeight:'bold'}}>W7ach</Text> ghodwa!
-                 </Text>
-             </View>
-         </GlassView>
+        <GlassView style={styles.insightCard} intensity={40} borderRadius={24}>
+          <View style={[styles.insightIcon, { backgroundColor: colors.primary }]}>
+            <Lightbulb size={20} color="#fff" fill="#fff" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.insightTitle, { color: colors.primary }]}>Nasi7a (Tip)</Text>
+            <Text style={[styles.insightText, { color: colors.text }]}>
+              Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold' }}>W7ach</Text> ghodwa!
+            </Text>
+          </View>
+        </GlassView>
       </View>
 
       {/* --- HISTORY --- */}
-      <View style={styles.section}>
-         <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Sjel (History)</Text>
-            <TouchableOpacity><Text style={[styles.link, { color: colors.primary }]}>Chouf el kol</Text></TouchableOpacity>
-         </View>
-         
-         <View style={{ gap: 12 }}>
-             {historyItems.map((item, idx) => (
-                 <GlassView key={idx} style={styles.historyRow} intensity={25} borderRadius={16}>
-                     <View style={styles.rowLeft}>
-                         <View style={[
-                             styles.statusDot, 
-                             { backgroundColor: item.score >= 7 ? colors.primary : colors.warning }
-                         ]} />
-                         <View>
-                            <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
-                            <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{item.status}</Text>
-                         </View>
-                     </View>
-
-                     <View style={styles.rowRight}>
-                         <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
-                         <View style={[
-                             styles.scoreBadge, 
-                             { backgroundColor: item.score >= 7 ? colors.primary + '20' : colors.warning + '20' }
-                         ]}>
-                            <Text style={[
-                                styles.scoreBadgeText,
-                                { color: item.score >= 7 ? colors.primary : colors.warning }
-                            ]}>{item.score}</Text>
-                         </View>
-                     </View>
-                 </GlassView>
-             ))}
-         </View>
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Sjel (History)</Text>
+        <TouchableOpacity>
+          <Text style={[styles.link, { color: colors.primary }]}>Chouf el kol</Text>
+        </TouchableOpacity>
       </View>
+    </>
+  );
 
-    </ScrollView>
+  return (
+    <FlashList
+      style={styles.container}
+      data={historyItems}
+      keyExtractor={(item, index) => String(item?.id ?? item?.date ?? index)}
+      renderItem={renderHistoryItem}
+      estimatedItemSize={84}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.listContent}
+      ListHeaderComponent={listHeader}
+      ItemSeparatorComponent={() => <View style={styles.historySeparator} />}
+    />
   );
 };
 
@@ -269,6 +307,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 24,
+  },
+  listContent: {
+    paddingBottom: 100,
   },
   header: {
     marginBottom: 24,
@@ -477,6 +518,9 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       marginBottom: 16,
       paddingHorizontal: 4,
+  },
+  historySeparator: {
+      height: 12,
   },
   sectionTitle: {
       fontSize: 20,

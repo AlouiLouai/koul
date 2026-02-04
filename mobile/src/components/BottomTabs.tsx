@@ -12,7 +12,7 @@ interface BottomTabsProps {
 export const BottomTabs = ({ activeTab, onTabChange }: BottomTabsProps) => {
   const { colors } = useTheme();
 
-  const TabButton = ({ name, icon: Icon, isActive, onPress }: any) => {
+  const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
     const scale = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
