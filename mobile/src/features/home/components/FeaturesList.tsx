@@ -1,81 +1,47 @@
-import React, { memo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import { ScanLine, TrendingUp, ArrowRight, Utensils } from 'lucide-react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Camera, Zap, Shield, Heart } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
-const FeatureCard = memo(({ title, desc, icon: Icon, color }: any) => {
-  const { colors } = useTheme();
-  return (
-    <GlassView style={[styles.featureCard, { borderColor: color + '40' }]} intensity={30} borderRadius={24}> 
-      <View style={[styles.featureCardHeader]}> 
-        <View style={[styles.featureIcon, { backgroundColor: color + '20' }]}> 
-          <Icon size={24} color={color} strokeWidth={2.5} /> 
-        </View>
-        <View style={[styles.arrowCircle, { backgroundColor: color + '10' }]}>
-           <ArrowRight size={14} color={color} /> 
-        </View>
-      </View>
-      <View> 
-        <Text style={[styles.featureTitle, { color: colors.text }]}>{title}</Text> 
-        <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>{desc}</Text> 
-      </View>
-    </GlassView>
-  );
-});
+const FEATURES = [
+  { id: '1', title: 'Sawar w 7alel', sub: 'Macros f\'thania', icon: Camera, color: '#2563eb' },
+  { id: '2', title: 'AI 100% Tounsi', sub: 'Ya3ref l\'Kousksi', icon: Zap, color: '#f59e0b' },
+  { id: '3', title: 'Khousousia Safia', sub: 'Data mkhabya', icon: Shield, color: '#10b981' },
+  { id: '4', title: 'Sa7tek Labes', sub: 'Ahdef tounes', icon: Heart, color: '#e11d48' },
+];
 
-export const FeaturesList = memo(() => {
+export const FeaturesList = () => {
   const { colors } = useTheme();
-  const features = [
-    {
-      title: 'Makla Tounsiya 🇹🇳',
-      desc: 'Min Lablebi l\'Mloukhia, na3rfouhom lkol! 🥘',
-      icon: Utensils,
-      color: colors.primary,
-    },
-    {
-      title: 'Calcul Exact 🎯',
-      desc: 'Bla mizan, sawar w a3raf chnoua klit. 📸',
-      icon: ScanLine,
-      color: colors.warning,
-    },
-    {
-      title: 'Suivi S7i7 📈',
-      desc: "Chouf rou7ek win wselt, w win mechi. 🚀",
-      icon: TrendingUp,
-      color: colors.success,
-    },
-  ];
 
   return (
-    <FlashList
-      horizontal
-      data={features}
-      renderItem={({ item }) => (
-        <FeatureCard
-          title={item.title}
-          desc={item.desc}
-          icon={item.icon}
-          color={item.color}
-        />
-      )}
-      keyExtractor={(item) => item.title}
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.featuresScroll}
-      estimatedItemSize={170}
-      ItemSeparatorComponent={() => <View style={styles.featureSeparator} />}
-    />
+    <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        contentContainerStyle={styles.scrollContent}
+    >
+      {FEATURES.map((item) => (
+        <View key={item.id} style={styles.cardWrapper}>
+            <GlassView intensity={20} borderRadius={24} style={styles.featureCard}>
+                <View style={[styles.iconBg, { backgroundColor: item.color + '15' }]}>
+                    <item.icon size={24} color={item.color} />
+                </View>
+                <View>
+                    <Text style={[styles.featureTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+                    <Text style={[styles.featureDesc, { color: colors.textSecondary }]} numberOfLines={1}>{item.sub}</Text>
+                </View>
+            </GlassView>
+        </View>
+      ))}
+    </ScrollView>
   );
-});
+};
 
 const styles = StyleSheet.create({
-  featuresScroll: { paddingBottom: 24, paddingRight: 24 },
-  featureSeparator: { width: 12 },
-  featureCard: { width: 160, height: 170, padding: 16, justifyContent: 'space-between', borderWidth: 1 },
-  featureCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  featureIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  arrowCircle: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  featureTitle: { fontSize: 16, fontWeight: '900', marginBottom: 6 },
-  featureDesc: { fontSize: 12, lineHeight: 18, fontWeight: '600', opacity: 0.8 },
+  scrollContent: { paddingHorizontal: 4, gap: 12 },
+  cardWrapper: { width: 140, height: 140 }, // Bigger Square
+  featureCard: { padding: 16, width: '100%', height: '100%', justifyContent: 'space-between' },
+  iconBg: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  featureTitle: { fontSize: 14, fontWeight: '900', marginBottom: 2, lineHeight: 18 },
+  featureDesc: { fontSize: 11, fontWeight: '600', opacity: 0.7 },
 });

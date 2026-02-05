@@ -96,7 +96,10 @@ export const ScanContainer = ({
         currentImage={currentImage}
         error={error}
         onImageSelected={handleImageSelected}
-        onReset={resetAnalysis}
+        onReset={() => {
+          resetAnalysis();
+          setShowLogSuccess(false);
+        }}
         onLogMeal={handleLogMeal}
         showLogSuccess={showLogSuccess}
         onCloseLogSuccess={handleCloseSuccess}

@@ -17,7 +17,7 @@ export const WaterTracker = () => {
   const bubble1 = useRef(new Animated.Value(0)).current;
   const bubble2 = useRef(new Animated.Value(0)).current;
   const bubble3 = useRef(new Animated.Value(0)).current;
-  const cardFillAnim = useRef(new Animated.Value(0)).current; // Now used for background fade
+  const cardFillAnim = useRef(new Animated.Value(0)).current; 
   const pulseAnim = useRef(new Animated.Value(0)).current;
   const waveAnim = useRef(new Animated.Value(0)).current;
   const pulseLoopRef = useRef<Animated.CompositeAnimation | null>(null);

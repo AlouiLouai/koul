@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { UserPlus, Sparkles, X } from 'lucide-react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { UserPlus, Sparkles } from 'lucide-react-native';
+import { BottomSheetModal } from './BottomSheetModal';
+import { ActionButton } from './ActionButton';
+import { useTheme } from '../theme/ThemeContext';
 
 interface GuestQuotaModalProps {
   visible: boolean;
@@ -9,82 +12,54 @@ interface GuestQuotaModalProps {
 }
 
 export const GuestQuotaModal = ({ visible, onClose, onConnect }: GuestQuotaModalProps) => {
+  const { colors } = useTheme();
+
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      statusBarTranslucent={true}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <X size={20} color="#a1a1aa" />
-          </TouchableOpacity>
+    <BottomSheetModal visible={visible} onClose={onClose}>
+      <View style={styles.content}>
+        <View style={[styles.iconBg, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}>
+           <UserPlus size={36} color={colors.primary} strokeWidth={2.5} />
+           <View style={styles.badge}>
+              <Sparkles size={12} color="#fff" fill="#fff" />
+           </View>
+        </View>
 
-          <View style={styles.iconBg}>
-             <UserPlus size={36} color="#2563eb" strokeWidth={2.5} />
-             <View style={styles.badge}>
-                <Sparkles size={12} color="#fff" fill="#fff" />
-             </View>
-          </View>
+        <Text style={[styles.title, { color: colors.text }]}>Wfet l'tjarib! 🛑</Text>
+        <Text style={[styles.message, { color: colors.textSecondary }]}>
+          Kammalt l'3 scans mta3ek l'youm. <Text style={[styles.highlight, { color: colors.primary }]}>Connecti</Text> tawa bach t7afedh 3la tsawrek w stats mta3ek!
+        </Text>
 
-          <Text style={styles.title}>Wfet l'tjarib! 🛑</Text>
-          <Text style={styles.message}>
-            Kammalt l'3 scans mta3ek l'youm. 
-            
-            <Text style={styles.highlight}>Connecti</Text> tawa bach t7afedh 3la tsawrek w stats mta3ek!
-          </Text>
-
-          <TouchableOpacity style={styles.connectBtn} onPress={() => { onClose(); onConnect(); }}>
-             <Text style={styles.connectBtnText}>Connecti Tawa</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-             <Text style={styles.cancelBtnText}>Batel, ghodwa nkamal</Text>
-          </TouchableOpacity>
+        <View style={styles.actions}>
+          <ActionButton 
+            text="Connecti Tawa" 
+            variant="primary" 
+            onPress={() => { onClose(); onConnect(); }} 
+            flex={1}
+          />
+          <ActionButton 
+            text="Batel, ghodwa nkamal" 
+            variant="secondary" 
+            onPress={onClose} 
+            flex={1}
+          />
         </View>
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
+  content: {
     alignItems: 'center',
-    padding: 24,
-  },
-  container: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 32,
-    padding: 32,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 10,
-    position: 'relative',
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    padding: 4,
   },
   iconBg: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#eff6ff',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    borderWidth: 2,
-    borderColor: '#bfdbfe',
+    borderWidth: 1,
     position: 'relative',
   },
   badge: {
@@ -103,44 +78,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '900',
-    color: '#18181b',
     marginBottom: 12,
     textAlign: 'center',
   },
   message: {
-    fontSize: 15,
-    color: '#71717a',
+    fontSize: 14,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
     marginBottom: 32,
+    maxWidth: '85%',
   },
   highlight: {
     color: '#2563eb',
     fontWeight: 'bold',
   },
-  connectBtn: {
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
     width: '100%',
-    backgroundColor: '#2563eb',
-    paddingVertical: 18,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginBottom: 12,
-    shadowColor: '#2563eb',
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  connectBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  cancelBtn: {
-    paddingVertical: 12,
-  },
-  cancelBtnText: {
-    color: '#a1a1aa',
-    fontWeight: '600',
-    fontSize: 14,
   },
 });

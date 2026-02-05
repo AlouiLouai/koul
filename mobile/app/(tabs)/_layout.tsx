@@ -1,22 +1,40 @@
 import React, { useEffect, useRef } from 'react';
 import { Tabs } from 'expo-router';
-import { View, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Animated, StyleSheet, Platform } from 'react-native';
 import { Home, PieChart, User as UserIcon, Camera } from 'lucide-react-native';
 import { GlassView } from '../../src/components/GlassView';
 import { useTheme } from '../../src/theme/ThemeContext';
 
 const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(0.6)).current;
+  const highlightScale = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.spring(scale, {
-      toValue: isActive ? 1.1 : 1,
-      useNativeDriver: true,
-      friction: 10,
-      tension: 50,
-    }).start();
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: isActive ? 1 : 1, // No scale on icon itself to keep it clean
+        useNativeDriver: true,
+        friction: 8,
+        tension: 40,
+      }),
+      Animated.timing(opacity, {
+        toValue: isActive ? 1 : 0.5,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(highlightScale, {
+        toValue: isActive ? 1 : 0,
+        useNativeDriver: true,
+        friction: 7,
+        tension: 35,
+      })
+    ]).start();
   }, [isActive]);
+
+  // Matching the light blue highlight from the image
+  const activeBgColor = mode === 'dark' ? 'rgba(56, 189, 248, 0.2)' : '#dbeafe';
 
   return (
     <TouchableOpacity 
@@ -24,60 +42,74 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
       activeOpacity={0.7}
       style={tabStyles.tabButtonWrapper}
     >
-      <Animated.View style={[
-        tabStyles.tabIconContainer, 
-        isActive && { backgroundColor: colors.primary + '20' },
-        { transform: [{ scale }] }
-      ]}>
-        <Icon 
-          size={24} 
-          color={isActive ? colors.primary : colors.textSecondary} 
-          strokeWidth={isActive ? 2.5 : 2}
+      <View style={tabStyles.iconWrapper}>
+        <Animated.View 
+            style={[
+                tabStyles.highlightCircle, 
+                { 
+                    backgroundColor: activeBgColor,
+                    transform: [{ scale: highlightScale }]
+                }
+            ]} 
         />
-      </Animated.View>
+        <Animated.View style={{ opacity }}>
+            <Icon 
+              size={24} 
+              color={isActive ? colors.primary : '#334155'} 
+              strokeWidth={isActive ? 2.5 : 2}
+            />
+        </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };
 
 function CustomTabBar({ state, navigation }: any) {
+  const { mode } = useTheme();
+
+  // Ultra-glass look: almost white but very transparent
+  const glassBackgroundColor = mode === 'light' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(15, 23, 42, 0.4)';
+
   return (
     <View style={tabStyles.container}>
       <GlassView 
         style={tabStyles.dockContainer} 
-        intensity={60} 
-        borderRadius={32}
+        intensity={mode === 'light' ? 50 : 80}
+        borderRadius={45}
         noBorder={true}
       >
-        {state.routes.map((route: any, index: number) => {
-          const isFocused = state.index === index;
+        <View style={tabStyles.innerContainer}>
+          {state.routes.map((route: any, index: number) => {
+            const isFocused = state.index === index;
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
+            const onPress = () => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
 
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
+              if (!isFocused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+              }
+            };
 
-          let icon;
-          if (route.name === 'index') icon = Home;
-          else if (route.name === 'scan') icon = Camera;
-          else if (route.name === 'stats') icon = PieChart;
-          else if (route.name === 'profile') icon = UserIcon;
+            let icon;
+            if (route.name === 'index') icon = Home;
+            else if (route.name === 'scan') icon = Camera;
+            else if (route.name === 'stats') icon = PieChart;
+            else if (route.name === 'profile') icon = UserIcon;
 
-          return (
-            <TabButton
-              key={route.key}
-              icon={icon}
-              isActive={isFocused}
-              onPress={onPress}
-            />
-          );
-        })}
+            return (
+              <TabButton
+                key={route.key}
+                icon={icon}
+                isActive={isFocused}
+                onPress={onPress}
+              />
+            );
+          })}
+        </View>
       </GlassView>
     </View>
   );
@@ -90,37 +122,14 @@ export default function TabsLayout() {
       screenOptions={{ 
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarTransparent: true,
         sceneStyle: { backgroundColor: 'transparent' },
       }}
     >
-      <Tabs.Screen 
-        name="index" 
-        options={{ 
-          title: 'Home',
-          headerShown: false,
-        }} 
-      />
-      <Tabs.Screen 
-        name="scan" 
-        options={{ 
-          title: 'Scan',
-          headerShown: false,
-        }} 
-      />
-      <Tabs.Screen 
-        name="stats" 
-        options={{ 
-          title: 'Stats',
-          headerShown: false,
-        }} 
-      />
-      <Tabs.Screen 
-        name="profile" 
-        options={{ 
-          title: 'Profile',
-          headerShown: false,
-        }} 
-      />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="scan" options={{ title: 'Scan' }} />
+      <Tabs.Screen name="stats" options={{ title: 'Stats' }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
     </Tabs>
   );
 }
@@ -128,33 +137,45 @@ export default function TabsLayout() {
 const tabStyles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 24, 
-    left: 0,
-    right: 0,
+    bottom: Platform.OS === 'ios' ? 34 : 24, 
+    left: 20,
+    right: 20,
     alignItems: 'center',
-    zIndex: 50,
+    zIndex: 100,
   },
   dockContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 12,
+    width: '100%',
+    maxWidth: 360,
+    paddingHorizontal: 8,
     paddingVertical: 10,
-    justifyContent: 'space-between',
-    width: 'auto',
-    minWidth: 220,
-    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  innerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   tabButtonWrapper: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 48,
-    height: 48,
+    height: 56,
   },
-  tabIconContainer: {
+  iconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    width: 50,
+  },
+  highlightCircle: {
+    position: 'absolute',
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
+  }
 });

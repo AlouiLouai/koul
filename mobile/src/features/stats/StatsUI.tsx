@@ -2,21 +2,20 @@ import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Circle, Svg } from 'react-native-svg';
-import { Flame, Zap, Dumbbell, Share2, Watch, Lightbulb } from 'lucide-react-native';
+import { Flame, Zap, Dumbbell, Share2, Watch, Lightbulb, ChevronRight, TrendingUp } from 'lucide-react-native';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 import type { TimeFrame } from './index';
 
 const { width } = Dimensions.get('window');
 const SCORE_SIZE = width * 0.65;
-const STROKE_WIDTH = 20;
+const STROKE_WIDTH = 16;
 const RADIUS = (SCORE_SIZE - STROKE_WIDTH) / 2;
-// 220 degrees arc for Speedometer look
 const ARC_ANGLE = 220;
 const ARC_LENGTH = (2 * Math.PI * RADIUS) * (ARC_ANGLE / 360);
 
 const Speedometer = ({ score }: { score: number }) => {
-    const { colors } = useTheme();
+    const { colors, mode } = useTheme();
     const animatedValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -27,12 +26,11 @@ const Speedometer = ({ score }: { score: number }) => {
         }).start();
     }, [score]);
 
-    // Calculate color based on gym levels - Unified Blue Palette
     const getScoreColor = () => {
-        if (score >= 9) return colors.accent; // Brand Red (Beast Mode)
-        if (score >= 7) return colors.primary; // Blue (Forma)
-        if (score >= 5) return colors.warning; // Yellow (Average)
-        return colors.textSecondary; // Gray (Weak)
+        if (score >= 9) return '#e11d48'; // Tunisian Red / Accent
+        if (score >= 7) return colors.primary; 
+        if (score >= 5) return '#f59e0b'; 
+        return colors.textSecondary;
     };
 
     const getScoreLabel = () => {
@@ -47,15 +45,13 @@ const Speedometer = ({ score }: { score: number }) => {
     const dashOffset = ARC_LENGTH * (1 - (score / 10));
 
     return (
-        <View style={{ width: SCORE_SIZE, height: SCORE_SIZE, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-             {/* Speedometer Arc */}
-             <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute' }}>
-                 {/* Background Track */}
+        <View style={{ width: SCORE_SIZE, height: SCORE_SIZE - 40, alignItems: 'center', justifyContent: 'center' }}>
+             <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute', top: 0 }}>
                  <Circle
                     cx={SCORE_SIZE / 2}
                     cy={SCORE_SIZE / 2}
                     r={RADIUS}
-                    stroke={colors.glassBorder}
+                    stroke={mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
                     strokeWidth={STROKE_WIDTH}
                     strokeDasharray={`${ARC_LENGTH} ${1000}`}
                     strokeLinecap="round"
@@ -63,7 +59,6 @@ const Speedometer = ({ score }: { score: number }) => {
                     rotation={rotation}
                     origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
                  />
-                 {/* Active Score Arc */}
                  <Circle
                     cx={SCORE_SIZE / 2}
                     cy={SCORE_SIZE / 2}
@@ -79,11 +74,10 @@ const Speedometer = ({ score }: { score: number }) => {
                  />
              </Svg>
              
-             {/* Center Content - The "Cockpit" */}
-             <View style={{ alignItems: 'center', gap: 4, marginTop: -20 }}>
-                <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Jahziya (Readiness)</Text>
+             <View style={{ alignItems: 'center', gap: 2, marginTop: 20 }}>
+                <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Readiness</Text>
                 <Text style={[styles.scoreBig, { color: colors.text }]}>{score}</Text>
-                <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '20' }]}>
+                <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '15', borderColor: scoreColor + '30', borderWidth: 1 }]}>
                     <Text style={[styles.scoreRankText, { color: scoreColor }]}>
                         {getScoreLabel()}
                     </Text>
@@ -114,19 +108,15 @@ export const StatsUI = ({
   historyItems,
   todayStats
 }: StatsUIProps) => {
-  const { colors } = useTheme();
-  // Simple score calculation for demo: (Protein/150)*10 capped at 10
+  const { colors, mode } = useTheme();
   const avgScore = Math.min(10, Math.round((todayStats.protein / 150) * 10 * 10) / 10) || 0.1;
 
   const renderHistoryItem = ({ item }: { item: any }) => (
-    <GlassView style={styles.historyRow} intensity={25} borderRadius={16}>
+    <GlassView style={[styles.historyRow, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)' }]} intensity={20} borderRadius={20}>
       <View style={styles.rowLeft}>
-        <View
-          style={[
-            styles.statusDot,
-            { backgroundColor: item.score >= 7 ? colors.primary : colors.warning }
-          ]}
-        />
+        <View style={[styles.iconBoxMini, { backgroundColor: item.score >= 7 ? colors.primary + '20' : '#f59e0b20' }]}>
+            <TrendingUp size={14} color={item.score >= 7 ? colors.primary : '#f59e0b'} />
+        </View>
         <View>
           <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
           <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{item.status}</Text>
@@ -134,55 +124,38 @@ export const StatsUI = ({
       </View>
 
       <View style={styles.rowRight}>
-        <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
-        <View
-          style={[
-            styles.scoreBadge,
-            { backgroundColor: item.score >= 7 ? colors.primary + '20' : colors.warning + '20' }
-          ]}
-        >
-          <Text
-            style={[
-              styles.scoreBadgeText,
-              { color: item.score >= 7 ? colors.primary : colors.warning }
-            ]}
-          >
-            {item.score}
-          </Text>
+        <View style={styles.historyStats}>
+            <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
+            <Text style={[styles.historyCals, { color: colors.textSecondary }]}>{item.cals || 0} kcal</Text>
         </View>
+        <ChevronRight size={18} color={colors.textSecondary} />
       </View>
     </GlassView>
   );
 
   const listHeader = (
-    <>
+    <View style={styles.padding}>
       {/* --- HEADER --- */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma 🏋️‍♂️</Text>
-          <View style={[styles.streakBadge, { backgroundColor: colors.primary + '20' }]}>
-            <Flame size={16} color={colors.primary} fill={colors.primary} />
-            <Text style={[styles.streakText, { color: colors.primary }]}>5 Jours</Text>
-          </View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma <Text style={{ color: '#e11d48' }}>🏋️‍♂️</Text></Text>
+          <GlassView style={styles.streakBadge} intensity={20} borderRadius={20}>
+            <Flame size={14} color="#e11d48" fill="#e11d48" />
+            <Text style={[styles.streakText, { color: colors.text }]}>5 Jours</Text>
+          </GlassView>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsScroll}
-        >
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
           {['Week', 'Month', '3M', '6M', 'Year'].map((t) => (
             <TouchableOpacity
               key={t}
-              style={[styles.tabBtn, timeframe === t && { backgroundColor: colors.text, borderColor: colors.text }]}
+              style={[
+                styles.tabBtn, 
+                timeframe === t && { backgroundColor: mode === 'dark' ? '#fff' : '#000', borderColor: mode === 'dark' ? '#fff' : '#000' }
+              ]}
               onPress={() => onTimeframeChange(t as TimeFrame)}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  { color: timeframe === t ? colors.background[0] : colors.textSecondary }
-                ]}
-              >
+              <Text style={[styles.tabText, { color: timeframe === t ? (mode === 'dark' ? '#000' : '#fff') : colors.textSecondary }]}>
                 {t}
               </Text>
             </TouchableOpacity>
@@ -190,118 +163,158 @@ export const StatsUI = ({
         </ScrollView>
       </View>
 
-      {/* --- HERO DASHBOARD --- */}
-      <View style={styles.heroSection}>
-        <GlassView style={styles.heroCard} intensity={20} borderRadius={40}>
-          {/* Share Button (Gamification) */}
-          <TouchableOpacity style={[styles.shareBtn, { backgroundColor: colors.glassBorder }]}>
-            <Share2 size={20} color={colors.text} />
-          </TouchableOpacity>
-
-          <View style={styles.ringWrapper}>
-            <Speedometer score={avgScore} />
+      {/* --- SPEEDOMETER CARD --- */}
+      <GlassView style={styles.heroCard} intensity={30} borderRadius={36}>
+          <Speedometer score={avgScore} />
+          <View style={styles.heroFooter}>
+             <View style={styles.footerItem}>
+                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>WEEKLY AVG</Text>
+                <Text style={[styles.footerValue, { color: colors.text }]}>8.2</Text>
+             </View>
+             <View style={[styles.footerDivider, { backgroundColor: colors.glassBorder }]} />
+             <View style={styles.footerItem}>
+                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>PR STREAK</Text>
+                <Text style={[styles.footerValue, { color: colors.text }]}>12d</Text>
+             </View>
           </View>
+      </GlassView>
 
-          {/* Gym-Specific Summary - 2026 Trends */}
-          <View style={styles.gymGrid}>
-            {/* Protein Dominance (Full Width) */}
-            <View
-              style={[
-                styles.gymCard,
-                styles.proteinCard,
-                { backgroundColor: colors.primary + '10', borderColor: colors.primary + '30', borderWidth: 1 }
-              ]}
-            >
-              <View style={styles.cardRow}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <View style={[styles.iconBoxSmall, { backgroundColor: colors.primary }]}>
-                    <Dumbbell size={16} color="#fff" />
+      {/* --- BENTO GRID FOR STATS --- */}
+      <View style={styles.bentoGrid}>
+          {/* PROTEIN (Left) */}
+          <GlassView style={styles.proteinCard} intensity={20} borderRadius={28}>
+              <View style={styles.cardHeader}>
+                  <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+                    <Dumbbell size={18} color={colors.primary} />
                   </View>
-                  <Text style={[styles.gymLabel, { color: colors.text }]}>El Bnai (Prot)</Text>
-                </View>
-                {/* Efficiency Badge */}
-                <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
-                  <Text style={[styles.badgeText, { color: colors.primary }]}>High Efficiency</Text>
-                </View>
+                  <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>BUILD</Text>
               </View>
+              <View style={styles.valueContainer}>
+                  <Text style={[styles.valueBig, { color: colors.text }]}>{Math.round(todayStats.protein)}<Text style={styles.unitSmall}>g</Text></Text>
+                  <Text style={[styles.targetLabel, { color: colors.textSecondary }]}>of 200g</Text>
+              </View>
+              <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }]} />
+              </View>
+          </GlassView>
 
-              <View style={[styles.cardRow, { marginTop: 8, alignItems: 'flex-end' }]}>
-                <Text style={[styles.gymValueLarge, { color: colors.text }]}>{Math.round(todayStats.protein)}g</Text>
-                <Text style={[styles.gymTarget, { color: colors.textSecondary }]}>/ 200g Goal</Text>
-              </View>
-
-              <View style={styles.miniBarTrack}>
-                <View
-                  style={[
-                    styles.miniBarFill,
-                    { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Net Calories & Wearable Sync */}
-            <View style={styles.dualRow}>
-              <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
-                <View style={styles.cardHeaderSmall}>
-                  <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>W7ach Ghodwa?</Text>
-                  <Zap size={14} color={colors.warning} fill={colors.warning} />
-                </View>
-                <Text style={[styles.gymValueSmall, { color: colors.text }]}>{avgScore >= 7 ? 'Ready ⚡' : 'Kamal Pro 🥩'}</Text>
-              </View>
-
-              <View style={[styles.gymCardSmall, { backgroundColor: colors.background[0] }]}>
-                <View style={styles.cardHeaderSmall}>
-                  <Text style={[styles.gymLabelSmall, { color: colors.textSecondary }]}>Total Cals</Text>
-                  <Watch size={14} color={colors.primary} />
-                </View>
-                <Text style={[styles.gymValueSmall, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
-                <Text style={{ fontSize: 9, color: colors.textSecondary }}>Kcal lyoum</Text>
-              </View>
-            </View>
+          {/* DUAL COLS (Right) */}
+          <View style={styles.rightCol}>
+              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+                  <Zap size={16} color="#f59e0b" fill="#f59e0b" />
+                  <View>
+                      <Text style={[styles.smallCardValue, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
+                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>KCAL</Text>
+                  </View>
+              </GlassView>
+              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+                  <Watch size={16} color={colors.primary} />
+                  <View>
+                      <Text style={[styles.smallCardValue, { color: colors.text }]}>Ready</Text>
+                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>SYNC</Text>
+                  </View>
+              </GlassView>
           </View>
-        </GlassView>
       </View>
 
-      {/* --- SMART INSIGHT (Klem Coach) --- */}
-      <View style={styles.section}>
-        <GlassView style={styles.insightCard} intensity={40} borderRadius={24}>
-          <View style={[styles.insightIcon, { backgroundColor: colors.primary }]}>
-            <Lightbulb size={20} color="#fff" fill="#fff" />
+      {/* --- COACH INSIGHT --- */}
+      <GlassView style={styles.insightCard} intensity={40} borderRadius={28}>
+          <View style={[styles.insightIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+            <Lightbulb size={20} color={colors.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.insightTitle, { color: colors.primary }]}>Nasi7a (Tip)</Text>
-            <Text style={[styles.insightText, { color: colors.text }]}>
-              Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold' }}>W7ach</Text> ghodwa!
+            <Text style={[styles.insightTitle, { color: colors.text }]}>Klem Coach <Text style={{ color: colors.primary }}>AI</Text></Text>
+            <Text style={[styles.insightText, { color: colors.textSecondary }]}>
+              Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold', color: colors.text }}>W7ach</Text> ghodwa!
             </Text>
           </View>
-        </GlassView>
-      </View>
+      </GlassView>
 
-      {/* --- HISTORY --- */}
+      {/* --- HISTORY TITLE --- */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Sjel (History)</Text>
-        <TouchableOpacity>
-          <Text style={[styles.link, { color: colors.primary }]}>Chouf el kol</Text>
-        </TouchableOpacity>
+        <ChevronRight size={20} color={colors.textSecondary} />
       </View>
-    </>
+    </View>
   );
 
   return (
-    <FlashList
-      style={styles.container}
-      data={historyItems}
-      keyExtractor={(item, index) => String(item?.id ?? item?.date ?? index)}
-      renderItem={renderHistoryItem}
-      estimatedItemSize={84}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.listContent}
-      ListHeaderComponent={listHeader}
-      ItemSeparatorComponent={() => <View style={styles.historySeparator} />}
-    />
+    <View style={styles.container}>
+        <FlashList
+            data={historyItems}
+            keyExtractor={(item, index) => String(item?.id ?? item?.date ?? index)}
+            renderItem={renderHistoryItem}
+            estimatedItemSize={90}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ListHeaderComponent={listHeader}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  padding: { paddingHorizontal: 20 },
+  listContent: { paddingBottom: 140, paddingTop: 10 },
+  header: { marginBottom: 24 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  headerTitle: { fontSize: 32, fontWeight: '900', letterSpacing: -1 },
+  streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: 'rgba(150,150,150,0.1)' },
+  streakText: { fontWeight: '800', fontSize: 13 },
+  tabsScroll: { gap: 8 },
+  tabBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(150,150,150,0.2)' },
+  tabText: { fontSize: 13, fontWeight: '800' },
+  
+  heroCard: { padding: 24, alignItems: 'center', marginBottom: 24 },
+  heroFooter: { flexDirection: 'row', width: '100%', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(150,150,150,0.1)' },
+  footerItem: { flex: 1, alignItems: 'center' },
+  footerLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, marginBottom: 4 },
+  footerValue: { fontSize: 18, fontWeight: '900' },
+  footerDivider: { width: 1, height: '60%', alignSelf: 'center' },
+
+  scoreBig: { fontSize: 64, fontWeight: '900', letterSpacing: -3, lineHeight: 68 },
+  scoreLabelText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5 },
+  scoreLabelBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
+  scoreRankText: { fontSize: 13, fontWeight: '900', textTransform: 'uppercase' },
+  
+  bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  proteinCard: { flex: 1.4, padding: 20, justifyContent: 'space-between' },
+  rightCol: { flex: 1, gap: 12 },
+  smallCard: { flex: 1, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  smallCardValue: { fontSize: 18, fontWeight: '900' },
+  smallCardLabel: { fontSize: 10, fontWeight: '900' },
+  
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  iconBox: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  cardLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+  valueContainer: { marginBottom: 12 },
+  valueBig: { fontSize: 32, fontWeight: '900' },
+  unitSmall: { fontSize: 14, fontWeight: '700', marginLeft: 2 },
+  targetLabel: { fontSize: 12, fontWeight: '600' },
+  progressTrack: { height: 8, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 4, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 4 },
+
+  insightCard: { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'center', marginBottom: 32 },
+  insightIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  insightTitle: { fontSize: 14, fontWeight: '900', marginBottom: 2 },
+  insightText: { fontSize: 13, lineHeight: 18, fontWeight: '500' },
+
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
+  sectionTitle: { fontSize: 22, fontWeight: '900' },
+  separator: { height: 10 },
+  
+  historyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, marginHorizontal: 2 },
+  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBoxMini: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  rowTitle: { fontSize: 16, fontWeight: '800' },
+  rowSub: { fontSize: 12, fontWeight: '500', opacity: 0.6 },
+  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  historyStats: { alignItems: 'flex-end' },
+  historyValue: { fontSize: 15, fontWeight: '800' },
+  historyCals: { fontSize: 11, fontWeight: '600' }
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -309,7 +322,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   listContent: {
-    paddingBottom: 100,
+    paddingBottom: 140,
   },
   header: {
     marginBottom: 24,
@@ -362,6 +375,23 @@ const styles = StyleSheet.create({
       padding: 24,
       alignItems: 'center',
       position: 'relative',
+  },
+  heroGlow: {
+      position: 'absolute',
+      right: -50,
+      top: -40,
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+      opacity: 0.18,
+  },
+  heroRibbon: {
+      position: 'absolute',
+      left: 0,
+      top: 28,
+      width: 4,
+      height: 64,
+      borderRadius: 3,
   },
   shareBtn: {
       position: 'absolute',
@@ -489,6 +519,16 @@ const styles = StyleSheet.create({
       padding: 20,
       gap: 16,
       alignItems: 'flex-start',
+      position: 'relative',
+      overflow: 'hidden',
+  },
+  insightRibbon: {
+      position: 'absolute',
+      left: 0,
+      top: 18,
+      width: 4,
+      height: 48,
+      borderRadius: 3,
   },
   insightIcon: {
       width: 40,

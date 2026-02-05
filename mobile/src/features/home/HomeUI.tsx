@@ -47,7 +47,7 @@ export const HomeUI = ({
         <FeaturesList />
       </View>
       
-      <View style={{ height: 100 }} />
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 };
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 20, fontWeight: '900' },
   featuresContainer: { width: '100%' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 4 },
+  bottomSpacer: { height: 140 },
 });
 
 export default HomeUI;

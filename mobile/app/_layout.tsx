@@ -118,6 +118,10 @@ function RootLayoutNav() {
         <LogSuccessModal 
           visible={showLogSuccess} 
           onClose={() => setShowLogSuccess(false)}
+          onAddMore={() => {
+            setShowLogSuccess(false);
+            router.push('/scan');
+          }}
           onViewStats={() => { 
             setShowLogSuccess(false); 
             router.push('/stats');

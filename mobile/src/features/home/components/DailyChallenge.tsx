@@ -32,6 +32,7 @@ export const DailyChallenge = () => {
           intensity={mode === 'dark' ? 60 : 80} 
           borderRadius={28}
         >
+          <View style={[styles.glowBlob, { backgroundColor: completed ? colors.success : colors.accent }]} />
           {/* Header Row: Icon + Label in one line */}
           <View style={styles.headerRow}>
             <View style={styles.headerLeft}>
@@ -75,15 +76,16 @@ export const DailyChallenge = () => {
 };
 
 const styles = StyleSheet.create({
-  challengeCard: { width: '100%', padding: 16, height: 160, justifyContent: 'space-between' },
+  challengeCard: { width: '100%', padding: 16, height: 170, justifyContent: 'space-between' },
+  glowBlob: { position: 'absolute', right: -30, top: -20, width: 120, height: 120, borderRadius: 60, opacity: 0.16 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   miniIcon: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   tagText: { fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
   content: { flex: 1, justifyContent: 'center' },
   textContainer: { width: '100%' },
-  challengeTitle: { fontSize: 17, fontWeight: '900', marginBottom: 4 },
-  challengeSub: { fontSize: 13, fontWeight: '600', lineHeight: 18 },
+  challengeTitle: { fontSize: 18, fontWeight: '900', marginBottom: 6 },
+  challengeSub: { fontSize: 13, fontWeight: '700', lineHeight: 18 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
   progressBarBg: { flex: 1, height: 6, borderRadius: 3, overflow: 'hidden' },
   progressBarFill: { height: '100%', borderRadius: 3 },

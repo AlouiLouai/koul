@@ -8,10 +8,11 @@ import { useTheme } from '../theme/ThemeContext';
 interface LogSuccessModalProps {
   visible: boolean;
   onClose: () => void;
+  onAddMore?: () => void;
   onViewStats: () => void;
 }
 
-export const LogSuccessModal = ({ visible, onClose, onViewStats }: LogSuccessModalProps) => {
+export const LogSuccessModal = ({ visible, onClose, onAddMore, onViewStats }: LogSuccessModalProps) => {
   const { colors } = useTheme();
 
   return (
@@ -30,7 +31,7 @@ export const LogSuccessModal = ({ visible, onClose, onViewStats }: LogSuccessMod
                 <ActionButton 
                     text="Zid Sawer" 
                     variant="secondary" 
-                    onPress={onClose} 
+                    onPress={onAddMore || onClose} 
                     icon={<Camera size={18} color={colors.text} />}
                     flex={1}
                 />

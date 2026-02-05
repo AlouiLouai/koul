@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ViewStyle, Platform, StyleProp } from 'react-native';
+import { View, ViewStyle, Platform, StyleProp, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -20,7 +20,7 @@ export const GlassView: React.FC<GlassViewProps> = ({
 }) => {
   const { colors, mode } = useTheme();
 
-  // Combine borders with theme colors
+  // Manual border styles because Tailwind doesn't support directional opacity well for borders in RN
   const borderStyle = noBorder === false ? {
     borderWidth: 1.5,
     borderColor: colors.glassBorder,
@@ -31,18 +31,19 @@ export const GlassView: React.FC<GlassViewProps> = ({
   } : {};
 
   return (
-    <View style={[
-      styles.container, 
-      { borderRadius, backgroundColor: colors.glass }, 
-      borderStyle,
-      styles.shadow,
-      style
-    ]}>
+    <View 
+      style={[
+        styles.container,
+        { borderRadius, backgroundColor: colors.glass }, 
+        borderStyle,
+        style
+      ]}
+    >
       <BlurView 
         intensity={intensity} 
-        tint={colors.tint}
+        tint={mode === 'dark' ? 'dark' : 'light'}
         experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : 'none'}
-        style={StyleSheet.absoluteFill} 
+        style={StyleSheet.absoluteFill}
       />
       {children}
     </View>
@@ -53,18 +54,10 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     position: 'relative',
-  },
-  shadow: {
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
 });

@@ -28,7 +28,7 @@ interface ThemeContextType {
 const LightColors: ThemeColors = {
   background: ['#fdfcf0', '#f1f5f9', '#e0f2fe'], // Warmer "Sahara/Oasis" vibe
   glass: 'rgba(255, 255, 255, 0.3)', 
-  glassBorder: 'rgba(255, 255, 255, 0.7)',
+  glassBorder: 'rgba(15, 23, 42, 0.18)',
   text: '#0f172a', // Slate 900
   textSecondary: '#475569', // Slate 600
   primary: '#2563eb', // Blue 600 - The new App Color
@@ -43,7 +43,7 @@ const LightColors: ThemeColors = {
 const DarkColors: ThemeColors = {
   background: ['#020617', '#0f172a', '#1e293b'], // Deep slate/night gradient
   glass: 'rgba(15, 23, 42, 0.75)', // Darker, smokier glass
-  glassBorder: 'rgba(255, 255, 255, 0.2)', // More visible premium edge
+  glassBorder: 'rgba(255, 255, 255, 0.38)', // More visible premium edge
   text: '#f1f5f9', // Slate 100
   textSecondary: '#94a3b8', // Slate 400
   primary: '#38bdf8', // Sky 400 - Glowing accent

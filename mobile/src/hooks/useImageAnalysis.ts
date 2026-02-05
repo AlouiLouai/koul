@@ -34,8 +34,7 @@ export const useImageAnalysis = () => {
 
       return response.data as AnalysisResponse;
     },
-    retry: 2,
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+    retry: 0,
     onSuccess: (data) => {
       queryClient.setQueryData(['analysis', 'last'], data);
     },
