@@ -22,12 +22,12 @@ export const GlassView: React.FC<GlassViewProps> = ({
 
   // Combine borders with theme colors
   const borderStyle = noBorder === false ? {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.glassBorder,
-    borderTopColor: mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
-    borderLeftColor: mode === 'light' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.2)',
-    borderRightColor: mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
-    borderBottomColor: mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.05)',
+    borderTopColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+    borderLeftColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+    borderRightColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+    borderBottomColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
   } : {};
 
   return (

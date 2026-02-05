@@ -27,10 +27,7 @@ export const HomeUI = ({
       {/* --- BENTO GRID LAYOUT --- */}
       <View style={styles.bentoGrid}>
           <View style={styles.leftCol}>
-             <WaterTracker 
-                isGuest={isGuest} 
-                onTriggerAuth={onTriggerAuth} 
-             />
+             <WaterTracker />
           </View>
 
           <View style={styles.rightCol}>

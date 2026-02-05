@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { ScanUI } from './ScanUI';
 import { useImageAnalysis } from '../../hooks/useImageAnalysis';
 import { QuotaExceededModal } from '../../components/QuotaExceededModal';
+import { GuestQuotaModal } from '../../components/GuestQuotaModal';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
 
@@ -25,6 +26,7 @@ export const ScanContainer = ({
   onTriggerAuth
 }: ScanContainerProps) => {
   const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const [showGuestModal, setShowGuestModal] = useState(false);
   const [showLogSuccess, setShowLogSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
@@ -39,13 +41,13 @@ export const ScanContainer = ({
   } = useImageAnalysis();
 
   const handleImageSelected = useCallback(async (uri: string, type: string, fileName: string) => {
-    if (isGuest) {
-      if (onTriggerAuth) onTriggerAuth();
-      return;
-    }
-
+    // 3 SCANS LIMIT for both Guests and non-Pro Users
     if (!isPro && dailyScans >= 3) {
-      setShowQuotaModal(true);
+      if (isGuest) {
+        setShowGuestModal(true);
+      } else {
+        setShowQuotaModal(true);
+      }
       return;
     }
 
@@ -66,7 +68,7 @@ export const ScanContainer = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [isPro, dailyScans, incrementScans, analyzeImage, isGuest, onTriggerAuth]);
+  }, [isPro, dailyScans, incrementScans, analyzeImage, isGuest]);
 
   const handleLogMeal = useCallback(() => {
     if (result) {
@@ -107,6 +109,15 @@ export const ScanContainer = ({
         onUpgrade={() => {
           setShowQuotaModal(false);
           onShowUpgrade();
+        }}
+      />
+
+      <GuestQuotaModal
+        visible={showGuestModal}
+        onClose={() => setShowGuestModal(false)}
+        onConnect={() => {
+          setShowGuestModal(false);
+          if (onTriggerAuth) onTriggerAuth();
         }}
       />
     </>

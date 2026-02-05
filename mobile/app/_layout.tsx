@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Slot, useRouter } from 'expo-router';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
 import { useStatsStore } from '../src/store/useStatsStore';
@@ -65,9 +65,17 @@ function RootLayoutNav() {
     showLoginModal, setShowLoginModal,
     setIsAuthenticated
   } = useUI();
-  const { upgradeToPro } = useStatsStore();
+  const { upgradeToPro, lastResetDate, resetDaily } = useStatsStore();
   const { mode } = useTheme();
   const router = useRouter();
+
+  // Handle Daily Reset
+  useEffect(() => {
+    const today = new Date().toDateString();
+    if (lastResetDate !== today) {
+      resetDaily();
+    }
+  }, [lastResetDate, resetDaily]);
 
   const handleAuthenticated = useCallback(() => {
     setIsAuthenticated(true);
