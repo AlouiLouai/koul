@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { AppLogo } from './AppLogo'; // Assumes AppLogo is in same folder or adjust import
 import { useTheme } from '../theme/ThemeContext';
 
-const { height } = Dimensions.get('window');
 
 interface SplashScreenProps {
   onFinish: () => void;
