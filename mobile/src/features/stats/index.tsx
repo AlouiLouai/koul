@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Crown } from 'lucide-react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Crown, X } from 'lucide-react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { StatsUI } from './StatsUI';
 import { useTheme } from '../../theme/ThemeContext';
 import { useStats } from '../../hooks/useStats';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { ActionButton } from '../../components/ActionButton';
+import { GlassView } from '../../components/GlassView';
 
 // --- Logic / Mock Data ---
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -30,8 +32,24 @@ interface StatsContainerProps {
 export const StatsContainer = ({ isPro, onShowUpgrade, isUpgradeVisible }: StatsContainerProps) => {
   const { colors } = useTheme();
   const { todayStats } = useStats();
+  const router = useRouter();
   const [timeframe, setTimeframe] = useState<TimeFrame>('Week');
   const [selectedDay] = useState(6);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Reset dismissal when user enters the screen
+  useFocusEffect(
+    useCallback(() => {
+      setIsDismissed(false);
+    }, [])
+  );
+
+  const handleClose = () => {
+    setIsDismissed(true);
+    // Use a small delay to allow modal animation to start before navigation if possible
+    // but redirect immediately to feel snappy
+    router.replace('/');
+  };
 
   return (
     <>
@@ -45,15 +63,23 @@ export const StatsContainer = ({ isPro, onShowUpgrade, isUpgradeVisible }: Stats
          todayStats={todayStats}
       />
 
-      <BottomSheetModal visible={!isPro && !isUpgradeVisible} onClose={() => {}}>
+      <BottomSheetModal visible={!isPro && !isUpgradeVisible && !isDismissed} onClose={handleClose}>
           <View style={styles.content}>
-              <View style={[styles.iconBg, { backgroundColor: colors.warning + '20', borderColor: colors.warning }]}>
-                  <Crown size={40} color={colors.warning} fill={colors.warning} />
+              <View style={styles.header}>
+                  <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+                      <GlassView intensity={20} borderRadius={20} style={styles.closeIcon}>
+                          <X size={20} color={colors.textSecondary} />
+                      </GlassView>
+                  </TouchableOpacity>
+              </View>
+
+              <View style={[styles.iconBg, { backgroundColor: colors.accent + '15', borderColor: colors.accent + '30' }]}>
+                  <Crown size={40} color={colors.accent} fill={colors.accent} />
               </View>
               
               <Text style={[styles.title, { color: colors.text }]}>Statistiques Msekra</Text>
               <Text style={[styles.message, { color: colors.textSecondary }]}>
-                  Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay.
+                  Habit tchouf el progress mta3ek? Walli Premium bach t7allel makletek bel detay w taba3 el forma.
               </Text>
 
               <View style={styles.actions}>
@@ -62,8 +88,13 @@ export const StatsContainer = ({ isPro, onShowUpgrade, isUpgradeVisible }: Stats
                       variant="primary" 
                       onPress={onShowUpgrade} 
                       flex={1}
+                      style={{ backgroundColor: colors.accent }}
                   />
               </View>
+
+              <TouchableOpacity onPress={handleClose} style={styles.secondaryAction}>
+                  <Text style={[styles.secondaryText, { color: colors.accent }]}>Rja3 lel Home</Text>
+              </TouchableOpacity>
           </View>
       </BottomSheetModal>
     </>
@@ -73,6 +104,22 @@ export const StatsContainer = ({ isPro, onShowUpgrade, isUpgradeVisible }: Stats
 const styles = StyleSheet.create({
   content: {
       alignItems: 'center',
+      paddingBottom: 10,
+  },
+  header: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginBottom: -10,
+  },
+  closeBtn: {
+      zIndex: 10,
+  },
+  closeIcon: {
+      width: 36,
+      height: 36,
+      alignItems: 'center',
+      justifyContent: 'center',
   },
   iconBg: {
     width: 72,
@@ -81,12 +128,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '900',
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   message: {
     fontSize: 14,
@@ -98,5 +146,14 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     width: '100%',
+    marginBottom: 16,
   },
+  secondaryAction: {
+      paddingVertical: 8,
+  },
+  secondaryText: {
+      fontSize: 13,
+      fontWeight: '700',
+      textDecorationLine: 'underline',
+  }
 });

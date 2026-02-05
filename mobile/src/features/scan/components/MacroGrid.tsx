@@ -41,8 +41,6 @@ interface MacroGridProps {
 }
 
 export const MacroGrid = ({ protein, carbs, fat }: MacroGridProps) => {
-  const { colors } = useTheme();
-
   return (
     <View style={styles.grid}>
         <MacroCard 

@@ -111,6 +111,10 @@ function RootLayoutNav() {
             <UpgradeScreen 
                 onClose={() => setShowUpgrade(false)} 
                 onUpgrade={upgradeToPro}
+                onRedirectHome={() => {
+                    setShowUpgrade(false);
+                    router.replace('/');
+                }}
             />
           </View>
         )}

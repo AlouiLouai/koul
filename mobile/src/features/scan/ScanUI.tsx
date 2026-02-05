@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView, Easing } from 'react-native';
 import { Trash2, CheckCircle2, ChevronLeft } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { MediaType } from 'expo-image-picker';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 import AnalysisResult from '../../components/AnalysisResult';
@@ -75,24 +74,34 @@ export const ScanUI = ({
           scanningProgress.setValue(0);
           
           Animated.loop(
-            Animated.sequence([
-                Animated.timing(beamAnim, { toValue: 1, duration: 2000, useNativeDriver: true }),
-                Animated.timing(beamAnim, { toValue: 0, duration: 2000, useNativeDriver: true })
-            ])
+            Animated.timing(beamAnim, { 
+                toValue: 1, 
+                duration: 2500, 
+                easing: Easing.bezier(0.4, 0, 0.2, 1),
+                useNativeDriver: true 
+            })
           ).start();
 
           // Smooth progress animation while waiting for API
-          Animated.timing(scanningProgress, { toValue: 0.9, duration: 15000, useNativeDriver: false }).start();
+          Animated.timing(scanningProgress, { 
+              toValue: 0.95, 
+              duration: 20000, 
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: false 
+          }).start();
           
-          const msg1 = setTimeout(() => setScanMessage("9a3ed nthabet f'moukawinet..."), 2000);
-          const msg2 = setTimeout(() => setScanMessage("Na7seb f'calories w protein..."), 5000);
+          const msg1 = setTimeout(() => setScanMessage("9a3ed nthabet f'moukawinet..."), 3000);
+          const msg2 = setTimeout(() => setScanMessage("Na7seb f'calories w protein..."), 7000);
+          const msg3 = setTimeout(() => setScanMessage("Tawa nchoufou el Verdict..."), 12000);
           
           return () => {
               clearTimeout(msg1);
               clearTimeout(msg2);
+              clearTimeout(msg3);
           };
       } else {
           scanningProgress.setValue(1);
+          beamAnim.setValue(0);
       }
   }, [loading]);
 
@@ -103,7 +112,7 @@ export const ScanUI = ({
     }
     try {
       const res = await ImagePicker.launchCameraAsync({
-        mediaTypes: MediaType.Images,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         quality: 0.7,
       });
@@ -135,15 +144,34 @@ export const ScanUI = ({
       }
   };
 
+    const containerHeight = useRef(new Animated.Value(580)).current;
+
+    useEffect(() => {
+        Animated.spring(containerHeight, {
+            toValue: (currentImage && !loading) ? 220 : 580,
+            useNativeDriver: false,
+            friction: 8,
+            tension: 30
+        }).start();
+    }, [currentImage, loading]);
+
   return (
     <View style={styles.container}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <View style={styles.padding}>
                 
-                <View style={[styles.imageContainer, { height: (currentImage && !loading) ? 220 : 500 }]}>
+                <Animated.View style={[styles.imageContainer, { height: containerHeight }]}>
                     {currentImage ? (
                         <>
                             <Image source={{ uri: currentImage }} style={styles.fullImage} />
+                            {loading && (
+                                <ScanLoading 
+                                    scanMessage={scanMessage} 
+                                    scanningProgress={scanningProgress} 
+                                    beamAnim={beamAnim}
+                                    containerHeight={580}
+                                />
+                            )}
                             {!loading && (
                                 <TouchableOpacity onPress={onReset} style={styles.backBtn}>
                                     <GlassView intensity={40} borderRadius={20} style={styles.iconBtn}>
@@ -157,16 +185,7 @@ export const ScanUI = ({
                             <ScanHero onCapture={handleCapture} onGallery={handleGallery} />
                         </GlassView>
                     )}
-                </View>
-
-                {loading && (
-                    <ScanLoading 
-                        scanMessage={scanMessage} 
-                        scanningProgress={scanningProgress} 
-                        beamAnim={beamAnim}
-                        backgroundImage={currentImage}
-                    />
-                )}
+                </Animated.View>
 
                 {result && !loading && (
                     <View style={styles.resultAnimationWrapper}>
@@ -225,7 +244,11 @@ const styles = StyleSheet.create({
     scrollView: { flex: 1 },
     scrollContent: { paddingBottom: 140, paddingTop: 10 },
     padding: { paddingHorizontal: 20 },
-    imageContainer: { borderRadius: 32, overflow: 'hidden', marginBottom: 16, elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 15 },
+    imageContainer: { 
+        borderRadius: 36, 
+        overflow: 'hidden', 
+        marginBottom: 16,
+    },
     fullImage: { width: '100%', height: '100%' },
     backBtn: { position: 'absolute', top: 12, left: 12 },
     iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },

@@ -67,9 +67,6 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
 function CustomTabBar({ state, navigation }: any) {
   const { mode } = useTheme();
 
-  // Ultra-glass look: almost white but very transparent
-  const glassBackgroundColor = mode === 'light' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(15, 23, 42, 0.4)';
-
   return (
     <View style={tabStyles.container}>
       <GlassView 
@@ -122,7 +119,6 @@ export default function TabsLayout() {
       screenOptions={{ 
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarTransparent: true,
         sceneStyle: { backgroundColor: 'transparent' },
       }}
     >

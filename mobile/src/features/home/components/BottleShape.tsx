@@ -6,10 +6,9 @@ interface BottleShapeProps {
   isComplete: boolean;
   waterTranslateY: Animated.AnimatedInterpolation<number | string>;
   bubbleAnims: Animated.Value[];
-  cups: number;
 }
 
-export const BottleShape = ({ isComplete, waterTranslateY, bubbleAnims, cups }: BottleShapeProps) => {
+export const BottleShape = ({ isComplete, waterTranslateY, bubbleAnims }: BottleShapeProps) => {
   const { colors, mode } = useTheme();
 
   const getBubbleStyle = (anim: Animated.Value, left: number) => ({

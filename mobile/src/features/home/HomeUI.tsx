@@ -13,10 +13,7 @@ interface HomeUIProps {
   onTriggerAuth?: () => void;
 }
 
-export const HomeUI = ({ 
-  isGuest = false, 
-  onTriggerAuth
-}: HomeUIProps) => { 
+export const HomeUI = (_props: HomeUIProps) => { 
   
   const { colors } = useTheme();
 
