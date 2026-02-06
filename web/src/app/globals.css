@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #fdfcf0;
+  --foreground: #0f172a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #030712;
+    --foreground: #e2e8f0;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .glass-card {
+    @apply relative overflow-hidden backdrop-blur-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(15, 23, 42, 0.18);
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+    border-left: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .glass-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .liquid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, #fdfcf0 0%, #f1f5f9 50%, #e0f2fe 100%);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
+  }
+
+  .dark .liquid-bg {
+    background: linear-gradient(135deg, #030712 0%, #0f172a 50%, #1e293b 100%);
+    background-size: 400% 400%;
+  }
+}
+
+@layer utilities {
+
+  .no-scrollbar::-webkit-scrollbar {
+
+    display: none;
+
+  }
+
+  .no-scrollbar {
+
+    -ms-overflow-style: none;
+
+    scrollbar-width: none;
+
+  }
+
+}
+
+
+
+@keyframes autoScroll {
+
+  0% { transform: translateY(0); }
+
+  45% { transform: translateY(-50%); }
+
+  55% { transform: translateY(-50%); }
+
+  100% { transform: translateY(0); }
+
+}
+
+
+
+.animate-auto-scroll {
+
+  animation: autoScroll 20s ease-in-out infinite;
+
+}
