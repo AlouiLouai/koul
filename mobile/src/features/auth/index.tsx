@@ -1,19 +1,21 @@
 import React, { useState, useCallback } from 'react';
 import { AuthUI } from './AuthUI';
-// import { useGoogleAuth } from '../../hooks/useGoogleAuth'; // Future hook
+import { LoginModal } from './LoginModal';
 
 interface AuthContainerProps {
   onAuthenticated: (user: any) => void;
+  isModal?: boolean;
+  visible?: boolean;
+  onClose?: () => void;
 }
 
-export const AuthContainer = ({ onAuthenticated }: AuthContainerProps) => {
+export const AuthContainer = ({ onAuthenticated, isModal = false, visible = false, onClose }: AuthContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleLogin = useCallback(async () => {
     setIsLoading(true);
     
-    // MOCK LOGIN FOR EXPO GO (Logic is here, UI just shows spinner)
-    // When you switch to native, this logic changes, but UI stays the same!
+    // MOCK LOGIN FOR EXPO GO
     setTimeout(() => {
       console.log('Mocking Google Login Success');
       setIsLoading(false);
@@ -24,6 +26,17 @@ export const AuthContainer = ({ onAuthenticated }: AuthContainerProps) => {
       });
     }, 1500);
   }, [onAuthenticated]);
+
+  if (isModal) {
+    return (
+      <LoginModal 
+        visible={visible} 
+        onClose={onClose || (() => {})} 
+        onLogin={handleGoogleLogin} 
+        isLoading={isLoading} 
+      />
+    );
+  }
 
   return (
     <AuthUI 

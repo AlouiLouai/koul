@@ -1,134 +1,241 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import { User as UserIcon, Sparkles, Settings, Bell, History, LogOut, Zap, ChevronRight, Star, ChefHat, Crown, Flame, Target, Trophy } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { 
+    User as UserIcon, Settings, Bell, History, LogOut, 
+    Zap, ChevronRight, Flame, Target, Trophy,
+    ShieldCheck, Lock, Sparkles
+} from 'lucide-react-native';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
+import { GoogleLogo } from '../../components/GoogleLogo';
+
 
 interface ProfileUIProps {
   onLogout: () => void;
   onShowUpgrade: () => void;
+  onTriggerAuth: () => void;
   userName?: string;
   isPro?: boolean;
+  isAuthenticated?: boolean;
 }
 
-const StatItem = ({ label, value, icon: Icon, color }: any) => (
-    <View style={styles.statItem}>
-        <View style={[styles.statIconCircle, { backgroundColor: color + '15' }]}>
-            <Icon size={18} color={color} strokeWidth={2.5} />
-        </View>
-        <Text style={styles.statValue}>{value}</Text>
-        <Text style={styles.statLabel}>{label}</Text>
-    </View>
-);
-
-const SettingItem = ({ icon: Icon, label, value, color = "#18181b", onPress }: any) => (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.6}>
-        <View style={styles.settingLeft}>
-            <View style={[styles.settingIcon, { backgroundColor: '#fafafa' }]}>
-                <Icon size={20} color={color} />
+const StatItem = ({ label, value, icon: Icon, color, locked }: any) => {
+    const { colors } = useTheme();
+    return (
+        <GlassView style={styles.statItem} intensity={30} borderRadius={24}>
+            <View style={[styles.statIconCircle, { backgroundColor: locked ? '#71717a15' : color + '15' }]}>
+                {locked ? <Lock size={16} color="#71717a" /> : <Icon size={18} color={color} strokeWidth={2.5} />}
             </View>
-            <Text style={styles.settingLabel}>{label}</Text>
-        </View>
-        <View style={styles.settingRight}>
-            {value && <Text style={styles.settingValue}>{value}</Text>}
-            <ChevronRight size={16} color="#d4d4d8" />
-        </View>
-    </TouchableOpacity>
-);
+            <Text style={[styles.statValue, { color: locked ? '#71717a' : colors.text }]}>
+                {locked ? '--' : value}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
+        </GlassView>
+    );
+};
+
+const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switchValue, onSwitchChange, disabled }: any) => {
+    const { colors } = useTheme();
+    const iconColor = color || colors.text;
+
+    return (
+        <TouchableOpacity 
+            style={[styles.settingItem, disabled && { opacity: 0.5 }]} 
+            onPress={onPress} 
+            activeOpacity={isSwitch ? 1 : 0.6}
+            disabled={isSwitch || disabled}
+        >
+            <View style={styles.settingLeft}>
+                <View style={[styles.settingIcon, { backgroundColor: colors.background[1] + '80' }]}>
+                    <Icon size={20} color={iconColor} />
+                </View>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>{label}</Text>
+            </View>
+            <View style={styles.settingRight}>
+                {isSwitch ? (
+                    <Switch 
+                        value={switchValue} 
+                        onValueChange={onSwitchChange}
+                        trackColor={{ false: '#767577', true: colors.primary }}
+                        thumbColor={'#fff'}
+                    />
+                ) : (
+                    <>
+                        {value && <Text style={[styles.settingValue, { color: colors.textSecondary }]}>{value}</Text>}
+                        <ChevronRight size={16} color={colors.textSecondary} />
+                    </>
+                )}
+            </View>
+        </TouchableOpacity>
+    );
+};
 
 export const ProfileUI = ({ 
     onLogout, 
     onShowUpgrade, 
-    userName = "John Doe", 
-    isPro = false 
+    onTriggerAuth,
+    userName = "Guest", 
+    isPro = false,
+    isAuthenticated = false
 }: ProfileUIProps) => {
+  const { colors, mode } = useTheme();
+
   return (
     <ScrollView 
       style={styles.container} 
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-        {/* Header Section */}
-        <View style={styles.headerCard}>
-            <View style={styles.avatarWrapper}>
-                <View style={styles.avatarBorder}>
-                    <View style={styles.bigAvatar}>
-                        <Text style={styles.bigAvatarText}>{userName.charAt(0)}</Text>
+        {/* Profile Header Card */}
+        <GlassView style={styles.headerCard} intensity={50} borderRadius={32}>
+            {isAuthenticated ? (
+                // Authenticated Header
+                <>
+                    <View style={styles.avatarWrapper}>
+                        <View style={[styles.avatarBorder, { borderColor: colors.primary }]}>
+                            <View style={[styles.bigAvatar, { backgroundColor: colors.primary + '15' }]}>
+                                <Text style={[styles.bigAvatarText, { color: colors.primary }]}>{userName.charAt(0)}</Text>
+                            </View>
+                        </View>
+                        <View style={[styles.editBadge, { backgroundColor: colors.text, borderColor: colors.glass }]}>
+                            <Settings size={14} color={colors.background[0]} />
+                        </View>
+                    </View>
+                    
+                    <Text style={[styles.profileName, { color: colors.text }]}>{userName}</Text>
+                    
+                    <View style={[styles.rankBadge, { backgroundColor: colors.warning + '10', borderColor: colors.warning }]}>
+                        <Trophy size={14} color={colors.warning} fill={colors.warning} />
+                        <Text style={[styles.rankText, { color: colors.warning }]}>Chef El 7ouma 👑</Text>
+                    </View>
+
+                    <View style={styles.levelModule}>
+                        <View style={styles.levelHeader}>
+                            <Text style={[styles.levelText, { color: colors.text }]}>Niveau 5</Text>
+                            <Text style={[styles.xpText, { color: colors.primary }]}>1,250 / 2,000 XP</Text>
+                        </View>
+                        <View style={[styles.progressTrack, { backgroundColor: colors.glassBorder }]}>
+                            <View style={[styles.progressFill, { width: '62.5%', backgroundColor: colors.primary }]} />
+                        </View>
+                    </View>
+                </>
+            ) : (
+                // Guest Header
+                <View style={styles.guestHeader}>
+                    <View style={[styles.guestIconCircle, { backgroundColor: colors.primary + '10' }]}>
+                        <UserIcon size={48} color={colors.primary} strokeWidth={1.5} />
+                    </View>
+                    
+                    <View style={styles.guestTextSection}>
+                        <Text style={[styles.guestTitle, { color: colors.text }]}>Mar7ba Bik! 👋</Text>
+                        <Text style={[styles.guestSubtitle, { color: colors.textSecondary }]}>
+                            Connecti bch tkhabi makeltek w ttaba3 progress-ek.
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity 
+                        style={[styles.connectBtn, { backgroundColor: mode === 'dark' ? '#fff' : '#000' }]}
+                        onPress={onTriggerAuth}
+                        activeOpacity={0.8}
+                    >
+                        <GoogleLogo size={20} />
+                        <Text style={[styles.connectBtnText, { color: mode === 'dark' ? '#000' : '#fff' }]}>Connecti b'Google</Text>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.secureBadge}>
+                        <ShieldCheck size={12} color={colors.success} />
+                        <Text style={[styles.secureText, { color: colors.success }]}>Data mte3ek mahfoutha</Text>
                     </View>
                 </View>
-                <View style={styles.editBadge}>
-                    <Settings size={14} color="#fff" />
-                </View>
-            </View>
-            
-            <Text style={styles.profileName}>{userName}</Text>
-            
-            <View style={styles.rankBadge}>
-                <Trophy size={14} color="#f59e0b" fill="#f59e0b" />
-                <Text style={styles.rankText}>Sultan el Koujina 👑</Text>
-            </View>
-
-            {/* Level Progress */}
-            <View style={styles.levelModule}>
-                <View style={styles.levelHeader}>
-                    <Text style={styles.levelText}>Niveau 5</Text>
-                    <Text style={styles.xpText}>1,250 / 2,000 XP</Text>
-                </View>
-                <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: '62.5%' }]} />
-                </View>
-            </View>
-        </View>
+            )}
+        </GlassView>
 
         {/* Quick Impact Stats */}
         <View style={styles.statsRow}>
-            <StatItem label="Ayyém" value="12" icon={Flame} color="#f97316" />
-            <StatItem label="Scans" value="42" icon={Target} color="#10b981" />
-            <StatItem label="Kou'ous" value="8" icon={Trophy} color="#f59e0b" />
+            <StatItem label="Ayyém" value="12" icon={Flame} color="#f97316" locked={!isAuthenticated} />
+            <StatItem label="Scans" value="42" icon={Target} color={colors.accent} locked={!isAuthenticated} />
+            <StatItem label="Kou'ous" value="8" icon={Trophy} color={colors.warning} locked={!isAuthenticated} />
         </View>
 
         {/* Premium "VIP" Section */}
         {!isPro && (
-            <TouchableOpacity style={styles.proCard} onPress={onShowUpgrade} activeOpacity={0.9}>
-                <View style={styles.proCardContent}>
-                    <View style={styles.proTextSection}>
-                        <View style={styles.proHeader}>
-                            <Crown size={20} color="#f59e0b" fill="#f59e0b" />
-                            <Text style={styles.proTitle}>KOUL Premium</Text>
+            <TouchableOpacity onPress={onShowUpgrade} activeOpacity={0.9}>
+                <GlassView 
+                    style={[styles.proCard, { backgroundColor: mode === 'dark' ? '#111827' : '#18181bE6' }]} 
+                    intensity={80} 
+                    borderRadius={32}
+                >
+                    <View style={styles.proCardContent}>
+                        <View style={styles.proTextSection}>
+                            <View style={styles.proHeader}>
+                                <Sparkles size={20} color={colors.warning} fill={colors.warning} />
+                                <Text style={[styles.proTitle, { color: '#fff' }]}>KOUL PREMIUM 💎</Text>
+                            </View>
+                            <Text style={[styles.proSubtitle, { color: '#a1a1aa' }]}>Unlock absolute food tracking power</Text>
+                            
+                            <View style={styles.proBulletList}>
+                                <Text style={styles.proBullet}>• AI Scanning illimité</Text>
+                                <Text style={styles.proBullet}>• Analyses approfondies</Text>
+                            </View>
                         </View>
-                        <Text style={styles.proSubtitle}>Walli M3allem w sayer l'AI</Text>
                         
-                        <View style={styles.proBulletList}>
-                            <Text style={styles.proBullet}>• Menu Sahri (Fridge Chef)</Text>
-                            <Text style={styles.proBullet}>• Coach Personnel 🤖</Text>
+                        <View style={styles.priceSection}>
+                            <Text style={[styles.priceVal, { color: colors.accent }]}>5 TND</Text>
+                            <View style={[styles.unlockBtn, { backgroundColor: colors.primary }]}>
+                                <Text style={styles.unlockText}>Unlock</Text>
+                            </View>
                         </View>
                     </View>
-                    
-                    <View style={styles.priceSection}>
-                        <Text style={styles.priceVal}>5 TND</Text>
-                        <Text style={styles.priceSub}>/ ch'har</Text>
-                        <View style={styles.unlockBtn}>
-                            <Text style={styles.unlockText}>Unlock</Text>
-                        </View>
-                    </View>
-                </View>
-                {/* Decorative Pattern */}
-                <View style={styles.proDeco} />
+                    <View style={styles.proDeco} />
+                </GlassView>
             </TouchableOpacity>
         )}
 
         {/* Settings List */}
         <View style={styles.settingsGroup}>
-            <Text style={styles.groupTitle}>EL PARRAMETRE</Text>
-            <View style={styles.settingsList}>
-                <SettingItem icon={UserIcon} label="Ma3loumet echakhsia" value="Bedel" color="#10b981" />
-                <SettingItem icon={Zap} label="Ahdef el makla" value="Bulking" color="#f59e0b" />
-                <SettingItem icon={Bell} label="Notifications" value="Mkhadma" color="#3b82f6" />
-                <SettingItem icon={History} label="Historique l'Scans" color="#6366f1" />
-                <View style={styles.divider} />
-                <SettingItem icon={LogOut} label="Okhroj" color="#ef4444" onPress={onLogout} />
-            </View>
+            <Text style={styles.groupTitle}>PARAMETRES</Text>
+            <GlassView style={styles.settingsList} intensity={40} borderRadius={32}>
+                <SettingItem 
+                    icon={UserIcon} 
+                    label="Ma3loumet echakhsia" 
+                    value={isAuthenticated ? "Modifier" : "S'inscrire"} 
+                    color={colors.primary}
+                    onPress={!isAuthenticated ? onTriggerAuth : undefined}
+                />
+                <SettingItem 
+                    icon={Zap} 
+                    label="Objectifs Nutritionnels" 
+                    value={isAuthenticated ? "Bulking" : "Locked"} 
+                    color={colors.warning} 
+                    disabled={!isAuthenticated}
+                />
+                <SettingItem 
+                    icon={Bell} 
+                    label="Notifications" 
+                    color="#3b82f6" 
+                />
+                <SettingItem 
+                    icon={History} 
+                    label="Historique l'Scans" 
+                    color="#6366f1" 
+                    disabled={!isAuthenticated}
+                />
+                
+                {isAuthenticated && (
+                    <>
+                        <View style={[styles.divider, { backgroundColor: colors.glassBorder }]} />
+                        <SettingItem 
+                            icon={LogOut} 
+                            label="Okhroj" 
+                            color={colors.error} 
+                            onPress={onLogout} 
+                        />
+                    </>
+                )}
+            </GlassView>
         </View>
 
-        <Text style={styles.versionText}>Version 1.0.0 (Tunisia Edition 🇹🇳)</Text>
+        <Text style={[styles.versionText, { color: colors.textSecondary }]}>KOUL Tunisia v1.0.0 🇹🇳</Text>
     </ScrollView>
   );
 };
@@ -136,10 +243,9 @@ export const ProfileUI = ({
 const styles = StyleSheet.create({
   container: {
       flex: 1,
-      backgroundColor: '#FFFBF7',
   },
   scrollContent: {
-      paddingTop: 20,
+      paddingTop: 10,
       paddingBottom: 140, 
       paddingHorizontal: 20,
   },
@@ -147,17 +253,71 @@ const styles = StyleSheet.create({
   // Header Design
   headerCard: {
       alignItems: 'center',
-      backgroundColor: '#fff',
-      borderRadius: 32,
       padding: 24,
       width: '100%',
       marginBottom: 20,
-      borderWidth: 1,
-      borderColor: '#f4f4f5',
-      shadowColor: '#000',
-      shadowOpacity: 0.02,
-      shadowRadius: 15,
   },
+  
+  // Guest Header
+  guestHeader: {
+      alignItems: 'center',
+      width: '100%',
+  },
+  guestIconCircle: {
+      width: 90,
+      height: 90,
+      borderRadius: 45,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+  },
+  guestTextSection: {
+      alignItems: 'center',
+      marginBottom: 24,
+      gap: 8,
+  },
+  guestTitle: {
+      fontSize: 26,
+      fontWeight: '900',
+  },
+  guestSubtitle: {
+      fontSize: 14,
+      textAlign: 'center',
+      lineHeight: 20,
+      paddingHorizontal: 20,
+      fontWeight: '600',
+  },
+  connectBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 14,
+      borderRadius: 20,
+      gap: 12,
+      width: '100%',
+      justifyContent: 'center',
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 5,
+  },
+  connectBtnText: {
+      fontSize: 16,
+      fontWeight: '800',
+  },
+  secureBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+  },
+  secureText: {
+      fontSize: 11,
+      fontWeight: '700',
+  },
+
+  // Authenticated Header
   avatarWrapper: {
       position: 'relative',
       marginBottom: 16,
@@ -166,21 +326,18 @@ const styles = StyleSheet.create({
       padding: 4,
       borderRadius: 60,
       borderWidth: 2,
-      borderColor: '#10b981',
       borderStyle: 'dashed',
   },
   bigAvatar: {
       width: 100,
       height: 100,
       borderRadius: 50,
-      backgroundColor: '#ecfdf5',
       alignItems: 'center',
       justifyContent: 'center',
   },
   bigAvatarText: {
       fontSize: 40,
       fontWeight: '900',
-      color: '#10b981',
   },
   editBadge: {
       position: 'absolute',
@@ -188,34 +345,28 @@ const styles = StyleSheet.create({
       right: 0,
       width: 32,
       height: 32,
-      backgroundColor: '#18181b',
       borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 3,
-      borderColor: '#fff',
   },
   profileName: {
       fontSize: 24,
       fontWeight: '900',
-      color: '#18181b',
       marginBottom: 6,
   },
   rankBadge: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#fffbeb',
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 12,
       gap: 6,
       borderWidth: 1,
-      borderColor: '#fcd34d',
       marginBottom: 24,
   },
   rankText: {
       fontWeight: '900',
-      color: '#d97706',
       fontSize: 12,
   },
   levelModule: {
@@ -229,22 +380,18 @@ const styles = StyleSheet.create({
   levelText: {
       fontSize: 13,
       fontWeight: '900',
-      color: '#18181b',
   },
   xpText: {
       fontSize: 12,
       fontWeight: '700',
-      color: '#10b981',
   },
   progressTrack: {
       height: 10,
-      backgroundColor: '#f4f4f5',
       borderRadius: 5,
       overflow: 'hidden',
   },
   progressFill: {
       height: '100%',
-      backgroundColor: '#10b981',
   },
 
   // Stats Row
@@ -255,13 +402,9 @@ const styles = StyleSheet.create({
       marginBottom: 24,
   },
   statItem: {
-      backgroundColor: '#fff',
-      borderRadius: 24,
       padding: 16,
       alignItems: 'center',
       width: '31%',
-      borderWidth: 1,
-      borderColor: '#f4f4f5',
   },
   statIconCircle: {
       width: 36,
@@ -274,12 +417,10 @@ const styles = StyleSheet.create({
   statValue: {
       fontSize: 16,
       fontWeight: '900',
-      color: '#18181b',
   },
   statLabel: {
       fontSize: 10,
       fontWeight: 'bold',
-      color: '#a1a1aa',
       textTransform: 'uppercase',
       marginTop: 2,
   },
@@ -287,17 +428,10 @@ const styles = StyleSheet.create({
   // Premium VIP Card
   proCard: {
       width: '100%',
-      backgroundColor: '#18181b',
-      borderRadius: 32,
       padding: 24,
       marginBottom: 32,
       position: 'relative',
       overflow: 'hidden',
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOpacity: 0.3,
-      shadowRadius: 20,
-      shadowOffset: { width: 0, height: 10 },
   },
   proCardContent: {
       flexDirection: 'row',
@@ -314,12 +448,10 @@ const styles = StyleSheet.create({
       marginBottom: 4,
   },
   proTitle: {
-      color: '#fff',
       fontSize: 18,
       fontWeight: '900',
   },
   proSubtitle: {
-      color: '#a1a1aa',
       fontSize: 12,
       fontWeight: '600',
       marginBottom: 12,
@@ -337,7 +469,6 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
   },
   priceVal: {
-      color: '#f59e0b',
       fontSize: 24,
       fontWeight: '900',
   },
@@ -349,7 +480,6 @@ const styles = StyleSheet.create({
       marginBottom: 12,
   },
   unlockBtn: {
-      backgroundColor: '#10b981',
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 10,
@@ -383,11 +513,7 @@ const styles = StyleSheet.create({
       marginLeft: 4,
   },
   settingsList: {
-      backgroundColor: '#fff',
-      borderRadius: 32,
       padding: 8,
-      borderWidth: 1,
-      borderColor: '#f4f4f5',
   },
   settingItem: {
       flexDirection: 'row',
@@ -410,7 +536,6 @@ const styles = StyleSheet.create({
   settingLabel: {
       fontSize: 15,
       fontWeight: '700',
-      color: '#18181b',
   },
   settingRight: {
       flexDirection: 'row',
@@ -419,12 +544,10 @@ const styles = StyleSheet.create({
   },
   settingValue: {
       fontSize: 13,
-      color: '#a1a1aa',
       fontWeight: '600',
   },
   divider: {
       height: 1,
-      backgroundColor: '#f4f4f5',
       marginHorizontal: 16,
       marginVertical: 4,
   },
@@ -432,7 +555,6 @@ const styles = StyleSheet.create({
       marginTop: 32,
       textAlign: 'center',
       fontSize: 11,
-      color: '#d4d4d8',
       fontWeight: 'bold',
   }
 });

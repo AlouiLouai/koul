@@ -12,9 +12,9 @@ export const QuotaExceededModal = ({ visible, onClose, onUpgrade }: QuotaExceede
   return (
     <Modal
       visible={visible}
-      transparent
+      transparent={true}
       animationType="fade"
-      statusBarTranslucent
+      statusBarTranslucent={true}
     >
       <View style={styles.overlay}>
         <View style={styles.container}>

@@ -14,95 +14,136 @@ const client = ModelClient(
   new AzureKeyCredential(CONFIG.AZURE.KEY!)
 );
 
-export const analyzeImage = async (userNotes: string, imageDataUrl: string): Promise<any> => {
-  try {
-    const response = await client.path("/chat/completions").post({
-      body: {
-        messages: [
-          {
-            role: "system",
-            content: ANALYSIS_PROMPT
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: `Analyze this image for nutrition items. Notes: ${userNotes}` },
-              {
-                type: "image_url",
-                image_url: {
-                  url: imageDataUrl,
-                  detail: "low"
-                }
-              }
-            ]
-          },
-        ],
-        max_tokens: 400, // Reduced from 1000 for speed
-        temperature: 0.1,
-        model: CONFIG.AZURE.DEPLOYMENT,
-        // stream: true // Streaming removed for lower latency in request/response model
-      }
-    });
+const COMPOSITE_PATTERN = /\b(on|with|and|plus)\b|&|\/|\+/i;
 
-    if (response.status !== "200") {
-      throw new Error(`AI API Error: ${response.status} - ${JSON.stringify(response.body)}`);
+const parseYamlContent = (content: string) => {
+  const yamlMatch = content.match(/```(?:yaml)?([\s\S]*?)```/);
+  let yamlString = yamlMatch ? yamlMatch[1].trim() : content.trim();
+  yamlString = yamlString.replace(/```(?:yaml)?/g, '').replace(/```/g, '').trim();
+  return yaml.load(yamlString) as any;
+};
+
+const hasCompositeItems = (items: any[] = []) =>
+  items.some((i) => {
+    const name = String(i?.name ?? '').trim();
+    return name && COMPOSITE_PATTERN.test(name);
+  });
+
+const mapMealAnalysis = (result: any) => {
+  const itemMap = new Map();
+
+  (result.items || []).forEach((i: any) => {
+    const name = i.name?.trim();
+    if (!name) return;
+
+    if (!itemMap.has(name)) {
+      itemMap.set(name, {
+        item: name,
+        portion_estimate: i.portion || "1 serving",
+        mass_g: i.mass_g || 0,
+        calories: i.cals || 0,
+        protein_g: i.p || 0,
+        carbs_g: i.c || 0,
+        fat_g: i.f || 0,
+        fiber_g: i.fi || 0,
+      });
     }
+  });
 
-    // @ts-ignore
-    const content = response.body.choices[0].message.content || "";
+  return Array.from(itemMap.values());
+};
 
-    // Robust Extraction: Find YAML block or fallback to full text
-    const yamlMatch = content.match(/```(?:yaml)?([\s\S]*?)```/);
-    let yamlString = yamlMatch ? yamlMatch[1].trim() : content.trim();
-    
-    // Extra safety: Remove any remaining markdown code block artifacts
-    yamlString = yamlString.replace(/```(?:yaml)?/g, '').replace(/```/g, '').trim();
+const buildResponse = (result: any) => {
+  const meal_analysis = mapMealAnalysis(result);
 
-    const result: any = yaml.load(yamlString);
-
-    // Deduplicate and Map
-    const itemMap = new Map();
-
-    (result.items || []).forEach((i: any) => {
-      const name = i.name?.trim();
-      if (!name) return;
-
-      if (!itemMap.has(name)) {
-        itemMap.set(name, {
-          item: name,
-          portion_estimate: i.portion || "1 serving",
-          mass_g: i.mass_g || 0,
-          calories: i.cals || 0,
-          protein_g: i.p || 0,
-          carbs_g: i.c || 0,
-          fat_g: i.f || 0,
-          fiber_g: 0,
-        });
-      }
-    });
-
-    const meal_analysis = Array.from(itemMap.values());
-
-    // Calculate Totals
-    const totals = meal_analysis.reduce((acc: any, curr: any) => ({
+  const totals = meal_analysis.reduce(
+    (acc: any, curr: any) => ({
       calories: acc.calories + curr.calories,
       protein: acc.protein + curr.protein_g,
       carbs: acc.carbs + curr.carbs_g,
       fat: acc.fat + curr.fat_g,
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+      fiber: (acc.fiber || 0) + curr.fiber_g,
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
+  );
 
     return {
       meal_analysis,
       totals,
       reasoning_log: result.analysis || `Identified ${meal_analysis.length} unique items.`,
-      confidence_score: 0.95,
+      confidence_score: result.confidence || 0.9,
       // New fields
       oil_estimate: result.oil_estimate,
       health_score: result.health_score,
       goals: result.goals,
       verdict: result.verdict
     };
+};
 
+const callModel = async (userNotes: string, imageDataUrl: string, extraText?: string) => {
+  const messageText = [
+    `Analyze this image for nutrition items.`,
+    userNotes ? `Notes: ${userNotes}` : null,
+    extraText ? `Correction: ${extraText}` : null,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const response = await client.path("/chat/completions").post({
+    body: {
+      messages: [
+        {
+          role: "system",
+          content: ANALYSIS_PROMPT,
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: messageText },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageDataUrl,
+                detail: "low",
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 450,
+      temperature: 0.1,
+      model: CONFIG.AZURE.DEPLOYMENT,
+    },
+  });
+
+  if (response.status !== "200") {
+    throw new Error(`AI API Error: ${response.status} - ${JSON.stringify(response.body)}`);
+  }
+
+  // @ts-ignore
+  return response.body.choices[0].message.content || "";
+};
+
+export const analyzeImage = async (userNotes: string, imageDataUrl: string): Promise<any> => {
+  try {
+    const content = await callModel(userNotes, imageDataUrl);
+    let result = parseYamlContent(content);
+
+    if (hasCompositeItems(result.items)) {
+      const compositeNames = (result.items || [])
+        .map((i: any) => String(i?.name ?? '').trim())
+        .filter((name: string) => name && COMPOSITE_PATTERN.test(name))
+        .join(", ");
+
+      const retryContent = await callModel(
+        userNotes,
+        imageDataUrl,
+        `You returned composite items (${compositeNames}). Split them into single ingredients with separate nutrition. Include hidden oils/sauces as items.`
+      );
+      result = parseYamlContent(retryContent);
+    }
+
+    return buildResponse(result);
   } catch (error: any) {
     console.error("Analysis Failure:", error);
     throw new Error(`Failed to analyze image: ${error.message}`);       

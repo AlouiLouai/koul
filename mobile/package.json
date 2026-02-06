@@ -1,7 +1,7 @@
 {
   "name": "mobile",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -10,19 +10,26 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-native-google-signin/google-signin": "^16.1.1",
+    "@shopify/flash-list": "2.0.2",
+    "@tanstack/react-query": "^5.87.1",
     "axios": "^1.13.4",
-    "clsx": "^2.1.1",
-    "eas-cli": "^16.32.0",
-    "expo": "~54.0.32",
+    "expo": "~54.0.33",
+    "expo-blur": "~15.0.8",
+    "expo-constants": "^18.0.13",
+    "expo-image-manipulator": "^14.0.8",
     "expo-image-picker": "^17.0.10",
-    "expo-speech": "~14.0.8",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-linking": "^8.0.11",
+    "expo-router": "^6.0.23",
     "expo-status-bar": "~3.0.9",
     "lucide-react-native": "^0.563.0",
     "react": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-mmkv": "^2.11.0",
+    "react-native-safe-area-context": "^5.6.2",
+    "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
-    "tailwind-merge": "^3.4.0"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

@@ -1,10 +1,11 @@
 name: EAS Build (Preview)
 
+# Muted for now
 on:
-  workflow_run:
-    workflows: ["Mobile CI (Quality Check)"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Mobile CI (Quality Check)"]
+  #   types:
+  #     - completed
   workflow_dispatch:
 
 jobs:

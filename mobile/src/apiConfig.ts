@@ -1,5 +1,6 @@
 // --- Configuration Constants ---
-const PROD_API_URL = 'https://nutriscan-api.politepond-83da7402.eastus2.azurecontainerapps.io';
+const PROD_API_URL = 'https://nutriscan-api--0000013.politepond-83da7402.eastus2.azurecontainerapps.io';
+
 
 /**
  * Determines the Base URL based on the environment and platform.

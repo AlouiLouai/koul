@@ -2,6 +2,7 @@
   "expo": {
     "name": "Makelti",
     "slug": "makelti-app",
+    "scheme": "koul",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,6 +35,16 @@
         "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
       }
     },
-    "owner": "mnm89"
+    "owner": "mnm89",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Bach takhtar taswira men galerie mta3ek! 🖼️",
+          "cameraPermission": "Bach nsawrou sa7nek w n9ouloulek chnoua fih! 📸"
+        }
+      ]
+    ]
   }
 }

@@ -1,580 +1,318 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Flame, TrendingUp, Activity, Trophy, ArrowUpRight, ArrowDownRight, Award, Droplets, Zap } from 'lucide-react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import { FlashList as ShopifyFlashList } from '@shopify/flash-list';
+const FlashList = ShopifyFlashList as any;
+import { Circle, Svg } from 'react-native-svg';
+import { Flame, Zap, Dumbbell, Watch, Lightbulb, ChevronRight, TrendingUp } from 'lucide-react-native';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
+import type { TimeFrame } from './index';
 
 const { width } = Dimensions.get('window');
-const TARGET_CALS = 2200;
+const SCORE_SIZE = width * 0.65;
+const STROKE_WIDTH = 16;
+const RADIUS = (SCORE_SIZE - STROKE_WIDTH) / 2;
+const ARC_ANGLE = 220;
+const ARC_LENGTH = (2 * Math.PI * RADIUS) * (ARC_ANGLE / 360);
 
-// --- New Component: Trophy Badge ---
-const TrophyBadge = ({ label, icon: Icon, color, locked }: any) => (
-  <View style={[styles.trophyCard, locked && styles.trophyLocked]}>
-    <View style={[styles.trophyIconBox, { backgroundColor: locked ? '#f4f4f5' : color + '20' }]}>
-      <Icon size={24} color={locked ? '#d4d4d8' : color} strokeWidth={2.5} />
-    </View>
-    <Text style={[styles.trophyLabel, locked && styles.textLocked]}>{label}</Text>
-  </View>
-);
+const Speedometer = ({ score }: { score: number }) => {
+    const { colors, mode } = useTheme();
+    const animatedValue = useRef(new Animated.Value(0)).current;
 
-const StatCard = ({ label, value, subValue, icon: Icon, color, trend }: any) => (
-  <View style={styles.statCard}>
-    <View style={[styles.iconBox, { backgroundColor: color + '15' }]}>
-      <Icon size={20} color={color} strokeWidth={2.5} />
-    </View>
-    <View>
-      <Text style={styles.statLabel}>{label}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
-        <Text style={styles.statValue}>{value}</Text>
-        {trend && (
-          <View style={[styles.trendBadge, { backgroundColor: trend === 'up' ? '#ecfdf5' : '#fef2f2' }]}>
-             {trend === 'up' ? <ArrowUpRight size={12} color="#10b981" /> : <ArrowDownRight size={12} color="#ef4444" />}
-             <Text style={[styles.trendText, { color: trend === 'up' ? '#10b981' : '#ef4444' }]}>{subValue}</Text>
-          </View>
-        )}
-      </View>
-      {!trend && <Text style={styles.statSub}>{subValue}</Text>}
-    </View>
-  </View>
-);
+    useEffect(() => {
+        Animated.timing(animatedValue, {
+            toValue: score / 10,
+            duration: 1500,
+            useNativeDriver: true, 
+        }).start();
+    }, [score]);
 
-const BarChart = ({ data, labels, activeIndex }: { data: number[], labels: string[], activeIndex: number }) => {
-  const max = Math.max(...data, TARGET_CALS) * 1.1;
-  
-  return (
-    <View style={styles.chartContainer}>
-      <View style={[styles.targetLine, { bottom: ((TARGET_CALS / max) * 100 + '%') as any }]} />
-      <View style={styles.chartRow}>
-        {data.map((val, i) => {
-          const height = (val / max) * 100;
-          const isActive = i === activeIndex;
-          
-          return (
-            <View key={i} style={styles.barWrapper}>
-              <View style={styles.barTrack}>
-                <View 
-                  style={[
-                    styles.barFill, 
-                    { 
-                      height: `${height}%`,
-                      backgroundColor: isActive ? '#10b981' : (val > TARGET_CALS + 200 ? '#f59e0b' : '#3f3f46'),
-                      opacity: isActive ? 1 : 0.7
-                    }
-                  ]} 
-                />
-              </View>
-              <Text style={[styles.barLabel, isActive && styles.barLabelActive]}>{labels[i]}</Text>
-            </View>
-          );
-        })}
-      </View>
-    </View>
-  );
+    const getScoreColor = () => {
+        if (score >= 9) return '#e11d48'; // Tunisian Red / Accent
+        if (score >= 7) return colors.primary; 
+        if (score >= 5) return '#f59e0b'; 
+        return colors.textSecondary;
+    };
+
+    const getScoreLabel = () => {
+        if (score >= 9) return 'W7ACH 🦁';
+        if (score >= 7) return 'FORMA 💪';
+        if (score >= 5) return 'LABES 🌤️';
+        return 'TE3EB 😴';
+    };
+    
+    const scoreColor = getScoreColor();
+    const rotation = (360 - ARC_ANGLE) / 2 + 180; 
+    const dashOffset = ARC_LENGTH * (1 - (score / 10));
+
+    return (
+        <View style={{ width: SCORE_SIZE, height: SCORE_SIZE - 40, alignItems: 'center', justifyContent: 'center' }}>
+             <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute', top: 0 }}>
+                 <Circle
+                    cx={SCORE_SIZE / 2}
+                    cy={SCORE_SIZE / 2}
+                    r={RADIUS}
+                    stroke={mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+                    strokeWidth={STROKE_WIDTH}
+                    strokeDasharray={`${ARC_LENGTH} ${1000}`}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    rotation={rotation}
+                    origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
+                 />
+                 <Circle
+                    cx={SCORE_SIZE / 2}
+                    cy={SCORE_SIZE / 2}
+                    r={RADIUS}
+                    stroke={scoreColor}
+                    strokeWidth={STROKE_WIDTH}
+                    strokeDasharray={`${ARC_LENGTH} ${1000}`}
+                    strokeDashoffset={dashOffset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    rotation={rotation}
+                    origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
+                 />
+             </Svg>
+             
+             <View style={{ alignItems: 'center', gap: 2, marginTop: 20 }}>
+                <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Readiness</Text>
+                <Text style={[styles.scoreBig, { color: colors.text }]}>{score}</Text>
+                <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '15', borderColor: scoreColor + '30', borderWidth: 1 }]}>
+                    <Text style={[styles.scoreRankText, { color: scoreColor }]}>
+                        {getScoreLabel()}
+                    </Text>
+                </View>
+             </View>
+        </View>
+    );
 };
 
 interface StatsUIProps {
-  timeframe: 'Week' | 'Month';
-  onTimeframeChange: (t: 'Week' | 'Month') => void;
+  timeframe: TimeFrame;
+  onTimeframeChange: (t: TimeFrame) => void;
   selectedDayIndex: number;
   weeklyData: number[];
   daysLabels: string[];
   historyItems: any[];
+  todayStats: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
-
-const getWeekDerja = (t: string) => t === 'Week' ? 'Jom3a' : "Ch'har";
 
 export const StatsUI = ({
   timeframe,
   onTimeframeChange,
-  selectedDayIndex,
-  weeklyData,
-  daysLabels,
-  historyItems
+  historyItems,
+  todayStats
 }: StatsUIProps) => {
-  
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-      
-      <View style={styles.header}>
+  const { colors, mode } = useTheme();
+  const avgScore = Math.min(10, Math.round((todayStats.protein / 150) * 10 * 10) / 10) || 0.1;
+
+  const renderHistoryItem = ({ item }: { item: any }) => (
+    <GlassView style={[styles.historyRow, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)' }]} intensity={20} borderRadius={20}>
+      <View style={styles.rowLeft}>
+        <View style={[styles.iconBoxMini, { backgroundColor: item.score >= 7 ? colors.primary + '20' : '#f59e0b20' }]}>
+            <TrendingUp size={14} color={item.score >= 7 ? colors.primary : '#f59e0b'} />
+        </View>
         <View>
-          <Text style={styles.headerTitle}>Progress mte3ek</Text>
-          <Text style={styles.headerSubtitle}>22 Jan - 28 Jan</Text>
-        </View>
-        <View style={styles.toggleContainer}>
-           {['Week', 'Month'].map((t) => (
-             <TouchableOpacity 
-               key={t} 
-               style={[styles.toggleBtn, timeframe === t && styles.toggleBtnActive]}
-               onPress={() => onTimeframeChange(t as any)}
-             >
-               <Text style={[styles.toggleText, timeframe === t && styles.toggleTextActive]}>{getWeekDerja(t)}</Text>
-             </TouchableOpacity>
-           ))}
+          <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
+          <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{item.status}</Text>
         </View>
       </View>
 
-      {/* --- NEW: Kou'ous (Trophies) Section --- */}
-      <View style={styles.trophySection}>
-         <Text style={styles.sectionTitle}>El Kou'ous 🏆</Text>
-         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.trophyScroll}>
-            <TrophyBadge label="Zero Mokli" icon={Award} color="#10b981" />
-            <TrophyBadge label="Protein King" icon={Flame} color="#3b82f6" />
-            <TrophyBadge label="Mroui" icon={Droplets} color="#0ea5e9" />
-            <TrophyBadge label="7arrai" icon={Zap} color="#f59e0b" locked />
-         </ScrollView>
+      <View style={styles.rowRight}>
+        <View style={styles.historyStats}>
+            <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
+            <Text style={[styles.historyCals, { color: colors.textSecondary }]}>{item.cals || 0} kcal</Text>
+        </View>
+        <ChevronRight size={18} color={colors.textSecondary} />
       </View>
+    </GlassView>
+  );
 
-      {/* --- NEW: Protein Streak (Gym Bro Feature) --- */}
-      <View style={styles.streakSection}>
-         <View style={styles.streakHeader}>
-            <Text style={styles.streakTitle}>Sélselet Protein 💪</Text>
-            <Text style={styles.streakCount}>5 Ayyém</Text>
-         </View>
-         <View style={styles.streakTrack}>
-            <View style={[styles.streakFill, { width: '70%' }]} />
-         </View>
-         <Text style={styles.streakSub}>Mazelek 2 ayyém 3al "Goule" badge!</Text>
-      </View>
+  const listHeader = (
+    <View style={styles.padding}>
+      {/* --- HEADER --- */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma <Text style={{ color: '#e11d48' }}>🏋️‍♂️</Text></Text>
+          <GlassView style={styles.streakBadge} intensity={20} borderRadius={20}>
+            <Flame size={14} color="#e11d48" fill="#e11d48" />
+            <Text style={[styles.streakText, { color: colors.text }]}>5 Jours</Text>
+          </GlassView>
+        </View>
 
-      <View style={styles.chartCard}>
-         <View style={styles.chartHeader}>
-            <View>
-               <Text style={styles.chartTitle}>Entidham l'Calories</Text>
-               <Text style={styles.chartSub}>Moyenne 2,140 kcal</Text>
-            </View>
-            <View style={styles.legend}>
-               <View style={styles.legendItem}>
-                  <View style={[styles.dot, { backgroundColor: '#10b981' }]} />
-                  <Text style={styles.legendText}>Hadaf</Text>
-               </View>
-            </View>
-         </View>
-         
-         <BarChart 
-            data={weeklyData} 
-            labels={daysLabels} 
-            activeIndex={selectedDayIndex} 
-         />
-      </View>
-
-      <View style={styles.statsGrid}>
-         <StatCard 
-            label="Moy. Protéine" 
-            value="175g" 
-            subValue="+12%" 
-            icon={Flame} 
-            color="#3b82f6" 
-            trend="up"
-         />
-         <StatCard 
-            label="El Mizén" 
-            value="82.4kg" 
-            subValue="-0.5kg" 
-            icon={Activity} 
-            color="#f59e0b" 
-            trend="down"
-         />
-         <StatCard 
-            label="Entrainement" 
-            value="5 Ayyém" 
-            subValue="Série" 
-            icon={TrendingUp} 
-            color="#ec4899" 
-         />
-         <StatCard 
-            label="Score" 
-            value="8.8" 
-            subValue="Tayara" 
-            icon={Trophy} 
-            color="#10b981" 
-         />
-      </View>
-
-      <View style={styles.historySection}>
-         <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Historique</Text>
-            <TouchableOpacity>
-               <Text style={styles.seeAll}>Chouf l'kol</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
+          {['Week', 'Month', '3M', '6M', 'Year'].map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[
+                styles.tabBtn, 
+                timeframe === t && { backgroundColor: mode === 'dark' ? '#fff' : '#000', borderColor: mode === 'dark' ? '#fff' : '#000' }
+              ]}
+              onPress={() => onTimeframeChange(t as TimeFrame)}
+            >
+              <Text style={[styles.tabText, { color: timeframe === t ? (mode === 'dark' ? '#000' : '#fff') : colors.textSecondary }]}>
+                {t}
+              </Text>
             </TouchableOpacity>
-         </View>
-         
-         {historyItems.map((item, idx) => (
-            <View key={idx} style={styles.historyItem}>
-               <View style={styles.historyLeft}>
-                  <View style={[
-                    styles.scoreBadge, 
-                    { backgroundColor: item.score >= 9 ? '#ecfdf5' : item.score >= 7 ? '#fffbeb' : '#fef2f2' }
-                  ]}>
-                     <Text style={[
-                        styles.scoreText,
-                        { color: item.score >= 9 ? '#059669' : item.score >= 7 ? '#d97706' : '#dc2626' }
-                     ]}>{item.score}</Text>
-                  </View>
-                  <View>
-                     <Text style={styles.historyDate}>{item.date === 'Today' ? 'Lyoum' : item.date === 'Yesterday' ? 'El bera7' : item.date}</Text>
-                     <Text style={styles.historyStatus}>{item.status}</Text>
-                  </View>
-               </View>
-               
-               <View style={styles.historyRight}>
-                  <View style={styles.macroTag}>
-                     <Text style={styles.macroTagText}>{item.p}g Protéine</Text>
-                  </View>
-                  <Text style={styles.historyCals}>{item.cals} kcal</Text>
-               </View>
-            </View>
-         ))}
+          ))}
+        </ScrollView>
       </View>
 
-    </ScrollView>
+      {/* --- SPEEDOMETER CARD --- */}
+      <GlassView style={styles.heroCard} intensity={30} borderRadius={36}>
+          <Speedometer score={avgScore} />
+          <View style={styles.heroFooter}>
+             <View style={styles.footerItem}>
+                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>WEEKLY AVG</Text>
+                <Text style={[styles.footerValue, { color: colors.text }]}>8.2</Text>
+             </View>
+             <View style={[styles.footerDivider, { backgroundColor: colors.glassBorder }]} />
+             <View style={styles.footerItem}>
+                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>PR STREAK</Text>
+                <Text style={[styles.footerValue, { color: colors.text }]}>12d</Text>
+             </View>
+          </View>
+      </GlassView>
+
+      {/* --- BENTO GRID FOR STATS --- */}
+      <View style={styles.bentoGrid}>
+          {/* PROTEIN (Left) */}
+          <GlassView style={styles.proteinCard} intensity={20} borderRadius={28}>
+              <View style={styles.cardHeader}>
+                  <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+                    <Dumbbell size={18} color={colors.primary} />
+                  </View>
+                  <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>BUILD</Text>
+              </View>
+              <View style={styles.valueContainer}>
+                  <Text style={[styles.valueBig, { color: colors.text }]}>{Math.round(todayStats.protein)}<Text style={styles.unitSmall}>g</Text></Text>
+                  <Text style={[styles.targetLabel, { color: colors.textSecondary }]}>of 200g</Text>
+              </View>
+              <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }]} />
+              </View>
+          </GlassView>
+
+          {/* DUAL COLS (Right) */}
+          <View style={styles.rightCol}>
+              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+                  <Zap size={16} color="#f59e0b" fill="#f59e0b" />
+                  <View>
+                      <Text style={[styles.smallCardValue, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
+                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>KCAL</Text>
+                  </View>
+              </GlassView>
+              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+                  <Watch size={16} color={colors.primary} />
+                  <View>
+                      <Text style={[styles.smallCardValue, { color: colors.text }]}>Ready</Text>
+                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>SYNC</Text>
+                  </View>
+              </GlassView>
+          </View>
+      </View>
+
+      {/* --- COACH INSIGHT --- */}
+      <GlassView style={styles.insightCard} intensity={40} borderRadius={28}>
+          <View style={[styles.insightIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+            <Lightbulb size={20} color={colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.insightTitle, { color: colors.text }]}>Klem Coach <Text style={{ color: colors.primary }}>AI</Text></Text>
+            <Text style={[styles.insightText, { color: colors.textSecondary }]}>
+              Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold', color: colors.text }}>W7ach</Text> ghodwa!
+            </Text>
+          </View>
+      </GlassView>
+
+      {/* --- HISTORY TITLE --- */}
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Sjel (History)</Text>
+        <ChevronRight size={20} color={colors.textSecondary} />
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+        <FlashList
+            data={historyItems}
+            keyExtractor={(item: any, index: number) => String(item?.id ?? item?.date ?? index)}
+            renderItem={renderHistoryItem}
+            estimatedItemSize={90}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ListHeaderComponent={listHeader}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 24,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#18181b',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#a1a1aa',
-    fontWeight: '600',
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#f4f4f5',
-    padding: 4,
-    borderRadius: 14,
-  },
-  toggleBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  toggleBtnActive: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  toggleText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#71717a',
-  },
-  toggleTextActive: {
-    color: '#18181b',
-  },
+  container: { flex: 1 },
+  padding: { paddingHorizontal: 20 },
+  listContent: { paddingBottom: 140, paddingTop: 10 },
+  header: { marginBottom: 24 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  headerTitle: { fontSize: 32, fontWeight: '900', letterSpacing: -1 },
+  streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: 'rgba(150,150,150,0.1)' },
+  streakText: { fontWeight: '800', fontSize: 13 },
+  tabsScroll: { gap: 8 },
+  tabBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(150,150,150,0.2)' },
+  tabText: { fontSize: 13, fontWeight: '800' },
   
-  // Trophy Section
-  trophySection: {
-    marginBottom: 24,
-  },
-  trophyScroll: {
-    gap: 12,
-    paddingRight: 24,
-  },
-  trophyCard: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#f4f4f5',
-    alignItems: 'center',
-    minWidth: 90,
-    gap: 8,
-  },
-  trophyLocked: {
-    backgroundColor: '#fafafa',
-    borderColor: '#e4e4e7',
-  },
-  trophyIconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  trophyLabel: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#18181b',
-    textAlign: 'center',
-  },
-  textLocked: {
-    color: '#a1a1aa',
-  },
+  heroCard: { padding: 24, alignItems: 'center', marginBottom: 24 },
+  heroFooter: { flexDirection: 'row', width: '100%', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(150,150,150,0.1)' },
+  footerItem: { flex: 1, alignItems: 'center' },
+  footerLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, marginBottom: 4 },
+  footerValue: { fontSize: 18, fontWeight: '900' },
+  footerDivider: { width: 1, height: '60%', alignSelf: 'center' },
 
-  // Streak Section
-  streakSection: {
-    backgroundColor: '#18181b', // Dark theme for Gym Bros
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  streakHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  streakTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  streakCount: {
-    color: '#10b981', // Emerald
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  streakTrack: {
-    height: 8,
-    backgroundColor: '#3f3f46', // Zinc 700
-    borderRadius: 4,
-    width: '100%',
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  streakFill: {
-    height: '100%',
-    backgroundColor: '#10b981',
-    borderRadius: 4,
-  },
-  streakSub: {
-    color: '#a1a1aa',
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  scoreBig: { fontSize: 64, fontWeight: '900', letterSpacing: -3, lineHeight: 68 },
+  scoreLabelText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5 },
+  scoreLabelBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
+  scoreRankText: { fontSize: 13, fontWeight: '900', textTransform: 'uppercase' },
+  
+  bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  proteinCard: { flex: 1.4, padding: 20, justifyContent: 'space-between' },
+  rightCol: { flex: 1, gap: 12 },
+  smallCard: { flex: 1, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  smallCardValue: { fontSize: 18, fontWeight: '900' },
+  smallCardLabel: { fontSize: 10, fontWeight: '900' },
+  
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  iconBox: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  cardLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+  valueContainer: { marginBottom: 12 },
+  valueBig: { fontSize: 32, fontWeight: '900' },
+  unitSmall: { fontSize: 14, fontWeight: '700', marginLeft: 2 },
+  targetLabel: { fontSize: 12, fontWeight: '600' },
+  progressTrack: { height: 8, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 4, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 4 },
 
-  chartCard: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#f4f4f5',
-    shadowColor: '#000',
-    shadowOpacity: 0.02,
-    shadowRadius: 10,
-    marginBottom: 24,
-  },
-  chartHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#18181b',
-  },
-  chartSub: {
-    fontSize: 12,
-    color: '#a1a1aa',
-    marginTop: 2,
-  },
-  legend: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { fontSize: 10, color: '#71717a', fontWeight: 'bold' },
-  chartContainer: {
-    height: 180,
-    justifyContent: 'flex-end',
-    position: 'relative',
-  },
-  targetLine: {
-    position: 'absolute',
-    left: 0, 
-    right: 0,
-    height: 2,
-    backgroundColor: '#10b981',
-    opacity: 0.2,
-    borderStyle: 'dashed',
-    zIndex: 0,
-  },
-  chartRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    height: '100%',
-    paddingBottom: 24,
-  },
-  barWrapper: {
-    alignItems: 'center',
-    width: 32,
-    height: '100%',
-    justifyContent: 'flex-end',
-  },
-  barTrack: {
-    width: 8,
-    height: '100%',
-    backgroundColor: '#f4f4f5',
-    borderRadius: 4,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  barFill: {
-    borderRadius: 4,
-    width: '100%',
-  },
-  barLabel: {
-    position: 'absolute',
-    bottom: -24,
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#d4d4d8',
-  },
-  barLabelActive: {
-    color: '#18181b',
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 32,
-  },
-  statCard: {
-    width: (width - 40 - 12) / 2, 
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#f4f4f5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#a1a1aa',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#18181b',
-  },
-  trendBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  trendText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  statSub: {
-    fontSize: 10,
-    color: '#71717a',
-    fontWeight: '600',
-  },
-  historySection: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#18181b',
-  },
-  seeAll: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#10b981',
-  },
-  historyItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 20,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#f4f4f5',
-  },
-  historyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  scoreBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreText: {
-    fontWeight: '900',
-    fontSize: 14,
-  },
-  historyDate: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#18181b',
-  },
-  historyStatus: {
-    fontSize: 12,
-    color: '#a1a1aa',
-    fontWeight: '500',
-  },
-  historyRight: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  macroTag: {
-    backgroundColor: '#f4f4f5',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  macroTagText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#71717a',
-  },
-  historyCals: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#18181b',
-  },
+  insightCard: { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'center', marginBottom: 32 },
+  insightIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  insightTitle: { fontSize: 14, fontWeight: '900', marginBottom: 2 },
+  insightText: { fontSize: 13, lineHeight: 18, fontWeight: '500' },
+
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
+  sectionTitle: { fontSize: 22, fontWeight: '900' },
+  separator: { height: 10 },
+  
+  historyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, marginHorizontal: 2 },
+  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBoxMini: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  rowTitle: { fontSize: 16, fontWeight: '800' },
+  rowSub: { fontSize: 12, fontWeight: '500', opacity: 0.6 },
+  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  historyStats: { alignItems: 'flex-end' },
+  historyValue: { fontSize: 15, fontWeight: '800' },
+  historyCals: { fontSize: 11, fontWeight: '600' }
 });

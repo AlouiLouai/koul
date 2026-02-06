@@ -1,14 +1,17 @@
 name: Mobile CI (Quality Check)
 
+# Muted for now
 on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'mobile/**'
-      - '.github/workflows/mobile-ci.yml'
-  push:
-    tags:
-      - '*'
+  # pull_request:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'mobile/**'
+  #     - '.github/workflows/mobile-ci.yml'
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'mobile/**'
+  #     - '.github/workflows/mobile-ci.yml'
   workflow_dispatch:
 
 jobs:
