@@ -14,25 +14,38 @@ const FEATURES = [
 export const FeaturesList = () => {
   const { colors } = useTheme();
 
+  const getFeatureColor = (id: string) => {
+    switch(id) {
+        case '1': return colors.primary;
+        case '2': return colors.warning;
+        case '3': return colors.success;
+        case '4': return colors.accent;
+        default: return colors.primary;
+    }
+  };
+
   return (
     <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
     >
-      {FEATURES.map((item) => (
-        <View key={item.id} style={styles.cardWrapper}>
-            <GlassView intensity={20} borderRadius={24} style={styles.featureCard}>
-                <View style={[styles.iconBg, { backgroundColor: item.color + '15' }]}>
-                    <item.icon size={24} color={item.color} />
-                </View>
-                <View>
-                    <Text style={[styles.featureTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-                    <Text style={[styles.featureDesc, { color: colors.textSecondary }]} numberOfLines={1}>{item.sub}</Text>
-                </View>
-            </GlassView>
-        </View>
-      ))}
+      {FEATURES.map((item) => {
+        const itemColor = getFeatureColor(item.id);
+        return (
+          <View key={item.id} style={styles.cardWrapper}>
+              <GlassView intensity={20} borderRadius={24} style={styles.featureCard}>
+                  <View style={[styles.iconBg, { backgroundColor: itemColor + '15' }]}>
+                      <item.icon size={24} color={itemColor} />
+                  </View>
+                  <View>
+                      <Text style={[styles.featureTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+                      <Text style={[styles.featureDesc, { color: colors.textSecondary }]} numberOfLines={1}>{item.sub}</Text>
+                  </View>
+              </GlassView>
+          </View>
+        );
+      })}
     </ScrollView>
   );
 };

@@ -5,17 +5,15 @@ import { useUI } from '../../src/hooks/UIContext';
 
 export default function ProfileScreen() {
   const { isPro } = useStats();
-  const { setIsAuthenticated, setShowUpgrade } = useUI();
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-  };
+  const { logout, setShowUpgrade, isAuthenticated, setShowLoginModal } = useUI();
 
   return (
     <ProfileContainer 
-      onLogout={handleLogout} 
+      onLogout={logout} 
       onShowUpgrade={() => setShowUpgrade(true)}
       isPro={isPro} 
+      isAuthenticated={isAuthenticated}
+      onTriggerAuth={() => setShowLoginModal(true)}
     />
   );
 }

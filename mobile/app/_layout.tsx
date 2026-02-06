@@ -9,25 +9,36 @@ import { SplashScreen } from '../src/components/SplashScreen';
 import { AuthContainer } from '../src/features/auth';
 import { UpgradeScreen } from '../src/components/UpgradeScreen';
 import { LogSuccessModal } from '../src/components/LogSuccessModal';
+import { ClickToPayModal } from '../src/components/ClickToPayModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AppLogo } from '../src/components/AppLogo';
 import { GlassView } from '../src/components/GlassView';
-import { Sun, Moon, User } from 'lucide-react-native';
+import { Sun, Moon } from 'lucide-react-native';
+import { GoogleLogo } from '../src/components/GoogleLogo';
 
 const Header = React.memo(() => {
   const { colors, mode, toggleTheme } = useTheme();
   const { isAuthenticated, setShowLoginModal } = useUI();
+  const router = useRouter();
+  
+  const handleGoHome = () => {
+    router.replace('/');
+  };
   
   return (
     <View style={styles.header}>
-      <View style={styles.headerLeft}>
-        <AppLogo size={36} borderRadius={10} intensity={50} />
+      <TouchableOpacity 
+        style={styles.headerLeft} 
+        onPress={handleGoHome}
+        activeOpacity={0.7}
+      >
+        <AppLogo size={36} borderRadius={10} intensity={50} animated={false} />
         <View>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>KOUL</Text>
+          <Text style={[styles.headerTitle, { color: colors.primary }]}>KOUL</Text>
         </View>
-      </View>
+      </TouchableOpacity>
       
       <View style={styles.headerRight}>
         <TouchableOpacity onPress={toggleTheme} activeOpacity={0.7} style={{ marginRight: 8 }}>
@@ -46,9 +57,8 @@ const Header = React.memo(() => {
             </GlassView>
         ) : (
             <TouchableOpacity onPress={() => setShowLoginModal(true)} activeOpacity={0.8}>
-                <GlassView style={[styles.connectBtn, { backgroundColor: colors.primary }]} intensity={80} borderRadius={20}>
-                    <User size={14} color="#fff" />
-                    <Text style={styles.connectText}>Connecti</Text>
+                <GlassView style={styles.iconBtn} intensity={30} borderRadius={20}>
+                    <GoogleLogo size={20} />
                 </GlassView>
             </TouchableOpacity>
         )}
@@ -58,12 +68,13 @@ const Header = React.memo(() => {
 });
 
 function RootLayoutNav() {
-  const [showSplash, setShowSplash] = useState(true);
   const { 
     showUpgrade, setShowUpgrade, 
     showLogSuccess, setShowLogSuccess,
     showLoginModal, setShowLoginModal,
-    setIsAuthenticated
+    setIsAuthenticated,
+    showSplash, setShowSplash,
+    showClickToPay, setShowClickToPay
   } = useUI();
   const { upgradeToPro, lastResetDate, resetDaily } = useStatsStore();
   const { mode } = useTheme();
@@ -81,6 +92,17 @@ function RootLayoutNav() {
     setIsAuthenticated(true);
     setShowLoginModal(false);
   }, [setIsAuthenticated, setShowLoginModal]);
+
+  const handleUpgradeIntent = useCallback(() => {
+    setShowUpgrade(false);
+    setShowClickToPay(true);
+  }, [setShowUpgrade, setShowClickToPay]);
+
+  const handlePaymentComplete = useCallback(() => {
+    upgradeToPro();
+    setShowClickToPay(false);
+    router.replace('/stats');
+  }, [upgradeToPro, setShowClickToPay, router]);
 
   if (showSplash) {
     return <SplashScreen onFinish={() => setShowSplash(false)} />;
@@ -110,7 +132,7 @@ function RootLayoutNav() {
           <View style={styles.absoluteContainer}>
             <UpgradeScreen 
                 onClose={() => setShowUpgrade(false)} 
-                onUpgrade={upgradeToPro}
+                onUpgrade={handleUpgradeIntent}
                 onRedirectHome={() => {
                     setShowUpgrade(false);
                     router.replace('/');
@@ -118,6 +140,12 @@ function RootLayoutNav() {
             />
           </View>
         )}
+
+        <ClickToPayModal 
+          visible={showClickToPay}
+          onClose={() => setShowClickToPay(false)}
+          onComplete={handlePaymentComplete}
+        />
 
         <LogSuccessModal 
           visible={showLogSuccess} 

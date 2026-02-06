@@ -5,13 +5,13 @@ import { useUI } from '../../src/hooks/UIContext';
 
 export default function StatsScreen() {
   const { isPro } = useStats();
-  const { setShowUpgrade, showUpgrade } = useUI();
+  const { setShowUpgrade, showUpgrade, showClickToPay } = useUI();
 
   return (
     <StatsContainer 
       isPro={isPro} 
       onShowUpgrade={() => setShowUpgrade(true)} 
-      isUpgradeVisible={showUpgrade}
+      isUpgradeVisible={showUpgrade || showClickToPay}
     />
   );
 }

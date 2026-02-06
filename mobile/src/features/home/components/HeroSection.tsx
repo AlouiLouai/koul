@@ -4,16 +4,12 @@ import { Zap } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
-import { AppLogo } from '../../../components/AppLogo';
-
 export const HeroSection = memo(() => {
   const { colors } = useTheme();
   return (
     <GlassView style={styles.heroCard} intensity={20} borderRadius={32}>
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
-          <AppLogo size={24} borderRadius={8} intensity={0} />
-          <Text style={[styles.tagText, { color: colors.primary }]}>KOUL</Text>
         </View>
         <GlassView style={styles.streakBadge} intensity={40} borderRadius={12}>
            <Zap size={14} color={colors.warning} fill={colors.warning} />
@@ -23,13 +19,13 @@ export const HeroSection = memo(() => {
 
       <View style={styles.content}>
         <Text style={[styles.heroTitle, { color: colors.text }]}> 
-          Koul Tounsi,
+          Scanni sa7nek,
           <Text style={[styles.heroHighlight, { color: colors.primary }]}> 
-            {"\n"}T3ich Tounsi.
+            {"\n"}Ebni badnek.
           </Text>
         </Text>
         <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}> 
-          AI ychouf sa7nek, y9ollek chnoua fi kerchek. 🇹🇳
+          AI ychouf sa7nek, ygollek chnoua fi kerchek. 🇹🇳
         </Text>
       </View>
     </GlassView>

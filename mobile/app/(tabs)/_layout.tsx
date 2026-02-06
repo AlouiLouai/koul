@@ -14,13 +14,13 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
   useEffect(() => {
     Animated.parallel([
       Animated.spring(scale, {
-        toValue: isActive ? 1 : 1, // No scale on icon itself to keep it clean
+        toValue: isActive ? 1.1 : 1,
         useNativeDriver: true,
         friction: 8,
         tension: 40,
       }),
       Animated.timing(opacity, {
-        toValue: isActive ? 1 : 0.5,
+        toValue: isActive ? 1 : 0.6,
         duration: 200,
         useNativeDriver: true,
       }),
@@ -33,8 +33,9 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
     ]).start();
   }, [isActive]);
 
-  // Matching the light blue highlight from the image
-  const activeBgColor = mode === 'dark' ? 'rgba(56, 189, 248, 0.2)' : '#dbeafe';
+  // Premium Blue Light tint for active state
+  const activeBgColor = mode === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(37, 99, 235, 0.1)';
+  const inactiveColor = mode === 'dark' ? 'rgba(148, 163, 184, 0.5)' : '#94a3b8';
 
   return (
     <TouchableOpacity 
@@ -52,10 +53,10 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
                 }
             ]} 
         />
-        <Animated.View style={{ opacity }}>
+        <Animated.View style={{ opacity, transform: [{ scale }] }}>
             <Icon 
               size={24} 
-              color={isActive ? colors.primary : '#334155'} 
+              color={isActive ? colors.primary : inactiveColor} 
               strokeWidth={isActive ? 2.5 : 2}
             />
         </Animated.View>
@@ -70,10 +71,15 @@ function CustomTabBar({ state, navigation }: any) {
   return (
     <View style={tabStyles.container}>
       <GlassView 
-        style={tabStyles.dockContainer} 
-        intensity={mode === 'light' ? 50 : 80}
+        style={[
+            tabStyles.dockContainer,
+            { 
+                backgroundColor: mode === 'dark' ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.6)',
+                borderColor: mode === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255, 255, 255, 0.3)',
+            }
+        ]} 
+        intensity={mode === 'dark' ? 90 : 60}
         borderRadius={45}
-        noBorder={true}
       >
         <View style={tabStyles.innerContainer}>
           {state.routes.map((route: any, index: number) => {
@@ -146,10 +152,9 @@ const tabStyles = StyleSheet.create({
     paddingVertical: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 24,
     elevation: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   innerContainer: {
     flexDirection: 'row',

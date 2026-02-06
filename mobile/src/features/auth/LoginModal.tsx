@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'rea
 import { X, ShieldCheck, ArrowRight } from 'lucide-react-native';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { AppLogo } from '../../components/AppLogo';
+import { GoogleLogo } from '../../components/GoogleLogo';
 import { useTheme } from '../../theme/ThemeContext';
 
 interface LoginModalProps {
@@ -53,25 +54,24 @@ export const LoginModal = ({ visible, onClose, onLogin, isLoading }: LoginModalP
                         borderColor: colors.text + '20',
                         borderWidth: 1,
                         shadowColor: colors.accent,
+                        minWidth: 160, // Ensure stable width during loading
+                        justifyContent: 'center'
                     }
                 ]}>
                     {isLoading ? (
-                        <ActivityIndicator color={colors.text} />
+                        <ActivityIndicator color={colors.primary} size="small" />
                     ) : (
-                        <>
+                        <View style={styles.btnInner}>
                             <View style={[styles.iconCircle, { shadowColor: '#000', elevation: 2 }]}>
-                                {/* Using distinct colors for the G parts would require SVG, 
-                                    falling back to a very clean branded look. */}
-                                <Text style={{fontSize: 24, fontWeight: '900', color: '#4285F4'}}>G</Text>
+                                <GoogleLogo size={20} />
                             </View>
                             <Text style={[
                                 styles.btnText, 
                                 { color: colors.text }
                             ]}>
-                                Connecti b' Google
+                                Connecti
                             </Text>
-                            <ArrowRight size={20} color={colors.text} opacity={0.4} />
-                        </>
+                        </View>
                     )}
                 </View>
             </TouchableOpacity>
@@ -125,36 +125,38 @@ const styles = StyleSheet.create({
       fontWeight: '700',
   },
   googleBtnWrapper: {
-      width: '100%',
+      alignSelf: 'center',
       marginTop: 10,
   },
   googleBtn: {
+      height: 52,
+      borderRadius: 26,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+  },
+  btnInner: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: 64,
-      paddingHorizontal: 8,
-      borderRadius: 24,
-      gap: 16,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 8,
-      elevation: 5,
+      paddingLeft: 6,
+      paddingRight: 24,
+      gap: 12,
   },
   iconCircle: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.05,
       shadowRadius: 4,
   },
   btnText: {
-      fontSize: 17,
+      fontSize: 16,
       fontWeight: '700',
-      flex: 1,
   },
   googleGContainer: {
       position: 'relative',

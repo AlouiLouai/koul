@@ -22,12 +22,12 @@ export const GlassView: React.FC<GlassViewProps> = ({
 
   // Manual border styles because Tailwind doesn't support directional opacity well for borders in RN
   const borderStyle = noBorder === false ? {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.glassBorder,
-    borderTopColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
-    borderLeftColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
-    borderRightColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
-    borderBottomColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+    borderTopColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.15)',
+    borderLeftColor: mode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.15)',
+    borderRightColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+    borderBottomColor: mode === 'light' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
   } : {};
 
   return (

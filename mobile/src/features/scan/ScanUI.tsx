@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView, Easing, Dimensions } from 'react-native';
 import { Trash2, CheckCircle2, ChevronLeft } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+
+const { width } = Dimensions.get('window');
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 import AnalysisResult from '../../components/AnalysisResult';
@@ -144,11 +146,11 @@ export const ScanUI = ({
       }
   };
 
-    const containerHeight = useRef(new Animated.Value(580)).current;
+    const containerHeight = useRef(new Animated.Value(width)).current; // Default to square-ish
 
     useEffect(() => {
         Animated.spring(containerHeight, {
-            toValue: (currentImage && !loading) ? 220 : 580,
+            toValue: (currentImage && !loading) ? 180 : 480, // Shrink more when result is ready
             useNativeDriver: false,
             friction: 8,
             tension: 30
@@ -157,7 +159,12 @@ export const ScanUI = ({
 
   return (
     <View style={styles.container}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent} 
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+        >
             <View style={styles.padding}>
                 
                 <Animated.View style={[styles.imageContainer, { height: containerHeight }]}>
@@ -169,7 +176,7 @@ export const ScanUI = ({
                                     scanMessage={scanMessage} 
                                     scanningProgress={scanningProgress} 
                                     beamAnim={beamAnim}
-                                    containerHeight={580}
+                                    containerHeight={480}
                                 />
                             )}
                             {!loading && (

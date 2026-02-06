@@ -35,7 +35,7 @@ export const MealItemList = ({ items }: MealItemListProps) => {
         <View style={styles.grid}>
             {visibleItems.map((item, idx) => (
                 <View key={idx} style={styles.cardWrapper}>
-                    <GlassView intensity={40} borderRadius={20} style={[styles.itemCard, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)', borderColor: colors.glassBorder }]}>
+                    <GlassView intensity={40} borderRadius={20} style={[styles.itemCard, { borderColor: colors.glassBorder }]}>
                         <View style={styles.itemHeader}>
                             <View style={[styles.dot, { backgroundColor: colors.primary }]} />
                             <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{item.item}</Text>

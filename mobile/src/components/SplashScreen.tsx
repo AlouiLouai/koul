@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { AppLogo } from './AppLogo'; // Assumes AppLogo is in same folder or adjust import
+import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { AppLogo } from './AppLogo';
 import { useTheme } from '../theme/ThemeContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface SplashScreenProps {
@@ -10,56 +11,149 @@ interface SplashScreenProps {
 
 export const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const { colors } = useTheme();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  
+  // Animation Values
+  const logoScale = useRef(new Animated.Value(0)).current;
+  const logoTranslateY = useRef(new Animated.Value(50)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(20)).current;
+  
+  const subtitleOpacity = useRef(new Animated.Value(0)).current;
+  const subtitleTranslateY = useRef(new Animated.Value(20)).current;
+  
+  const containerOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Entrance Animation
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Sequence of animations
+    const animation = Animated.sequence([
+      // 1. Logo Entrance
+      Animated.parallel([
+        Animated.spring(logoScale, {
+          toValue: 1,
+          tension: 40,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+        Animated.timing(logoTranslateY, {
+          toValue: 0,
+          duration: 800,
+          easing: Easing.out(Easing.back(1.5)),
+          useNativeDriver: true,
+        }),
+        Animated.timing(logoOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
+      
+      // 2. Title Entrance
+      Animated.parallel([
+        Animated.timing(titleOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleTranslateY, {
+          toValue: 0,
+          duration: 600,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
+      
+      // 3. Subtitle Entrance
+      Animated.parallel([
+        Animated.timing(subtitleOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(subtitleTranslateY, {
+          toValue: 0,
+          duration: 600,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
 
-    // Exit Timer (1.5s total visible time)
+    animation.start();
+
+    // Exit Timer
     const timer = setTimeout(() => {
-        // Exit Animation
-        Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-        }).start(() => onFinish());
-    }, 2000); // 2 seconds total (enter + stay + exit)
+      Animated.timing(containerOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => onFinish());
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background[0] }]}>
-      <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-        
+    <Animated.View style={[styles.container, { opacity: containerOpacity }]}>
+      <LinearGradient
+        colors={[colors.background[0], colors.background[1] || colors.background[0]]}
+        style={StyleSheet.absoluteFill}
+      />
+      
+      <View style={styles.content}>
         {/* Logo Section */}
-        <View style={styles.logoWrapper}>
-            <AppLogo size={100} borderRadius={32} inverted />
-        </View>
+        <Animated.View 
+          style={[
+            styles.logoWrapper, 
+            { 
+              opacity: logoOpacity,
+              transform: [
+                { scale: logoScale },
+                { translateY: logoTranslateY }
+              ] 
+            }
+          ]}
+        >
+          <AppLogo size={120} borderRadius={38} inverted />
+        </Animated.View>
 
         {/* Text Section */}
         <View style={styles.textWrapper}>
-            <Text style={[styles.title, { color: colors.text }]}>Mar7ba Bik.</Text>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                Sawer sahnek, taba3 ta9tek.
-            </Text>
+          <Animated.Text 
+            style={[
+              styles.title, 
+              { 
+                color: colors.text,
+                opacity: titleOpacity,
+                transform: [{ translateY: titleTranslateY }]
+              }
+            ]}
+          >
+            KOUL.
+          </Animated.Text>
+          <Animated.Text 
+            style={[
+              styles.subtitle, 
+              { 
+                color: colors.textSecondary,
+                opacity: subtitleOpacity,
+                transform: [{ translateY: subtitleTranslateY }]
+              }
+            ]}
+          >
+            Sawer sahnek, taba3 ta9tek.
+          </Animated.Text>
         </View>
-
+      </View>
+      
+      {/* Subtle branding at bottom */}
+      <Animated.View style={[styles.footer, { opacity: subtitleOpacity }]}>
+        <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+          Premium AI Nutrition
+        </Text>
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -68,32 +162,47 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#000',
   },
   content: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 40,
   },
   logoWrapper: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.15,
-      shadowRadius: 20,
-      elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 15,
   },
   textWrapper: {
-      alignItems: 'center',
-      gap: 8,
+    alignItems: 'center',
+    gap: 12,
   },
   title: {
-      fontSize: 32,
-      fontWeight: '900',
-      letterSpacing: -1,
+    fontSize: 48,
+    fontWeight: '900',
+    letterSpacing: -2,
+    textAlign: 'center',
   },
   subtitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      textAlign: 'center',
-      opacity: 0.8,
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    opacity: 0.8,
+    maxWidth: '80%',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 50,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    opacity: 0.5,
   }
 });

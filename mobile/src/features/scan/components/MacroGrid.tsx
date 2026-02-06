@@ -41,27 +41,29 @@ interface MacroGridProps {
 }
 
 export const MacroGrid = ({ protein, carbs, fat }: MacroGridProps) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.grid}>
         <MacroCard 
             label="Protéine" 
             value={protein.toFixed(1)} 
             unit="g" 
-            color={{ bg: '#2563eb', text: '#2563eb' }} 
+            color={{ bg: colors.primary, text: colors.primary }} 
             icon={Flame} 
         />
         <MacroCard 
             label="Carbs" 
             value={carbs.toFixed(0)} 
             unit="g" 
-            color={{ bg: '#10b981', text: '#10b981' }} 
+            color={{ bg: colors.success, text: colors.success }} 
             icon={Wheat} 
         />
         <MacroCard 
             label="Dhoune" 
             value={fat.toFixed(0)} 
             unit="g" 
-            color={{ bg: '#f59e0b', text: '#f59e0b' }} 
+            color={{ bg: colors.warning, text: colors.warning }} 
             icon={Droplets} 
         />
     </View>
@@ -70,7 +72,7 @@ export const MacroGrid = ({ protein, carbs, fat }: MacroGridProps) => {
 
 const styles = StyleSheet.create({
     grid: { flexDirection: 'row', gap: 10, marginBottom: 20, marginTop: 8 },
-    macroCard: { flex: 1, padding: 12, height: 85, justifyContent: 'space-between', backgroundColor: '#fff' },
+    macroCard: { flex: 1, padding: 12, height: 85, justifyContent: 'space-between', backgroundColor: 'transparent' },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     iconCircle: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
     label: { fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 },
