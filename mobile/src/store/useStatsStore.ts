@@ -1,23 +1,21 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { createMMKV } from 'react-native-mmkv';
+import { createStorage } from '@/lib/mmkv';
 
 const STORAGE_ID = 'stats-storage';
-const STATS_STORAGE = createMMKV({
-  id: STORAGE_ID,
-});
+const STORAGE = createStorage(STORAGE_ID);
 
 const storage = createJSONStorage(() => {
   return {
     getItem: (name: string) => {
-      const value = STATS_STORAGE.getString(name);
+      const value = STORAGE.getString(name);
       return value ?? null;
     },
     setItem: (name: string, value: string) => {
-      STATS_STORAGE.set(name, value);
+      STORAGE.set(name, value);
     },
     removeItem: (name: string) => {
-      STATS_STORAGE.remove(name);
+      STORAGE.remove(name);
     },
   }
 });
