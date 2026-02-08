@@ -15,7 +15,10 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.makelti.app"
+      "package": "com.makelti.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -37,14 +40,14 @@
           "image": "./assets/splash-icon.png",
           "backgroundColor": "#ffffff",
           "dark": {
-            "backgroundColor": "#141626"
+            "backgroundColor": "#000000"
           }
         }
       ]
     ],
     "extra": {
       "eas": {
-        "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
+        "projectId": "c73de80d-2bb3-4422-af5a-10b7efb60ee7"
       }
     },
     "owner": "mnm89"
