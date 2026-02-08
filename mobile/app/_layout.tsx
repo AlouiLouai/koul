@@ -1,75 +1,25 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Slot, useRouter } from 'expo-router';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
-import { useStatsStore } from '../src/store/useStatsStore';
-import { UIProvider, useUI } from '../src/hooks/UIContext';
+import { useStatsStore } from '@/store/useStatsStore';
+import { UIProvider, useUI } from '@/hooks/UIContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { LiquidBackground } from '../src/components/LiquidBackground';
-import { SplashScreen } from '../src/components/SplashScreen';
-import { AuthContainer } from '../src/features/auth';
-import { UpgradeScreen } from '../src/components/UpgradeScreen';
-import { LogSuccessModal } from '../src/components/LogSuccessModal';
-import { ClickToPayModal } from '../src/components/ClickToPayModal';
+import { LiquidBackground } from '@/components/LiquidBackground';
+import { SplashScreen } from '@/components/SplashScreen';
+import { AuthContainer } from '@/features/auth';
+import { UpgradeScreen } from '@/components/UpgradeScreen';
+import { LogSuccessModal } from '@/components/LogSuccessModal';
+import { ClickToPayModal } from '@/components/ClickToPayModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { AppLogo } from '../src/components/AppLogo';
-import { GlassView } from '../src/components/GlassView';
-import { Sun, Moon } from 'lucide-react-native';
-import { GoogleLogo } from '../src/components/GoogleLogo';
+import { AppHeader } from '@/components/AppHeader';
 
-const Header = React.memo(() => {
-  const { colors, mode, toggleTheme } = useTheme();
-  const { isAuthenticated, setShowLoginModal } = useUI();
-  const router = useRouter();
-  
-  const handleGoHome = () => {
-    router.replace('/');
-  };
-  
-  return (
-    <View style={styles.header}>
-      <TouchableOpacity 
-        style={styles.headerLeft} 
-        onPress={handleGoHome}
-        activeOpacity={0.7}
-      >
-        <AppLogo size={36} borderRadius={10} intensity={50} animated={false} />
-        <View>
-          <Text style={[styles.headerTitle, { color: colors.primary }]}>KOUL</Text>
-        </View>
-      </TouchableOpacity>
-      
-      <View style={styles.headerRight}>
-        <TouchableOpacity onPress={toggleTheme} activeOpacity={0.7} style={{ marginRight: 8 }}>
-            <GlassView style={styles.iconBtn} intensity={20} borderRadius={20}>
-            {mode === 'dark' ? (
-                <Sun size={18} color={colors.warning} fill={colors.warning} />
-            ) : (
-                <Moon size={18} color={colors.textSecondary} fill={colors.textSecondary} />
-            )}
-            </GlassView>
-        </TouchableOpacity>
 
-        {isAuthenticated ? (
-            <GlassView style={styles.userAvatar} intensity={30} borderRadius={20}>
-                <Text style={{ fontWeight: 'bold', color: colors.primary }}>U</Text>
-            </GlassView>
-        ) : (
-            <TouchableOpacity onPress={() => setShowLoginModal(true)} activeOpacity={0.8}>
-                <GlassView style={styles.iconBtn} intensity={30} borderRadius={20}>
-                    <GoogleLogo size={20} />
-                </GlassView>
-            </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
-});
 
 function RootLayoutNav() {
-  const { 
-    showUpgrade, setShowUpgrade, 
+  const {
+    showUpgrade, setShowUpgrade,
     showLogSuccess, setShowLogSuccess,
     showLoginModal, setShowLoginModal,
     setIsAuthenticated,
@@ -112,10 +62,10 @@ function RootLayoutNav() {
     <LiquidBackground>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-        
+
         <View style={styles.mainAppContainer}>
           <View style={styles.contentPadding}>
-            <Header />
+            <AppHeader />
           </View>
 
           <View style={styles.tabContentContainer}>
@@ -130,41 +80,41 @@ function RootLayoutNav() {
 
         {showUpgrade && (
           <View style={styles.absoluteContainer}>
-            <UpgradeScreen 
-                onClose={() => setShowUpgrade(false)} 
-                onUpgrade={handleUpgradeIntent}
-                onRedirectHome={() => {
-                    setShowUpgrade(false);
-                    router.replace('/');
-                }}
+            <UpgradeScreen
+              onClose={() => setShowUpgrade(false)}
+              onUpgrade={handleUpgradeIntent}
+              onRedirectHome={() => {
+                setShowUpgrade(false);
+                router.replace('/');
+              }}
             />
           </View>
         )}
 
-        <ClickToPayModal 
+        <ClickToPayModal
           visible={showClickToPay}
           onClose={() => setShowClickToPay(false)}
           onComplete={handlePaymentComplete}
         />
 
-        <LogSuccessModal 
-          visible={showLogSuccess} 
+        <LogSuccessModal
+          visible={showLogSuccess}
           onClose={() => setShowLogSuccess(false)}
           onAddMore={() => {
             setShowLogSuccess(false);
             router.push('/scan');
           }}
-          onViewStats={() => { 
-            setShowLogSuccess(false); 
+          onViewStats={() => {
+            setShowLogSuccess(false);
             router.push('/stats');
           }}
         />
 
-        <AuthContainer 
-           onAuthenticated={handleAuthenticated} 
-           isModal={true} 
-           visible={showLoginModal} 
-           onClose={() => setShowLoginModal(false)}
+        <AuthContainer
+          onAuthenticated={handleAuthenticated}
+          isModal={true}
+          visible={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
         />
       </SafeAreaView>
     </LiquidBackground>
@@ -218,49 +168,16 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     zIndex: 100,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    marginTop: 12, 
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  headerRight: {
-      flexDirection: 'row',
-      alignItems: 'center',
-  },
-  iconBtn: {
-      width: 40,
-      height: 40,
-      alignItems: 'center',
-      justifyContent: 'center',
-  },
-  userAvatar: {
-      width: 40,
-      height: 40,
-      alignItems: 'center',
-      justifyContent: 'center',
-  },
   connectBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      gap: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 6,
   },
   connectText: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 13,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    letterSpacing: -0.5,
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 13,
   },
 });

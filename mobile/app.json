@@ -4,11 +4,14 @@
     "slug": "makelti-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "makelti",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "icon": {
+        "light": "./assets/ios-light.png",
+        "dark": "./assets/ios-dark.png"
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.makelti.app",
       "infoPlist": {
@@ -16,6 +19,10 @@
       }
     },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundImage": "./assets/adaptive-background.png"
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.makelti.app",
@@ -35,10 +42,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
-          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon-light.png",
+          "backgroundColor": "#f1f5f9",
+          "imageWidth": 280,
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#0f172a",
+            "image": "./assets/splash-icon-dark.png"
           }
         }
       ],
