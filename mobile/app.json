@@ -21,17 +21,12 @@
       ]
     },
     "plugins": [
-      [
-        "expo-dev-client",
-        {
-          "launchMode": "most-recent"
-        }
-      ],
+      "expo-router",
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app needs access to your photos to let you analyze your food from an image.",
-          "cameraPermission": "The app needs access to your camera to let you analyze your food from a photo."
+          "photosPermission": "Bach takhtar taswira men galerie mta3ek! 🖼️",
+          "cameraPermission": "Bach nsawrou sa7nek w n9ouloulek chnoua fih! 📸"
         }
       ],
       [
@@ -43,6 +38,12 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "launchMode": "most-recent"
+        }
       ]
     ],
     "extra": {
@@ -50,16 +51,6 @@
         "projectId": "c73de80d-2bb3-4422-af5a-10b7efb60ee7"
       }
     },
-    "owner": "mnm89",
-    "plugins": [
-      "expo-router",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Bach takhtar taswira men galerie mta3ek! 🖼️",
-          "cameraPermission": "Bach nsawrou sa7nek w n9ouloulek chnoua fih! 📸"
-        }
-      ]
-    ]
+    "owner": "mnm89"
   }
 }
