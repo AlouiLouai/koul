@@ -9,8 +9,6 @@ interface UIContextType {
   setShowLoginModal: (show: boolean) => void;
   isAuthenticated: boolean;
   setIsAuthenticated: (auth: boolean) => void;
-  showSplash: boolean;
-  setShowSplash: (show: boolean) => void;
   showClickToPay: boolean;
   setShowClickToPay: (show: boolean) => void;
   logout: () => void;
@@ -23,12 +21,10 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [showLogSuccess, setShowLogSuccess] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
   const [showClickToPay, setShowClickToPay] = useState(false);
 
   const logout = () => {
     setIsAuthenticated(false);
-    setShowSplash(true);
   };
 
   return (
@@ -41,8 +37,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       setShowLoginModal,
       isAuthenticated,
       setIsAuthenticated,
-      showSplash,
-      setShowSplash,
       showClickToPay,
       setShowClickToPay,
       logout

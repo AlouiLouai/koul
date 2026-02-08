@@ -7,7 +7,7 @@ const expoConfig = require('eslint-config-expo/flat');
 /**
  * @type {import('@eslint/config-helpers').SimpleExtendsElement}
  */
-const restrictedImports = {
+const reactNativeMMKV = {
   rules: {
     'no-restricted-imports': [
       'error',
@@ -25,10 +25,29 @@ const restrictedImports = {
   },
   ignores: ['src/lib/mmkv.ts'],
 }
+const tanstackReactQuery = {
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@tanstack/react-query',
+            message:
+              'Do not use @tanstack/react-query directly. Use @/lib/react-query instead.',
+          },
+        ],
+
+      },
+    ],
+  },
+  ignores: ['src/lib/react-query.ts'],
+}
 
 module.exports = defineConfig([
   expoConfig,
-  restrictedImports,
+  reactNativeMMKV,
+  tanstackReactQuery,
   {
     ignores: ['dist/*'],
   },

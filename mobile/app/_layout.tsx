@@ -1,29 +1,21 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Slot, useRouter } from 'expo-router';
-import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
-import { useStatsStore } from '@/store/useStatsStore';
-import { UIProvider, useUI } from '@/hooks/UIContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { Stack } from 'expo-router';
 import { LiquidBackground } from '@/components/LiquidBackground';
-import { SplashScreen } from '@/components/SplashScreen';
-import { AuthContainer } from '@/features/auth';
-import { UpgradeScreen } from '@/components/UpgradeScreen';
-import { LogSuccessModal } from '@/components/LogSuccessModal';
-import { ClickToPayModal } from '@/components/ClickToPayModal';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, View, } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { AppHeader } from '@/components/AppHeader';
+import * as SplashScreen from 'expo-splash-screen';
+import { AppProviders } from '@/components/AppProviders';
+import { initializeSupabaseClient } from '@/lib/supabase';
+import { AuthStateProvider } from '@/features/auth/AuthState';
 
 
 
-function RootLayoutNav() {
+
+/* function RootLayoutNav() {
   const {
     showUpgrade, setShowUpgrade,
     showLogSuccess, setShowLogSuccess,
     showLoginModal, setShowLoginModal,
     setIsAuthenticated,
-    showSplash, setShowSplash,
     showClickToPay, setShowClickToPay
   } = useUI();
   const { upgradeToPro, lastResetDate, resetDaily } = useStatsStore();
@@ -54,102 +46,123 @@ function RootLayoutNav() {
     router.replace('/stats');
   }, [upgradeToPro, setShowClickToPay, router]);
 
-  if (showSplash) {
-    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+
+  return (
+
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+
+      <View style={styles.mainAppContainer}>
+        <View style={styles.contentPadding}>
+          <AppHeader />
+        </View>
+
+        <View style={styles.tabContentContainer}>
+          <Slot />
+        </View>
+      </View>
+
+      {showUpgrade && (
+        <View style={styles.absoluteContainer}>
+          <UpgradeScreen
+            onClose={() => setShowUpgrade(false)}
+            onUpgrade={handleUpgradeIntent}
+            onRedirectHome={() => {
+              setShowUpgrade(false);
+              router.replace('/');
+            }}
+          />
+        </View>
+      )}
+
+      <ClickToPayModal
+        visible={showClickToPay}
+        onClose={() => setShowClickToPay(false)}
+        onComplete={handlePaymentComplete}
+      />
+
+      <LogSuccessModal
+        visible={showLogSuccess}
+        onClose={() => setShowLogSuccess(false)}
+        onAddMore={() => {
+          setShowLogSuccess(false);
+          router.push('/scan');
+        }}
+        onViewStats={() => {
+          setShowLogSuccess(false);
+          router.push('/stats');
+        }}
+      />
+
+      <AuthContainer
+        onAuthenticated={handleAuthenticated}
+        isModal={true}
+        visible={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
+    </SafeAreaView>
+  );
+} */
+
+
+
+
+
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might trigger some race conditions, ignore them */
+});
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
+
+export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    let appStateSubscription: Awaited<ReturnType<typeof initializeSupabaseClient>> | null = null;
+    async function doAsyncStuff() {
+      // TODO: Replace with actual logic to load initial data
+      // check session , storage , preferences, .... etc.
+      await new Promise(resolve => setTimeout(resolve, 500));
+      appStateSubscription = await initializeSupabaseClient();
+    }
+
+    doAsyncStuff().finally(() => {
+      setIsReady(true);
+    });
+    return () => {
+      appStateSubscription?.remove();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isReady) {
+      SplashScreen.hide();
+    }
+  }, [isReady]);
+
+  if (!isReady) {
+    return null;
   }
 
   return (
-    <LiquidBackground>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-
-        <View style={styles.mainAppContainer}>
-          <View style={styles.contentPadding}>
-            <AppHeader />
-          </View>
-
-          <View style={styles.tabContentContainer}>
-            {/* 
-              Using Slot instead of Stack here to avoid nesting Navigators inside Views 
-              which is a common source of Fabric crashes in Expo Router.
-              The routing logic will now be handled by the (tabs)/_layout.tsx
-            */}
-            <Slot />
-          </View>
-        </View>
-
-        {showUpgrade && (
-          <View style={styles.absoluteContainer}>
-            <UpgradeScreen
-              onClose={() => setShowUpgrade(false)}
-              onUpgrade={handleUpgradeIntent}
-              onRedirectHome={() => {
-                setShowUpgrade(false);
-                router.replace('/');
-              }}
-            />
-          </View>
-        )}
-
-        <ClickToPayModal
-          visible={showClickToPay}
-          onClose={() => setShowClickToPay(false)}
-          onComplete={handlePaymentComplete}
-        />
-
-        <LogSuccessModal
-          visible={showLogSuccess}
-          onClose={() => setShowLogSuccess(false)}
-          onAddMore={() => {
-            setShowLogSuccess(false);
-            router.push('/scan');
-          }}
-          onViewStats={() => {
-            setShowLogSuccess(false);
-            router.push('/stats');
-          }}
-        />
-
-        <AuthContainer
-          onAuthenticated={handleAuthenticated}
-          isModal={true}
-          visible={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-        />
-      </SafeAreaView>
-    </LiquidBackground>
+    <AppProviders>
+      <AuthStateProvider>
+        <LiquidBackground>
+          <Stack screenOptions={{ headerShown: false }} >
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </LiquidBackground>
+        <StatusBar style="auto" />
+      </AuthStateProvider>
+    </AppProviders>
   );
 }
 
-export default function RootLayout() {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 1000 * 60 * 60,
-          },
-          mutations: {
-            retry: 2,
-          },
-        },
-      })
-  );
-
-  return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <UIProvider>
-            <RootLayoutNav />
-          </UIProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
-  );
-}
-
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
@@ -180,4 +193,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
   },
-});
+}); */

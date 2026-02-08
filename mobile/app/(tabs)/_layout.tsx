@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Tabs } from 'expo-router';
 import { View, TouchableOpacity, Animated, StyleSheet, Platform } from 'react-native';
 import { Home, PieChart, User as UserIcon, Camera } from 'lucide-react-native';
@@ -11,7 +11,8 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
   const opacity = useRef(new Animated.Value(0.6)).current;
   const highlightScale = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
+
+  const startAnimation = useCallback((isActive: boolean) => {
     Animated.parallel([
       Animated.spring(scale, {
         toValue: isActive ? 1.1 : 1,
@@ -31,34 +32,38 @@ const TabButton = ({ icon: Icon, isActive, onPress }: any) => {
         tension: 35,
       })
     ]).start();
-  }, [isActive]);
+  }, [highlightScale, opacity, scale]);
+
+  useEffect(() => {
+    startAnimation(isActive)
+  }, [isActive, startAnimation]);
 
   // Premium Blue Light tint for active state
   const activeBgColor = mode === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(37, 99, 235, 0.1)';
   const inactiveColor = mode === 'dark' ? 'rgba(148, 163, 184, 0.5)' : '#94a3b8';
 
   return (
-    <TouchableOpacity 
-      onPress={onPress} 
+    <TouchableOpacity
+      onPress={onPress}
       activeOpacity={0.7}
       style={tabStyles.tabButtonWrapper}
     >
       <View style={tabStyles.iconWrapper}>
-        <Animated.View 
-            style={[
-                tabStyles.highlightCircle, 
-                { 
-                    backgroundColor: activeBgColor,
-                    transform: [{ scale: highlightScale }]
-                }
-            ]} 
+        <Animated.View
+          style={[
+            tabStyles.highlightCircle,
+            {
+              backgroundColor: activeBgColor,
+              transform: [{ scale: highlightScale }]
+            }
+          ]}
         />
         <Animated.View style={{ opacity, transform: [{ scale }] }}>
-            <Icon 
-              size={24} 
-              color={isActive ? colors.primary : inactiveColor} 
-              strokeWidth={isActive ? 2.5 : 2}
-            />
+          <Icon
+            size={24}
+            color={isActive ? colors.primary : inactiveColor}
+            strokeWidth={isActive ? 2.5 : 2}
+          />
         </Animated.View>
       </View>
     </TouchableOpacity>
@@ -70,14 +75,14 @@ function CustomTabBar({ state, navigation }: any) {
 
   return (
     <View style={tabStyles.container}>
-      <GlassView 
+      <GlassView
         style={[
-            tabStyles.dockContainer,
-            { 
-                backgroundColor: mode === 'dark' ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.6)',
-                borderColor: mode === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255, 255, 255, 0.3)',
-            }
-        ]} 
+          tabStyles.dockContainer,
+          {
+            backgroundColor: mode === 'dark' ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.6)',
+            borderColor: mode === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255, 255, 255, 0.3)',
+          }
+        ]}
         intensity={mode === 'dark' ? 90 : 60}
         borderRadius={45}
       >
@@ -120,9 +125,9 @@ function CustomTabBar({ state, navigation }: any) {
 
 export default function TabsLayout() {
   return (
-    <Tabs 
+    <Tabs
       tabBar={props => <CustomTabBar {...props} />}
-      screenOptions={{ 
+      screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
         sceneStyle: { backgroundColor: 'transparent' },
@@ -139,7 +144,7 @@ export default function TabsLayout() {
 const tabStyles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 34 : 24, 
+    bottom: Platform.OS === 'ios' ? 34 : 24,
     left: 20,
     right: 20,
     alignItems: 'center',

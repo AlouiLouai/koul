@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { HomeContainer } from '../../src/features/home';
-import { useStats } from '../../src/hooks/useStats';
-import { useUI } from '../../src/hooks/UIContext';
+import { HomeContainer } from '@/features/home';
+import { useStats } from '@/hooks/useStats';
+import { useUI } from '@/hooks/UIContext';
 
 export default function HomeScreen() {
   const { logMeal, dailyScans, incrementScans, isPro } = useStats();
@@ -12,15 +12,15 @@ export default function HomeScreen() {
   }, [logMeal]);
 
   return (
-    <HomeContainer 
-       onLogMeal={handleLogMeal}
-       onShowLogSuccess={() => setShowLogSuccess(true)}
-       dailyScans={dailyScans}
-       incrementScans={incrementScans}
-       isPro={isPro}
-       onShowUpgrade={() => setShowUpgrade(true)}
-       isGuest={!isAuthenticated}
-       onTriggerAuth={() => setShowLoginModal(true)}
+    <HomeContainer
+      onLogMeal={handleLogMeal}
+      onShowLogSuccess={() => setShowLogSuccess(true)}
+      dailyScans={dailyScans}
+      incrementScans={incrementScans}
+      isPro={isPro}
+      onShowUpgrade={() => setShowUpgrade(true)}
+      isGuest={!isAuthenticated}
+      onTriggerAuth={() => setShowLoginModal(true)}
     />
   );
 }
