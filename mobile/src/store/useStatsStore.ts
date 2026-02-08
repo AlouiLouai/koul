@@ -1,44 +1,28 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MMKV } from 'react-native-mmkv';
-import { Platform } from 'react-native';
+import { createMMKV } from 'react-native-mmkv';
 
-// Senior Engineering Note: Reverted to MMKV v2.11.0 to remove NitroModules dependency.
-// This version uses 'new MMKV()' and 'delete()' instead of 'createMMKV()' and 'remove()'.
-let storageInstance: any = null;
-try {
-  if (Platform.OS !== 'web') {
-    storageInstance = new MMKV();
-  }
-} catch (e) {
-  console.warn('MMKV native module not found. Falling back to non-persistent shim (Expo Go).');
-}
+const STORAGE_ID = 'stats-storage';
+const STATS_STORAGE = createMMKV({
+  id: STORAGE_ID,
+});
 
-const mmkvStorage = {
-  setItem: (name: string, value: string) => {
-    if (storageInstance) {
-      storageInstance.set(name, value);
-    } else if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(name, value);
-    }
-  },
-  getItem: (name: string) => {
-    if (storageInstance) {
-      const value = storageInstance.getString(name);
+const storage = createJSONStorage(() => {
+  return {
+    getItem: (name: string) => {
+      const value = STATS_STORAGE.getString(name);
       return value ?? null;
-    } else if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem(name);
-    }
-    return null;
-  },
-  removeItem: (name: string) => {
-    if (storageInstance) {
-      storageInstance.delete(name);
-    } else if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(name);
-    }
-  },
-};
+    },
+    setItem: (name: string, value: string) => {
+      STATS_STORAGE.set(name, value);
+    },
+    removeItem: (name: string) => {
+      STATS_STORAGE.remove(name);
+    },
+  }
+});
+
+
 
 interface StatsState {
   todayStats: {
@@ -99,8 +83,8 @@ export const useStatsStore = create<StatsState>()(
       }),
     }),
     {
-      name: 'stats-storage',
-      storage: createJSONStorage(() => mmkvStorage),
+      name: STORAGE_ID,
+      storage
     }
   )
 );
