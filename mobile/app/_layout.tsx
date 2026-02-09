@@ -49,18 +49,6 @@ import { AuthStateProvider } from '@/features/auth/AuthState';
 
   return (
 
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-
-      <View style={styles.mainAppContainer}>
-        <View style={styles.contentPadding}>
-          <AppHeader />
-        </View>
-
-        <View style={styles.tabContentContainer}>
-          <Slot />
-        </View>
-      </View>
 
       {showUpgrade && (
         <View style={styles.absoluteContainer}>
@@ -100,7 +88,6 @@ import { AuthStateProvider } from '@/features/auth/AuthState';
         visible={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
-    </SafeAreaView>
   );
 } */
 
@@ -154,6 +141,7 @@ export default function RootLayout() {
         <LiquidBackground>
           <Stack screenOptions={{ headerShown: false }} >
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="login" options={{ presentation: 'modal' }} />
           </Stack>
         </LiquidBackground>
         <StatusBar style="auto" />
@@ -163,20 +151,6 @@ export default function RootLayout() {
 }
 
 /* const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  mainAppContainer: {
-    flex: 1,
-    position: 'relative',
-  },
-  contentPadding: {
-    paddingHorizontal: 20,
-  },
-  tabContentContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
   absoluteContainer: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 100,
