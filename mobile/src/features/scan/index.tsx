@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { ScanUI } from './ScanUI';
 import { useImageAnalysis } from '../../hooks/useImageAnalysis';
-import { QuotaExceededModal } from '../../components/QuotaExceededModal';
-import { GuestQuotaModal } from '../../components/GuestQuotaModal';
+import { useModals } from '@/modals/ModalsProvider';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
 import { logger } from '@/lib/logger';
@@ -26,9 +25,7 @@ export const ScanContainer = ({
   isGuest = false,
   onTriggerAuth
 }: ScanContainerProps) => {
-  const [showQuotaModal, setShowQuotaModal] = useState(false);
-  const [showGuestModal, setShowGuestModal] = useState(false);
-  const [showLogSuccess, setShowLogSuccess] = useState(false);
+  const { presentModal } = useModals();
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
@@ -45,9 +42,11 @@ export const ScanContainer = ({
     // 3 SCANS LIMIT for both Guests and non-Pro Users
     if (!isPro && dailyScans >= 3) {
       if (isGuest) {
-        setShowGuestModal(true);
+        presentModal('guestQuota', {
+          onConnect: () => onTriggerAuth?.() ?? presentModal('login'),
+        });
       } else {
-        setShowQuotaModal(true);
+        presentModal('quotaExceeded', { onUpgrade: onShowUpgrade });
       }
       return;
     }
@@ -69,25 +68,20 @@ export const ScanContainer = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [isPro, dailyScans, incrementScans, analyzeImage, isGuest]);
+  }, [isPro, dailyScans, incrementScans, analyzeImage, isGuest, presentModal, onTriggerAuth]);
 
   const handleLogMeal = useCallback(() => {
     if (result) {
       onLogMeal(result.totals);
-      setShowLogSuccess(true);
+      presentModal('logSuccess', {
+        onAddMore: () => resetAnalysis(),
+        onViewStats: () => {
+          resetAnalysis();
+          router.push('/stats');
+        },
+      });
     }
-  }, [result, onLogMeal]);
-
-  const handleViewStats = () => {
-    setShowLogSuccess(false);
-    resetAnalysis();
-    router.push('/stats');
-  };
-
-  const handleCloseSuccess = () => {
-    setShowLogSuccess(false);
-    resetAnalysis();
-  };
+  }, [result, onLogMeal, presentModal, resetAnalysis, router]);
 
   return (
     <>
@@ -97,32 +91,8 @@ export const ScanContainer = ({
         currentImage={currentImage}
         error={error}
         onImageSelected={handleImageSelected}
-        onReset={() => {
-          resetAnalysis();
-          setShowLogSuccess(false);
-        }}
+        onReset={resetAnalysis}
         onLogMeal={handleLogMeal}
-        showLogSuccess={showLogSuccess}
-        onCloseLogSuccess={handleCloseSuccess}
-        onViewStats={handleViewStats}
-      />
-
-      <QuotaExceededModal
-        visible={showQuotaModal}
-        onClose={() => setShowQuotaModal(false)}
-        onUpgrade={() => {
-          setShowQuotaModal(false);
-          onShowUpgrade();
-        }}
-      />
-
-      <GuestQuotaModal
-        visible={showGuestModal}
-        onClose={() => setShowGuestModal(false)}
-        onConnect={() => {
-          setShowGuestModal(false);
-          if (onTriggerAuth) onTriggerAuth();
-        }}
       />
     </>
   );

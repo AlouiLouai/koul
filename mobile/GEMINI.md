@@ -67,7 +67,7 @@ Each feature MUST follow the **Container/Presenter** pattern:
 - **Visuals:** Maintain a "Premium" feel. Use `expo-linear-gradient` for
   backgrounds and `expo-blur` for overlays.
 - **Layout:** Use `SafeAreaView` correctly (managed in `_layout.tsx`).
-- **Feedback:** Use `LogSuccessModal` or `QuotaExceededModal` for user feedback.
+- **Feedback:** Use `useModals()` and `presentModal()` for modals (e.g. `logSuccess`, `quotaExceeded`, `guestQuota`). Modals live in `src/modals/` and are registered in `ModalsProvider`.
 
 ## 📋 Data Models (`src/types.ts`)
 

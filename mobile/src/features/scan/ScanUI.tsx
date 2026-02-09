@@ -5,7 +5,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { GlassView } from '@/components/GlassView';
 import { useTheme } from '@/theme/ThemeContext';
 import { AnalysisResult } from '@/components/AnalysisResult';
-import { LogSuccessModal } from '@/components/LogSuccessModal';
 import { ScanHero } from './components/ScanHero';
 import { ScanLoading } from './components/ScanLoading';
 import type { AnalysisResponse } from '@/types';
@@ -21,9 +20,6 @@ interface ScanUIProps {
     onImageSelected: (uri: string, type: string, fileName: string) => void;
     onReset: () => void;
     onLogMeal: () => void;
-    showLogSuccess: boolean;
-    onCloseLogSuccess: () => void;
-    onViewStats: () => void;
 }
 
 export const ScanUI = ({
@@ -33,9 +29,6 @@ export const ScanUI = ({
     onImageSelected,
     onReset,
     onLogMeal,
-    showLogSuccess,
-    onCloseLogSuccess,
-    onViewStats
 }: ScanUIProps) => {
 
     const { colors } = useTheme();
@@ -240,12 +233,6 @@ export const ScanUI = ({
                     )}
                 </View>
             </ScrollView>
-            <LogSuccessModal
-                visible={showLogSuccess}
-                onClose={onCloseLogSuccess}
-                onViewStats={onViewStats}
-                onAddMore={onReset}
-            />
         </View>
     );
 };
