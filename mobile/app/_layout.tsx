@@ -9,73 +9,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { ModalsProvider } from '@/modals/ModalsProvider';
 
-
-
-/* function RootLayoutNav() {
-  const {
-    showUpgrade, setShowUpgrade,
-    showLogSuccess, setShowLogSuccess,
-    showLoginModal, setShowLoginModal,
-    setIsAuthenticated,
-    showClickToPay, setShowClickToPay
-  } = useUI();
-  const { upgradeToPro, lastResetDate, resetDaily } = useStatsStore();
-  const { mode } = useTheme();
-  const router = useRouter();
-
-  // Handle Daily Reset
-  useEffect(() => {
-    const today = new Date().toDateString();
-    if (lastResetDate !== today) {
-      resetDaily();
-    }
-  }, [lastResetDate, resetDaily]);
-
-  const handleAuthenticated = useCallback(() => {
-    setIsAuthenticated(true);
-    setShowLoginModal(false);
-  }, [setIsAuthenticated, setShowLoginModal]);
-
-  const handleUpgradeIntent = useCallback(() => {
-    setShowUpgrade(false);
-    setShowClickToPay(true);
-  }, [setShowUpgrade, setShowClickToPay]);
-
-  const handlePaymentComplete = useCallback(() => {
-    upgradeToPro();
-    setShowClickToPay(false);
-    router.replace('/stats');
-  }, [upgradeToPro, setShowClickToPay, router]);
-
-
-  return (
-
-      <ClickToPayModal
-        visible={showClickToPay}
-        onClose={() => setShowClickToPay(false)}
-        onComplete={handlePaymentComplete}
-      />
-
-      <LogSuccessModal
-        visible={showLogSuccess}
-        onClose={() => setShowLogSuccess(false)}
-        onAddMore={() => {
-          setShowLogSuccess(false);
-          router.push('/scan');
-        }}
-        onViewStats={() => {
-          setShowLogSuccess(false);
-          router.push('/stats');
-        }}
-      />
-  );
-} */
-
-
-
-
-
-
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {
   /* reloading the app might trigger some race conditions, ignore them */
@@ -124,6 +57,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="login" options={{ presentation: 'modal' }} />
               <Stack.Screen name="upgrade" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="payment" options={{ presentation: 'modal' }} />
             </Stack>
           </ModalsProvider>
           <StatusBar style="auto" />
@@ -132,22 +66,3 @@ export default function RootLayout() {
     </AppProviders>
   );
 }
-
-/* const styles = StyleSheet.create({
-  absoluteContainer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 100,
-  },
-  connectBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 6,
-  },
-  connectText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-}); */
