@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useStats } from '@/hooks/useStats';
 import { StatsUI } from '@/features/stats/StatsUI';
+import { useStatsStore } from '@/features/stats/useStatsStore';
 
 
 // --- Logic / Mock Data ---
@@ -19,7 +19,7 @@ type TimeFrame = 'Week' | 'Month' | '3M' | '6M' | 'Year';
 export default function StatsScreen() {
   const [timeframe, setTimeframe] = useState<TimeFrame>('Week');
   const [selectedDay] = useState(6);
-  const { todayStats } = useStats();
+  const { todayStats } = useStatsStore();
   return (
     <StatsUI
       timeframe={timeframe}

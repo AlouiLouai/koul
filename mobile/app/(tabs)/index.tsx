@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { HomeContainer } from '@/features/home';
-import { useStats } from '@/hooks/useStats';
+import { useStatsStore } from '@/features/stats/useStatsStore';
 import { useUI } from '@/hooks/UIContext';
 import { useAuthState } from '@/features/auth/AuthState';
 
 export default function HomeScreen() {
-  const { logMeal, dailyScans, incrementScans, } = useStats();
+  const { logMeal, dailyScans, incrementScans, } = useStatsStore();
   const { isAuthenticated, isPro } = useAuthState();
   const { setShowLogSuccess } = useUI();
 

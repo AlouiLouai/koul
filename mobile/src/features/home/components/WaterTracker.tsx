@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { Droplets, Plus, Check } from 'lucide-react-native';
-import { useTheme } from '../../../theme/ThemeContext';
-import { useStatsStore } from '../../../store/useStatsStore';
+import { useTheme } from '@/theme/ThemeContext';
+import { useStatsStore } from '@/features/stats/useStatsStore';
 
 const CARD_HEIGHT = 340;
 
