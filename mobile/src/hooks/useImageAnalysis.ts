@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@/lib/react-query';
 import { API_CONFIG } from '../apiConfig';
 import type { AnalysisResponse } from '../types';
+import { logger } from '@/lib/logger';
 
 export const useImageAnalysis = () => {
   const [currentImage, setCurrentImage] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export const useImageAnalysis = () => {
         name: fileName,
       } as any);
 
-      console.log('Sending request to:', `${API_CONFIG.BASE_URL}/api/analyze`);
+      logger.log('Sending request to:', `${API_CONFIG.BASE_URL}/api/analyze`);
       const response = await axios.post(`${API_CONFIG.BASE_URL}/api/analyze`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

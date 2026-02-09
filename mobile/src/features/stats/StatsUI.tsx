@@ -1,12 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { FlashList as ShopifyFlashList } from '@shopify/flash-list';
-const FlashList = ShopifyFlashList as any;
 import { Circle, Svg } from 'react-native-svg';
 import { Flame, Zap, Dumbbell, Watch, Lightbulb, ChevronRight, TrendingUp } from 'lucide-react-native';
-import { GlassView } from '../../components/GlassView';
-import { useTheme } from '../../theme/ThemeContext';
-import type { TimeFrame } from './index';
+import { GlassView } from '@/components/GlassView';
+import { useTheme } from '@/theme/ThemeContext';
+const FlashList = ShopifyFlashList as any;
 
 const { width } = Dimensions.get('window');
 const SCORE_SIZE = width * 0.65;
@@ -16,78 +15,79 @@ const ARC_ANGLE = 220;
 const ARC_LENGTH = (2 * Math.PI * RADIUS) * (ARC_ANGLE / 360);
 
 const Speedometer = ({ score }: { score: number }) => {
-    const { colors, mode } = useTheme();
-    const animatedValue = useRef(new Animated.Value(0)).current;
+  const { colors, mode } = useTheme();
+  const animatedValue = useRef(new Animated.Value(0)).current;
 
-    useEffect(() => {
-        Animated.timing(animatedValue, {
-            toValue: score / 10,
-            duration: 1500,
-            useNativeDriver: true, 
-        }).start();
-    }, [score]);
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: score / 10,
+      duration: 1500,
+      useNativeDriver: true,
+    }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [score]);
 
-    const getScoreColor = () => {
-        if (score >= 9) return '#e11d48'; // Tunisian Red / Accent
-        if (score >= 7) return colors.primary; 
-        if (score >= 5) return '#f59e0b'; 
-        return colors.textSecondary;
-    };
+  const getScoreColor = () => {
+    if (score >= 9) return '#e11d48'; // Tunisian Red / Accent
+    if (score >= 7) return colors.primary;
+    if (score >= 5) return '#f59e0b';
+    return colors.textSecondary;
+  };
 
-    const getScoreLabel = () => {
-        if (score >= 9) return 'W7ACH 🦁';
-        if (score >= 7) return 'FORMA 💪';
-        if (score >= 5) return 'LABES 🌤️';
-        return 'TE3EB 😴';
-    };
-    
-    const scoreColor = getScoreColor();
-    const rotation = (360 - ARC_ANGLE) / 2 + 180; 
-    const dashOffset = ARC_LENGTH * (1 - (score / 10));
+  const getScoreLabel = () => {
+    if (score >= 9) return 'W7ACH 🦁';
+    if (score >= 7) return 'FORMA 💪';
+    if (score >= 5) return 'LABES 🌤️';
+    return 'TE3EB 😴';
+  };
 
-    return (
-        <View style={{ width: SCORE_SIZE, height: SCORE_SIZE - 40, alignItems: 'center', justifyContent: 'center' }}>
-             <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute', top: 0 }}>
-                 <Circle
-                    cx={SCORE_SIZE / 2}
-                    cy={SCORE_SIZE / 2}
-                    r={RADIUS}
-                    stroke={mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
-                    strokeWidth={STROKE_WIDTH}
-                    strokeDasharray={`${ARC_LENGTH} ${1000}`}
-                    strokeLinecap="round"
-                    fill="transparent"
-                    rotation={rotation}
-                    origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
-                 />
-                 <Circle
-                    cx={SCORE_SIZE / 2}
-                    cy={SCORE_SIZE / 2}
-                    r={RADIUS}
-                    stroke={scoreColor}
-                    strokeWidth={STROKE_WIDTH}
-                    strokeDasharray={`${ARC_LENGTH} ${1000}`}
-                    strokeDashoffset={dashOffset}
-                    strokeLinecap="round"
-                    fill="transparent"
-                    rotation={rotation}
-                    origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
-                 />
-             </Svg>
-             
-             <View style={{ alignItems: 'center', gap: 2, marginTop: 20 }}>
-                <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Readiness</Text>
-                <Text style={[styles.scoreBig, { color: colors.text }]}>{score}</Text>
-                <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '15', borderColor: scoreColor + '30', borderWidth: 1 }]}>
-                    <Text style={[styles.scoreRankText, { color: scoreColor }]}>
-                        {getScoreLabel()}
-                    </Text>
-                </View>
-             </View>
+  const scoreColor = getScoreColor();
+  const rotation = (360 - ARC_ANGLE) / 2 + 180;
+  const dashOffset = ARC_LENGTH * (1 - (score / 10));
+
+  return (
+    <View style={{ width: SCORE_SIZE, height: SCORE_SIZE - 40, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute', top: 0 }}>
+        <Circle
+          cx={SCORE_SIZE / 2}
+          cy={SCORE_SIZE / 2}
+          r={RADIUS}
+          stroke={mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+          strokeWidth={STROKE_WIDTH}
+          strokeDasharray={`${ARC_LENGTH} ${1000}`}
+          strokeLinecap="round"
+          fill="transparent"
+          rotation={rotation}
+          origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
+        />
+        <Circle
+          cx={SCORE_SIZE / 2}
+          cy={SCORE_SIZE / 2}
+          r={RADIUS}
+          stroke={scoreColor}
+          strokeWidth={STROKE_WIDTH}
+          strokeDasharray={`${ARC_LENGTH} ${1000}`}
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          fill="transparent"
+          rotation={rotation}
+          origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
+        />
+      </Svg>
+
+      <View style={{ alignItems: 'center', gap: 2, marginTop: 20 }}>
+        <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Readiness</Text>
+        <Text style={[styles.scoreBig, { color: colors.text }]}>{score}</Text>
+        <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '15', borderColor: scoreColor + '30', borderWidth: 1 }]}>
+          <Text style={[styles.scoreRankText, { color: scoreColor }]}>
+            {getScoreLabel()}
+          </Text>
         </View>
-    );
+      </View>
+    </View>
+  );
 };
-
+type TimeFrame = 'Week' | 'Month' | '3M' | '6M' | 'Year';
 interface StatsUIProps {
   timeframe: TimeFrame;
   onTimeframeChange: (t: TimeFrame) => void;
@@ -116,7 +116,7 @@ export const StatsUI = ({
     <GlassView style={[styles.historyRow, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)' }]} intensity={20} borderRadius={20}>
       <View style={styles.rowLeft}>
         <View style={[styles.iconBoxMini, { backgroundColor: item.score >= 7 ? colors.primary + '20' : '#f59e0b20' }]}>
-            <TrendingUp size={14} color={item.score >= 7 ? colors.primary : '#f59e0b'} />
+          <TrendingUp size={14} color={item.score >= 7 ? colors.primary : '#f59e0b'} />
         </View>
         <View>
           <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
@@ -126,8 +126,8 @@ export const StatsUI = ({
 
       <View style={styles.rowRight}>
         <View style={styles.historyStats}>
-            <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
-            <Text style={[styles.historyCals, { color: colors.textSecondary }]}>{item.cals || 0} kcal</Text>
+          <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
+          <Text style={[styles.historyCals, { color: colors.textSecondary }]}>{item.cals || 0} kcal</Text>
         </View>
         <ChevronRight size={18} color={colors.textSecondary} />
       </View>
@@ -151,7 +151,7 @@ export const StatsUI = ({
             <TouchableOpacity
               key={t}
               style={[
-                styles.tabBtn, 
+                styles.tabBtn,
                 timeframe === t && { backgroundColor: mode === 'dark' ? '#fff' : '#000', borderColor: mode === 'dark' ? '#fff' : '#000' }
               ]}
               onPress={() => onTimeframeChange(t as TimeFrame)}
@@ -166,69 +166,69 @@ export const StatsUI = ({
 
       {/* --- SPEEDOMETER CARD --- */}
       <GlassView style={styles.heroCard} intensity={30} borderRadius={36}>
-          <Speedometer score={avgScore} />
-          <View style={styles.heroFooter}>
-             <View style={styles.footerItem}>
-                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>WEEKLY AVG</Text>
-                <Text style={[styles.footerValue, { color: colors.text }]}>8.2</Text>
-             </View>
-             <View style={[styles.footerDivider, { backgroundColor: colors.glassBorder }]} />
-             <View style={styles.footerItem}>
-                <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>PR STREAK</Text>
-                <Text style={[styles.footerValue, { color: colors.text }]}>12d</Text>
-             </View>
+        <Speedometer score={avgScore} />
+        <View style={styles.heroFooter}>
+          <View style={styles.footerItem}>
+            <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>WEEKLY AVG</Text>
+            <Text style={[styles.footerValue, { color: colors.text }]}>8.2</Text>
           </View>
+          <View style={[styles.footerDivider, { backgroundColor: colors.glassBorder }]} />
+          <View style={styles.footerItem}>
+            <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>PR STREAK</Text>
+            <Text style={[styles.footerValue, { color: colors.text }]}>12d</Text>
+          </View>
+        </View>
       </GlassView>
 
       {/* --- BENTO GRID FOR STATS --- */}
       <View style={styles.bentoGrid}>
-          {/* PROTEIN (Left) */}
-          <GlassView style={styles.proteinCard} intensity={20} borderRadius={28}>
-              <View style={styles.cardHeader}>
-                  <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
-                    <Dumbbell size={18} color={colors.primary} />
-                  </View>
-                  <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>BUILD</Text>
-              </View>
-              <View style={styles.valueContainer}>
-                  <Text style={[styles.valueBig, { color: colors.text }]}>{Math.round(todayStats.protein)}<Text style={styles.unitSmall}>g</Text></Text>
-                  <Text style={[styles.targetLabel, { color: colors.textSecondary }]}>of 200g</Text>
-              </View>
-              <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }]} />
-              </View>
-          </GlassView>
-
-          {/* DUAL COLS (Right) */}
-          <View style={styles.rightCol}>
-              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
-                  <Zap size={16} color="#f59e0b" fill="#f59e0b" />
-                  <View>
-                      <Text style={[styles.smallCardValue, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
-                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>KCAL</Text>
-                  </View>
-              </GlassView>
-              <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
-                  <Watch size={16} color={colors.primary} />
-                  <View>
-                      <Text style={[styles.smallCardValue, { color: colors.text }]}>Ready</Text>
-                      <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>SYNC</Text>
-                  </View>
-              </GlassView>
+        {/* PROTEIN (Left) */}
+        <GlassView style={styles.proteinCard} intensity={20} borderRadius={28}>
+          <View style={styles.cardHeader}>
+            <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+              <Dumbbell size={18} color={colors.primary} />
+            </View>
+            <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>BUILD</Text>
           </View>
+          <View style={styles.valueContainer}>
+            <Text style={[styles.valueBig, { color: colors.text }]}>{Math.round(todayStats.protein)}<Text style={styles.unitSmall}>g</Text></Text>
+            <Text style={[styles.targetLabel, { color: colors.textSecondary }]}>of 200g</Text>
+          </View>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }]} />
+          </View>
+        </GlassView>
+
+        {/* DUAL COLS (Right) */}
+        <View style={styles.rightCol}>
+          <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+            <Zap size={16} color="#f59e0b" fill="#f59e0b" />
+            <View>
+              <Text style={[styles.smallCardValue, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
+              <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>KCAL</Text>
+            </View>
+          </GlassView>
+          <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
+            <Watch size={16} color={colors.primary} />
+            <View>
+              <Text style={[styles.smallCardValue, { color: colors.text }]}>Ready</Text>
+              <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>SYNC</Text>
+            </View>
+          </GlassView>
+        </View>
       </View>
 
       {/* --- COACH INSIGHT --- */}
       <GlassView style={styles.insightCard} intensity={40} borderRadius={28}>
-          <View style={[styles.insightIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
-            <Lightbulb size={20} color={colors.primary} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.insightTitle, { color: colors.text }]}>Klem Coach <Text style={{ color: colors.primary }}>AI</Text></Text>
-            <Text style={[styles.insightText, { color: colors.textSecondary }]}>
-              Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold', color: colors.text }}>W7ach</Text> ghodwa!
-            </Text>
-          </View>
+        <View style={[styles.insightIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+          <Lightbulb size={20} color={colors.primary} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.insightTitle, { color: colors.text }]}>Klem Coach <Text style={{ color: colors.primary }}>AI</Text></Text>
+          <Text style={[styles.insightText, { color: colors.textSecondary }]}>
+            Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold', color: colors.text }}>W7ach</Text> ghodwa!
+          </Text>
+        </View>
       </GlassView>
 
       {/* --- HISTORY TITLE --- */}
@@ -241,16 +241,16 @@ export const StatsUI = ({
 
   return (
     <View style={styles.container}>
-        <FlashList
-            data={historyItems}
-            keyExtractor={(item: any, index: number) => String(item?.id ?? item?.date ?? index)}
-            renderItem={renderHistoryItem}
-            estimatedItemSize={90}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.listContent}
-            ListHeaderComponent={listHeader}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
+      <FlashList
+        data={historyItems}
+        keyExtractor={(item: any, index: number) => String(item?.id ?? item?.date ?? index)}
+        renderItem={renderHistoryItem}
+        estimatedItemSize={90}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={listHeader}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
     </View>
   );
 };
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   tabsScroll: { gap: 8 },
   tabBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(150,150,150,0.2)' },
   tabText: { fontSize: 13, fontWeight: '800' },
-  
+
   heroCard: { padding: 24, alignItems: 'center', marginBottom: 24 },
   heroFooter: { flexDirection: 'row', width: '100%', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(150,150,150,0.1)' },
   footerItem: { flex: 1, alignItems: 'center' },
@@ -279,14 +279,14 @@ const styles = StyleSheet.create({
   scoreLabelText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5 },
   scoreLabelBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
   scoreRankText: { fontSize: 13, fontWeight: '900', textTransform: 'uppercase' },
-  
+
   bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   proteinCard: { flex: 1.4, padding: 20, justifyContent: 'space-between' },
   rightCol: { flex: 1, gap: 12 },
   smallCard: { flex: 1, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
   smallCardValue: { fontSize: 18, fontWeight: '900' },
   smallCardLabel: { fontSize: 10, fontWeight: '900' },
-  
+
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   iconBox: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   cardLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
   sectionTitle: { fontSize: 22, fontWeight: '900' },
   separator: { height: 10 },
-  
+
   historyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, marginHorizontal: 2 },
   rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconBoxMini: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },

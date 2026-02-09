@@ -17,40 +17,40 @@ export const LogSuccessModal = ({ visible, onClose, onAddMore, onViewStats }: Lo
 
   return (
     <BottomSheetModal visible={visible} onClose={onClose}>
-        <View style={styles.content}>
-            <View style={[styles.iconBg, { backgroundColor: colors.success + '20', borderColor: colors.success }]}>
-                <CheckCircle2 size={40} color={colors.success} fill={colors.success} />
-            </View>
-            
-            <Text style={[styles.title, { color: colors.text }]}>C'est Bon! ✅</Text>
-            <Text style={[styles.message, { color: colors.textSecondary }]}>
-                Fatourek tkayed. Taba3 progress mte3ek kol youm bach tousel l'ahdafek.
-            </Text>
-
-            <View style={styles.actions}>
-                <ActionButton 
-                    text="Zid Sawer" 
-                    variant="secondary" 
-                    onPress={onAddMore || onClose} 
-                    icon={<Camera size={18} color={colors.text} />}
-                    flex={1}
-                />
-                <ActionButton 
-                    text="Chouf l'Stats" 
-                    variant="primary" 
-                    onPress={onViewStats} 
-                    icon={<ArrowRight size={18} color="#fff" />}
-                    flex={1.5}
-                />
-            </View>
+      <View style={styles.content}>
+        <View style={[styles.iconBg, { backgroundColor: colors.success + '20', borderColor: colors.success }]}>
+          <CheckCircle2 size={40} color={colors.success} fill={colors.success} />
         </View>
+
+        <Text style={[styles.title, { color: colors.text }]}>C&apos;est Bon! ✅</Text>
+        <Text style={[styles.message, { color: colors.textSecondary }]}>
+          Fatourek tkayed. Taba3 progress mte3ek kol youm bach tousel l&apos;ahdafek.
+        </Text>
+
+        <View style={styles.actions}>
+          <ActionButton
+            text="Zid Sawer"
+            variant="secondary"
+            onPress={onAddMore || onClose}
+            icon={<Camera size={18} color={colors.text} />}
+            flex={1}
+          />
+          <ActionButton
+            text="Chouf l'Stats"
+            variant="primary"
+            onPress={onViewStats}
+            icon={<ArrowRight size={18} color="#fff" />}
+            flex={1.5}
+          />
+        </View>
+      </View>
     </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
   content: {
-      alignItems: 'center',
+    alignItems: 'center',
   },
   iconBg: {
     width: 72,

@@ -2,40 +2,34 @@
   "expo": {
     "name": "Makelti",
     "slug": "makelti-app",
-    "scheme": "koul",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "makelti",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
+      "icon": {
+        "light": "./assets/ios-light.png",
+        "dark": "./assets/ios-dark.png"
+      },
       "supportsTablet": true,
-      "bundleIdentifier": "com.makelti.app"
+      "bundleIdentifier": "com.makelti.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundImage": "./assets/adaptive-background.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.makelti.app"
+      "package": "com.makelti.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "1baef3a5-ee2e-4bb0-a67e-794489f4c258"
-      }
-    },
-    "owner": "mnm89",
     "plugins": [
       "expo-router",
       [
@@ -44,7 +38,36 @@
           "photosPermission": "Bach takhtar taswira men galerie mta3ek! 🖼️",
           "cameraPermission": "Bach nsawrou sa7nek w n9ouloulek chnoua fih! 📸"
         }
-      ]
-    ]
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon-light.png",
+          "backgroundColor": "#f1f5f9",
+          "imageWidth": 280,
+          "dark": {
+            "backgroundColor": "#0f172a",
+            "image": "./assets/splash-icon-dark.png"
+          }
+        }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "launchMode": "most-recent"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c73de80d-2bb3-4422-af5a-10b7efb60ee7"
+      }
+    },
+    "owner": "mnm89"
   }
 }

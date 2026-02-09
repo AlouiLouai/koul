@@ -1,10 +1,10 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Utensils } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
-export const TrendingDishCard = memo(() => {
+export const TrendingDishCard = () => {
   const { colors } = useTheme();
   return (
     <GlassView style={styles.dishCard} intensity={60} borderRadius={28}>
@@ -19,16 +19,16 @@ export const TrendingDishCard = memo(() => {
 
       <View style={styles.contentRow}>
         <View style={styles.dishContent}>
-            <Text style={[styles.dishTitle, { color: colors.text }]}>Kafteji Royal 🌶️</Text>
-            <Text style={[styles.dishDesc, { color: colors.textSecondary }]}>7ar w mcharwret, ama rod belek 3al zit!</Text>
+          <Text style={[styles.dishTitle, { color: colors.text }]}>Kafteji Royal 🌶️</Text>
+          <Text style={[styles.dishDesc, { color: colors.textSecondary }]}>7ar w mcharwret, ama rod belek 3al zit!</Text>
         </View>
         <View style={[styles.dishIconBox, { borderColor: colors.glassBorder }]}>
-            <Utensils size={28} color={colors.text} />
+          <Utensils size={28} color={colors.text} />
         </View>
       </View>
     </GlassView>
   );
-});
+}
 
 const styles = StyleSheet.create({
   dishCard: { padding: 16, justifyContent: 'space-between' },
