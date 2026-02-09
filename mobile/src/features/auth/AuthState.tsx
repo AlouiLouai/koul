@@ -9,15 +9,12 @@ type AuthState = {
     isLoading: boolean;
     error: AuthError | null;
     lastEvent: AuthChangeEvent | null;
+    isAuthenticated: boolean;
+    isGuest: boolean;
+    isPro: boolean;
 };
 
-const AuthStateContext = createContext<AuthState>({
-    user: null,
-    session: null,
-    isLoading: true,
-    error: null,
-    lastEvent: null,
-});
+const AuthStateContext = createContext<AuthState | null>(null);
 
 function AuthStateProvider({ children }: { children: React.ReactNode }) {
     const [authState, setAuthState] = useState<AuthState>({
@@ -26,6 +23,9 @@ function AuthStateProvider({ children }: { children: React.ReactNode }) {
         isLoading: true,
         error: null,
         lastEvent: null,
+        isAuthenticated: false,
+        isGuest: true,
+        isPro: false,
     });
 
 
@@ -42,7 +42,16 @@ function AuthStateProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         //  https://supabase.com/docs/reference/javascript/auth-onauthstatechange
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            setAuthState((prev) => ({ ...prev, user: session?.user ?? null, session: session ?? null, isLoading: false, lastEvent: event }));
+            setAuthState((prev) => ({
+                ...prev,
+                user: session?.user ?? null,
+                session: session,
+                isLoading: false,
+                lastEvent: event,
+                isAuthenticated: session?.user !== undefined,
+                isGuest: session?.user === undefined,
+                isPro: session?.user?.user_metadata.is_pro ?? false,
+            }));
         });
         return () => subscription.unsubscribe();
     }, []);

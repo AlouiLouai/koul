@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { ScanContainer } from '@/features/scan';
 import { useStats } from '@/hooks/useStats';
-import { useUI } from '@/hooks/UIContext';
 import { router } from 'expo-router';
+import { useAuthState } from '@/features/auth/AuthState';
 
 export default function ScanScreen() {
-  const { logMeal, dailyScans, incrementScans, isPro } = useStats();
-  const { isAuthenticated } = useUI();
+  const { logMeal, dailyScans, incrementScans } = useStats();
+  const { isAuthenticated, isPro } = useAuthState();
 
   const handleLogMeal = useCallback((totals: any) => {
     logMeal(totals);

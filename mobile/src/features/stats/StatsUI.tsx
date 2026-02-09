@@ -24,6 +24,7 @@ const Speedometer = ({ score }: { score: number }) => {
       duration: 1500,
       useNativeDriver: true,
     }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score]);
 
   const getScoreColor = () => {

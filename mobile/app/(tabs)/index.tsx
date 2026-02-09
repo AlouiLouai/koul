@@ -2,10 +2,12 @@ import React, { useCallback } from 'react';
 import { HomeContainer } from '@/features/home';
 import { useStats } from '@/hooks/useStats';
 import { useUI } from '@/hooks/UIContext';
+import { useAuthState } from '@/features/auth/AuthState';
 
 export default function HomeScreen() {
-  const { logMeal, dailyScans, incrementScans, isPro } = useStats();
-  const { isAuthenticated, setShowUpgrade, setShowLogSuccess, setShowLoginModal } = useUI();
+  const { logMeal, dailyScans, incrementScans, } = useStats();
+  const { isAuthenticated, isPro } = useAuthState();
+  const { setShowLogSuccess } = useUI();
 
   const handleLogMeal = useCallback((totals: any) => {
     logMeal(totals);
@@ -18,9 +20,7 @@ export default function HomeScreen() {
       dailyScans={dailyScans}
       incrementScans={incrementScans}
       isPro={isPro}
-      onShowUpgrade={() => setShowUpgrade(true)}
       isGuest={!isAuthenticated}
-      onTriggerAuth={() => setShowLoginModal(true)}
     />
   );
 }

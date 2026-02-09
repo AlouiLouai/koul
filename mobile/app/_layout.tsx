@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
-import { LiquidBackground } from '@/components/LiquidBackground';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppProviders } from '@/components/AppProviders';
@@ -8,6 +7,7 @@ import { initializeSupabaseClient } from '@/lib/supabase';
 import { AuthStateProvider } from '@/features/auth/AuthState';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
+import { ModalsProvider } from '@/modals/ModalsProvider';
 
 
 
@@ -68,13 +68,6 @@ import 'react-native-reanimated';
           router.push('/stats');
         }}
       />
-
-      <AuthContainer
-        onAuthenticated={handleAuthenticated}
-        isModal={true}
-        visible={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
   );
 } */
 
@@ -125,14 +118,14 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <AuthStateProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <LiquidBackground>
+        <GestureHandlerRootView>
+          <ModalsProvider>
             <Stack screenOptions={{ headerShown: false }} >
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="login" options={{ presentation: 'modal' }} />
               <Stack.Screen name="upgrade" options={{ presentation: 'modal' }} />
             </Stack>
-          </LiquidBackground>
+          </ModalsProvider>
           <StatusBar style="auto" />
         </GestureHandlerRootView>
       </AuthStateProvider>

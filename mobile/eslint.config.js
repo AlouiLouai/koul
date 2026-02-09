@@ -44,10 +44,36 @@ const tanstackReactQuery = {
   ignores: ['src/lib/react-query.ts'],
 }
 
+const gorhomBottomSheet = {
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@gorhom/bottom-sheet',
+            message:
+              'Do not use @gorhom/bottom-sheet directly. Use @/modals instead.',
+          },
+        ],
+      },
+    ],
+  },
+  ignores: ['src/modals/**/*.{ts,tsx}'],
+}
+
+const consoleRule = {
+  rules: {
+    'no-console': 'error',
+  },
+  ignores: ['src/lib/logger.ts'],
+}
 module.exports = defineConfig([
   expoConfig,
   reactNativeMMKV,
   tanstackReactQuery,
+  gorhomBottomSheet,
+  consoleRule,
   {
     ignores: ['dist/*'],
   },

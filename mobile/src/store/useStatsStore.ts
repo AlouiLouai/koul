@@ -32,11 +32,9 @@ interface StatsState {
   dailyScans: number;
   waterCups: number;
   lastResetDate: string | null;
-  isPro: boolean;
   logMeal: (mealTotals: { calories: number; protein: number; carbs: number; fat: number }) => void;
   incrementScans: () => void;
   incrementWater: () => void;
-  upgradeToPro: () => void;
   resetDaily: () => void;
 }
 
@@ -52,7 +50,6 @@ export const useStatsStore = create<StatsState>()(
       dailyScans: 0,
       waterCups: 0,
       lastResetDate: new Date().toDateString(),
-      isPro: false,
 
       logMeal: (mealTotals) => set((state) => ({
         todayStats: {
@@ -70,8 +67,6 @@ export const useStatsStore = create<StatsState>()(
       incrementWater: () => set((state) => ({
         waterCups: Math.min(state.waterCups + 1, 12) // Max 3L (12 * 0.25)
       })),
-
-      upgradeToPro: () => set({ isPro: true }),
 
       resetDaily: () => set({
         todayStats: { calories: 0, protein: 0, carbs: 0, fat: 0 },
