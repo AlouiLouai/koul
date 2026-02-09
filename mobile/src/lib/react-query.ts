@@ -1,5 +1,5 @@
 
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 export { QueryClientProvider } from '@tanstack/react-query';
 
 export const queryClient = new QueryClient({
@@ -12,3 +12,4 @@ export const queryClient = new QueryClient({
         },
     },
 })
+export { useMutation, useQuery, useQueryClient };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Home, PieChart, User as UserIcon, Camera } from 'lucide-react-native';
 import { GlassView } from '@/components/GlassView';
 import { useTheme } from '@/theme/ThemeContext';
@@ -62,7 +62,7 @@ export function TabBar({ state, navigation }: any) {
 const tabStyles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: Platform.OS === 'ios' ? 34 : 24,
+        bottom: 24,
         left: 20,
         right: 20,
         alignItems: 'center',

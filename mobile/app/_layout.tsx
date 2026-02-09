@@ -6,7 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { AppProviders } from '@/components/AppProviders';
 import { initializeSupabaseClient } from '@/lib/supabase';
 import { AuthStateProvider } from '@/features/auth/AuthState';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import 'react-native-reanimated';
 
 
 
@@ -48,20 +49,6 @@ import { AuthStateProvider } from '@/features/auth/AuthState';
 
 
   return (
-
-
-      {showUpgrade && (
-        <View style={styles.absoluteContainer}>
-          <UpgradeScreen
-            onClose={() => setShowUpgrade(false)}
-            onUpgrade={handleUpgradeIntent}
-            onRedirectHome={() => {
-              setShowUpgrade(false);
-              router.replace('/');
-            }}
-          />
-        </View>
-      )}
 
       <ClickToPayModal
         visible={showClickToPay}
@@ -138,13 +125,16 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <AuthStateProvider>
-        <LiquidBackground>
-          <Stack screenOptions={{ headerShown: false }} >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-          </Stack>
-        </LiquidBackground>
-        <StatusBar style="auto" />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <LiquidBackground>
+            <Stack screenOptions={{ headerShown: false }} >
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="upgrade" options={{ presentation: 'modal' }} />
+            </Stack>
+          </LiquidBackground>
+          <StatusBar style="auto" />
+        </GestureHandlerRootView>
       </AuthStateProvider>
     </AppProviders>
   );

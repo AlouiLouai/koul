@@ -1,9 +1,8 @@
-import React from 'react';
 import { Tabs } from 'expo-router';
 import { TabBar } from '@/components/TabBar';
-import { View } from 'react-native';
 import { AppHeader } from '@/components/AppHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 export default function TabsLayout() {
   return (
@@ -31,4 +30,3 @@ export default function TabsLayout() {
     </SafeAreaView>
   );
 }
-

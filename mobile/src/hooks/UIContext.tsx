@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
 interface UIContextType {
-  showUpgrade: boolean;
-  setShowUpgrade: (show: boolean) => void;
   showLogSuccess: boolean;
   setShowLogSuccess: (show: boolean) => void;
   isAuthenticated: boolean;
@@ -15,7 +13,6 @@ interface UIContextType {
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const [showLogSuccess, setShowLogSuccess] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showClickToPay, setShowClickToPay] = useState(false);
@@ -26,8 +23,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return (
     <UIContext.Provider value={{
-      showUpgrade,
-      setShowUpgrade,
       showLogSuccess,
       setShowLogSuccess,
       isAuthenticated,
