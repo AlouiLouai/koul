@@ -23,25 +23,25 @@ export const QuotaExceededModal = ({ visible, onClose, onUpgrade }: QuotaExceede
           </TouchableOpacity>
 
           <View style={styles.iconBg}>
-             <Lock size={40} color="#f59e0b" strokeWidth={2.5} />
-             <View style={styles.badge}>
-                <Crown size={12} color="#fff" fill="#fff" />
-             </View>
+            <Lock size={40} color="#f59e0b" strokeWidth={2.5} />
+            <View style={styles.badge}>
+              <Crown size={12} color="#fff" fill="#fff" />
+            </View>
           </View>
 
-          <Text style={styles.title}>Kammalt l'Quota! 🛑</Text>
+          <Text style={styles.title}>Kammalt l&apos;Quota! 🛑</Text>
           <Text style={styles.message}>
-            Yezzi ma sawart lyoum! 3 scans/jour houa l'limit mta3ek.
-            
+            Yezzi ma sawart lyoum! 3 scans/jour houa l&apos;limit mta3ek.
+
             <Text style={styles.highlight}>Walli Premium</Text> bach t7allel makletek bla 7seb.
           </Text>
 
           <TouchableOpacity style={styles.upgradeBtn} onPress={() => { onClose(); onUpgrade(); }}>
-             <Text style={styles.upgradeBtnText}>Walli Premium (5 TND)</Text>
+            <Text style={styles.upgradeBtnText}>Walli Premium (5 TND)</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-             <Text style={styles.cancelBtnText}>Batel, ghodwa nkamal</Text>
+            <Text style={styles.cancelBtnText}>Batel, ghodwa nkamal</Text>
           </TouchableOpacity>
         </View>
       </View>
