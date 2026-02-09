@@ -1,26 +1,26 @@
 import React, { useCallback } from 'react';
-import { HomeContainer } from '@/features/home';
-import { useStatsStore } from '@/features/stats/useStatsStore';
-import { useUI } from '@/hooks/UIContext';
-import { useAuthState } from '@/features/auth/AuthState';
+import { HomeContainer } from '../../src/features/home';
+import { useStats } from '../../src/hooks/useStats';
+import { useUI } from '../../src/hooks/UIContext';
 
 export default function HomeScreen() {
-  const { logMeal, dailyScans, incrementScans, } = useStatsStore();
-  const { isAuthenticated, isPro } = useAuthState();
-  const { setShowLogSuccess } = useUI();
+  const { logMeal, dailyScans, incrementScans, isPro } = useStats();
+  const { isAuthenticated, setShowUpgrade, setShowLogSuccess, setShowLoginModal } = useUI();
 
   const handleLogMeal = useCallback((totals: any) => {
     logMeal(totals);
   }, [logMeal]);
 
   return (
-    <HomeContainer
-      onLogMeal={handleLogMeal}
-      onShowLogSuccess={() => setShowLogSuccess(true)}
-      dailyScans={dailyScans}
-      incrementScans={incrementScans}
-      isPro={isPro}
-      isGuest={!isAuthenticated}
+    <HomeContainer 
+       onLogMeal={handleLogMeal}
+       onShowLogSuccess={() => setShowLogSuccess(true)}
+       dailyScans={dailyScans}
+       incrementScans={incrementScans}
+       isPro={isPro}
+       onShowUpgrade={() => setShowUpgrade(true)}
+       isGuest={!isAuthenticated}
+       onTriggerAuth={() => setShowLoginModal(true)}
     />
   );
 }

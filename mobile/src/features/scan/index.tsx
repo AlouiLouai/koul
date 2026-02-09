@@ -5,7 +5,6 @@ import { QuotaExceededModal } from '../../components/QuotaExceededModal';
 import { GuestQuotaModal } from '../../components/GuestQuotaModal';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
-import { logger } from '@/lib/logger';
 
 interface ScanContainerProps {
   onLogMeal: (totals: any) => void;
@@ -17,11 +16,11 @@ interface ScanContainerProps {
   onTriggerAuth?: () => void;
 }
 
-export const ScanContainer = ({
-  onLogMeal,
-  dailyScans,
-  incrementScans,
-  isPro,
+export const ScanContainer = ({ 
+  onLogMeal, 
+  dailyScans, 
+  incrementScans, 
+  isPro, 
   onShowUpgrade,
   isGuest = false,
   onTriggerAuth
@@ -32,13 +31,13 @@ export const ScanContainer = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
-  const {
-    loading,
-    result,
-    currentImage,
-    error,
-    analyzeImage,
-    resetAnalysis
+  const { 
+    loading, 
+    result, 
+    currentImage, 
+    error, 
+    analyzeImage, 
+    resetAnalysis 
   } = useImageAnalysis();
 
   const handleImageSelected = useCallback(async (uri: string, type: string, fileName: string) => {
@@ -56,14 +55,14 @@ export const ScanContainer = ({
       setIsProcessing(true);
       const manipulatedImage = await ImageManipulator.manipulateAsync(
         uri,
-        [{ resize: { width: 1024 } }],
+        [{ resize: { width: 1024 } }], 
         { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
       );
 
       incrementScans();
       analyzeImage(manipulatedImage.uri, 'image/jpeg', 'analyzed_meal.jpg');
     } catch (err) {
-      logger.error('Image manipulation failed:', err);
+      console.error('Image manipulation failed:', err);
       incrementScans();
       analyzeImage(uri, type, fileName);
     } finally {
@@ -79,14 +78,14 @@ export const ScanContainer = ({
   }, [result, onLogMeal]);
 
   const handleViewStats = () => {
-    setShowLogSuccess(false);
-    resetAnalysis();
-    router.push('/stats');
+      setShowLogSuccess(false);
+      resetAnalysis();
+      router.push('/stats');
   };
 
   const handleCloseSuccess = () => {
-    setShowLogSuccess(false);
-    resetAnalysis();
+      setShowLogSuccess(false);
+      resetAnalysis();
   };
 
   return (
@@ -106,9 +105,9 @@ export const ScanContainer = ({
         onCloseLogSuccess={handleCloseSuccess}
         onViewStats={handleViewStats}
       />
-
-      <QuotaExceededModal
-        visible={showQuotaModal}
+      
+      <QuotaExceededModal 
+        visible={showQuotaModal} 
         onClose={() => setShowQuotaModal(false)}
         onUpgrade={() => {
           setShowQuotaModal(false);

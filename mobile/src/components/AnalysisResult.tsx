@@ -24,26 +24,26 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
 
   return (
     <View style={styles.container}>
-      <RarityScoreCard
-        score={data.health_score ?? 0}
-        calories={data.totals.calories}
+      <RarityScoreCard 
+        score={data.health_score ?? 0} 
+        calories={data.totals.calories} 
         verdict={verdictText}
       />
 
-      <MacroGrid
+      <MacroGrid 
         protein={data.totals.protein}
         carbs={data.totals.carbs}
         fat={data.totals.fat}
       />
 
       {data.oil_estimate && (
-        <OilEstimate
-          amount={data.oil_estimate.amount_tbsp}
-          calories={data.oil_estimate.calories}
+        <OilEstimate 
+            amount={data.oil_estimate.amount_tbsp} 
+            calories={data.oil_estimate.calories} 
         />
       )}
 
-      <NutritionistInsight />
+      <NutritionistInsight  />
 
       <MealItemList items={data.meal_analysis} />
     </View>
@@ -51,8 +51,10 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    marginTop: 16,
-  },
+    container: {
+        width: '100%',
+        marginTop: 16,
+    },
 });
+
+export default AnalysisResult;

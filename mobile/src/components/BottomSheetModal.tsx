@@ -43,7 +43,6 @@ export const BottomSheetModal = ({ visible, onClose, children }: BottomSheetModa
         })
       ]).start();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   if (!visible && fadeAnim === new Animated.Value(0)) return null;
@@ -57,23 +56,23 @@ export const BottomSheetModal = ({ visible, onClose, children }: BottomSheetModa
     >
       <View style={styles.overlayWrapper}>
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
-          <Pressable style={{ flex: 1 }} onPress={onClose} />
+           <Pressable style={{ flex: 1 }} onPress={onClose} />
         </Animated.View>
 
-        <Animated.View
+        <Animated.View 
           style={[
-            styles.sheetContainer,
+            styles.sheetContainer, 
             { transform: [{ translateY: slideAnim }] }
           ]}
         >
-          <GlassView
-            style={styles.sheetContent}
-            intensity={95}
+          <GlassView 
+            style={styles.sheetContent} 
+            intensity={95} 
             borderRadius={32}
             noBorder={false}
           >
             {children}
-            <View style={{ height: 20 }} />
+            <View style={{ height: 20 }} /> 
           </GlassView>
         </Animated.View>
       </View>

@@ -1,26 +1,44 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { createStorage } from '@/lib/mmkv';
+import { MMKV } from 'react-native-mmkv';
+import { Platform } from 'react-native';
 
-const STORAGE_ID = 'stats-storage';
-const STORAGE = createStorage(STORAGE_ID);
-
-const storage = createJSONStorage(() => {
-  return {
-    getItem: (name: string) => {
-      const value = STORAGE.getString(name);
-      return value ?? null;
-    },
-    setItem: (name: string, value: string) => {
-      STORAGE.set(name, value);
-    },
-    removeItem: (name: string) => {
-      STORAGE.remove(name);
-    },
+// Senior Engineering Note: Reverted to MMKV v2.11.0 to remove NitroModules dependency.
+// This version uses 'new MMKV()' and 'delete()' instead of 'createMMKV()' and 'remove()'.
+let storageInstance: any = null;
+try {
+  if (Platform.OS !== 'web') {
+    storageInstance = new MMKV();
   }
-});
+} catch (e) {
+  console.warn('MMKV native module not found. Falling back to non-persistent shim (Expo Go).');
+}
 
-
+const mmkvStorage = {
+  setItem: (name: string, value: string) => {
+    if (storageInstance) {
+      storageInstance.set(name, value);
+    } else if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(name, value);
+    }
+  },
+  getItem: (name: string) => {
+    if (storageInstance) {
+      const value = storageInstance.getString(name);
+      return value ?? null;
+    } else if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(name);
+    }
+    return null;
+  },
+  removeItem: (name: string) => {
+    if (storageInstance) {
+      storageInstance.delete(name);
+    } else if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(name);
+    }
+  },
+};
 
 interface StatsState {
   todayStats: {
@@ -32,9 +50,11 @@ interface StatsState {
   dailyScans: number;
   waterCups: number;
   lastResetDate: string | null;
+  isPro: boolean;
   logMeal: (mealTotals: { calories: number; protein: number; carbs: number; fat: number }) => void;
   incrementScans: () => void;
   incrementWater: () => void;
+  upgradeToPro: () => void;
   resetDaily: () => void;
 }
 
@@ -50,6 +70,7 @@ export const useStatsStore = create<StatsState>()(
       dailyScans: 0,
       waterCups: 0,
       lastResetDate: new Date().toDateString(),
+      isPro: false,
 
       logMeal: (mealTotals) => set((state) => ({
         todayStats: {
@@ -68,6 +89,8 @@ export const useStatsStore = create<StatsState>()(
         waterCups: Math.min(state.waterCups + 1, 12) // Max 3L (12 * 0.25)
       })),
 
+      upgradeToPro: () => set({ isPro: true }),
+
       resetDaily: () => set({
         todayStats: { calories: 0, protein: 0, carbs: 0, fat: 0 },
         dailyScans: 0,
@@ -76,8 +99,8 @@ export const useStatsStore = create<StatsState>()(
       }),
     }),
     {
-      name: STORAGE_ID,
-      storage
+      name: 'stats-storage',
+      storage: createJSONStorage(() => mmkvStorage),
     }
   )
 );

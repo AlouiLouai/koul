@@ -18,28 +18,28 @@ export const GuestQuotaModal = ({ visible, onClose, onConnect }: GuestQuotaModal
     <BottomSheetModal visible={visible} onClose={onClose}>
       <View style={styles.content}>
         <View style={[styles.iconBg, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}>
-          <UserPlus size={36} color={colors.primary} strokeWidth={2.5} />
-          <View style={styles.badge}>
-            <Sparkles size={12} color="#fff" fill="#fff" />
-          </View>
+           <UserPlus size={36} color={colors.primary} strokeWidth={2.5} />
+           <View style={styles.badge}>
+              <Sparkles size={12} color="#fff" fill="#fff" />
+           </View>
         </View>
 
-        <Text style={[styles.title, { color: colors.text }]}>Wfet l&apos;tjarib! 🛑</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Wfet l'tjarib! 🛑</Text>
         <Text style={[styles.message, { color: colors.textSecondary }]}>
-          Kammalt l&apos;3 scans mta3ek l&apos;youm. <Text style={[styles.highlight, { color: colors.primary }]}>Connecti</Text> tawa bach t7afedh 3la tsawrek w stats mta3ek!
+          Kammalt l'3 scans mta3ek l'youm. <Text style={[styles.highlight, { color: colors.primary }]}>Connecti</Text> tawa bach t7afedh 3la tsawrek w stats mta3ek!
         </Text>
 
         <View style={styles.actions}>
-          <ActionButton
-            text="Connecti Tawa"
-            variant="primary"
-            onPress={() => { onClose(); onConnect(); }}
+          <ActionButton 
+            text="Connecti Tawa" 
+            variant="primary" 
+            onPress={() => { onClose(); onConnect(); }} 
             flex={1}
           />
-          <ActionButton
-            text="Batel, ghodwa nkamal"
-            variant="secondary"
-            onPress={onClose}
+          <ActionButton 
+            text="Batel, ghodwa nkamal" 
+            variant="secondary" 
+            onPress={onClose} 
             flex={1}
           />
         </View>

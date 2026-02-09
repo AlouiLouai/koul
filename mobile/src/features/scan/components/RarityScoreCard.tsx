@@ -62,75 +62,74 @@ export const RarityScoreCard = ({ score, calories, verdict }: RarityScoreCardPro
   const { colors, mode } = useTheme();
   const rarity = getRarityConfig(score);
   const RarityIcon = rarity.icon;
-
+  
   const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 1000, useNativeDriver: false }),
-        Animated.timing(glowAnim, { toValue: 0, duration: 1000, useNativeDriver: false })
-      ])
+        Animated.sequence([
+            Animated.timing(glowAnim, { toValue: 1, duration: 1000, useNativeDriver: false }),
+            Animated.timing(glowAnim, { toValue: 0, duration: 1000, useNativeDriver: false })
+        ])
     ).start();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedGlow = glowAnim.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [
-      mode === 'dark' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(37, 99, 235, 0.05)',
-      rarity.bgTint,
-      mode === 'dark' ? 'rgba(251, 113, 133, 0.1)' : 'rgba(225, 29, 72, 0.1)'
+        mode === 'dark' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(37, 99, 235, 0.05)',
+        rarity.bgTint,
+        mode === 'dark' ? 'rgba(251, 113, 133, 0.1)' : 'rgba(225, 29, 72, 0.1)'
     ]
   });
 
   return (
-    <GlassView
-      intensity={30}
+    <GlassView 
+      intensity={30} 
       borderRadius={32}
       style={[
-        styles.card,
+        styles.card, 
         { borderColor: rarity.color + '80', backgroundColor: mode === 'dark' ? 'rgba(0,0,0,0.6)' : '#fff' }
       ]}
     >
-      <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: animatedGlow, borderRadius: 32 }]} />
-
-      <View style={styles.header}>
-        <View style={[styles.badge, { backgroundColor: rarity.bgTint, borderColor: rarity.color + '40' }]}>
-          <RarityIcon size={14} color={rarity.color} fill={rarity.type === 'LEGENDARY' ? rarity.color : 'none'} />
-          <Text style={[styles.badgeText, { color: rarity.color }]}>{rarity.label}</Text>
-        </View>
-      </View>
-
-      <View style={styles.mainInfo}>
-        <View style={styles.scoreSection}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>KCAL TOTAL</Text>
-          <Text style={[styles.scoreNum, { color: colors.text }]}>{calories}</Text>
+        <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: animatedGlow, borderRadius: 32 }]} />
+        
+        <View style={styles.header}>
+            <View style={[styles.badge, { backgroundColor: rarity.bgTint, borderColor: rarity.color + '40' }]}>
+                <RarityIcon size={14} color={rarity.color} fill={rarity.type === 'LEGENDARY' ? rarity.color : 'none'} />
+                <Text style={[styles.badgeText, { color: rarity.color }]}>{rarity.label}</Text>
+            </View>
         </View>
 
-        <View style={styles.verdictCol}>
-          <View style={styles.verdictHeader}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>EL 7OKM</Text>
-          </View>
-          <Text style={[styles.verdictText, { color: colors.text }]} numberOfLines={3}>
-            {verdict}
-          </Text>
+        <View style={styles.mainInfo}>
+            <View style={styles.scoreSection}>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>KCAL TOTAL</Text>
+                <Text style={[styles.scoreNum, { color: colors.text }]}>{calories}</Text>
+            </View>
+            
+            <View style={styles.verdictCol}>
+                <View style={styles.verdictHeader}>
+                    <Text style={[styles.label, { color: colors.textSecondary }]}>EL 7OKM</Text>
+                </View>
+                <Text style={[styles.verdictText, { color: colors.text }]} numberOfLines={3}>
+                    "{verdict}"
+                </Text>
+            </View>
         </View>
-      </View>
     </GlassView>
   );
 };
 
 const styles = StyleSheet.create({
-  card: { padding: 20, marginBottom: 16, borderWidth: 2, overflow: 'hidden' },
-  header: { flexDirection: 'row', marginBottom: 16, zIndex: 10 },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
-  badgeText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-  mainInfo: { flexDirection: 'row', alignItems: 'center', gap: 20, zIndex: 10 },
-  scoreSection: { minWidth: 80 },
-  scoreNum: { fontSize: 40, fontWeight: '900', letterSpacing: -1, lineHeight: 44 },
-  label: { fontSize: 9, fontWeight: '900', letterSpacing: 1.2, marginBottom: 4 },
-  verdictCol: { flex: 1, paddingLeft: 20, borderLeftWidth: 1, borderLeftColor: 'rgba(150,150,150,0.2)', gap: 2 },
-  verdictHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  verdictText: { fontSize: 14, fontWeight: '700', fontStyle: 'italic', lineHeight: 20 }
+    card: { padding: 20, marginBottom: 16, borderWidth: 2, overflow: 'hidden' },
+    header: { flexDirection: 'row', marginBottom: 16, zIndex: 10 },
+    badge: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
+    badgeText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+    mainInfo: { flexDirection: 'row', alignItems: 'center', gap: 20, zIndex: 10 },
+    scoreSection: { minWidth: 80 },
+    scoreNum: { fontSize: 40, fontWeight: '900', letterSpacing: -1, lineHeight: 44 },
+    label: { fontSize: 9, fontWeight: '900', letterSpacing: 1.2, marginBottom: 4 },
+    verdictCol: { flex: 1, paddingLeft: 20, borderLeftWidth: 1, borderLeftColor: 'rgba(150,150,150,0.2)', gap: 2 },
+    verdictHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    verdictText: { fontSize: 14, fontWeight: '700', fontStyle: 'italic', lineHeight: 20 }
 });

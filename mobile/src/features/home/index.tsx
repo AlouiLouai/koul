@@ -7,12 +7,13 @@ interface HomeContainerProps {
   dailyScans: number;
   incrementScans: () => void;
   isPro: boolean;
+  onShowUpgrade: () => void;
   isGuest?: boolean;
   onTriggerAuth?: () => void;
 }
 
-export const HomeContainer = ({
-  isGuest = false,
+export const HomeContainer = ({ 
+  isGuest = false, 
   onTriggerAuth
 }: HomeContainerProps) => {
   return (

@@ -5,90 +5,90 @@ import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
 interface MealItem {
-    item: string;
-    calories: number;
-    portion_estimate: string;
-    protein_g: number;
-    carbs_g: number;
-    fat_g: number;
-    fiber_g?: number;
+  item: string;
+  calories: number;
+  portion_estimate: string;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  fiber_g?: number;
 }
 
 interface MealItemListProps {
-    items: MealItem[];
+  items: MealItem[];
 }
 
 export const MealItemList = ({ items }: MealItemListProps) => {
-    const { colors } = useTheme();
-    const [showAll, setShowAll] = useState(false);
+  const { colors, mode } = useTheme();
+  const [showAll, setShowAll] = useState(false);
+  
+  const INITIAL_COUNT = 2;
+  const visibleItems = showAll ? items : items.slice(0, INITIAL_COUNT);
+  const hasMore = items.length > INITIAL_COUNT;
 
-    const INITIAL_COUNT = 2;
-    const visibleItems = showAll ? items : items.slice(0, INITIAL_COUNT);
-    const hasMore = items.length > INITIAL_COUNT;
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.headerRow}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Moukawinet Sa7n</Text>
-            </View>
-
-            <View style={styles.grid}>
-                {visibleItems.map((item, idx) => (
-                    <View key={idx} style={styles.cardWrapper}>
-                        <GlassView intensity={40} borderRadius={20} style={[styles.itemCard, { borderColor: colors.glassBorder }]}>
-                            <View style={styles.itemHeader}>
-                                <View style={[styles.dot, { backgroundColor: colors.primary }]} />
-                                <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{item.item}</Text>
-                            </View>
-
-                            <View style={styles.calsRow}>
-                                <Text style={[styles.itemCals, { color: colors.text }]}>{item.calories} <Text style={styles.unitSmall}>kcal</Text></Text>
-                                <Text style={[styles.itemPortion, { color: colors.textSecondary }]}>{item.portion_estimate}</Text>
-                            </View>
-
-                            <View style={styles.macrosList}>
-                                <View style={styles.macroRow}>
-                                    <Flame size={10} color={colors.primary} />
-                                    <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.protein_g}g Protéine</Text>
-                                </View>
-                                <View style={styles.macroRow}>
-                                    <Wheat size={10} color={colors.success} />
-                                    <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.carbs_g}g Carbs</Text>
-                                </View>
-                                <View style={styles.macroRow}>
-                                    <Droplets size={10} color={colors.warning} />
-                                    <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.fat_g}g Dhoune</Text>
-                                </View>
-                                <View style={styles.macroRow}>
-                                    <Leaf size={10} color="#10b981" />
-                                    <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.fiber_g || 0}g Fibres</Text>
-                                </View>
-                            </View>
-                        </GlassView>
-                    </View>
-                ))}
-            </View>
-
-            {hasMore && (
-                <TouchableOpacity
-                    style={styles.loadMoreBtn}
-                    onPress={() => setShowAll(!showAll)}
-                    activeOpacity={0.7}
-                >
-                    <GlassView intensity={10} borderRadius={12} style={styles.loadMoreInner}>
-                        <Text style={[styles.loadMoreText, { color: colors.textSecondary }]}>
-                            {showAll ? 'Na9es' : `Chouf akther (${items.length - INITIAL_COUNT})`}
-                        </Text>
-                        <ChevronDown
-                            size={14}
-                            color={colors.textSecondary}
-                            style={{ transform: [{ rotate: showAll ? '180deg' : '0deg' }] }}
-                        />
-                    </GlassView>
-                </TouchableOpacity>
-            )}
+  return (
+    <View style={styles.container}>
+        <View style={styles.headerRow}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Moukawinet Sa7n</Text>
         </View>
-    );
+        
+        <View style={styles.grid}>
+            {visibleItems.map((item, idx) => (
+                <View key={idx} style={styles.cardWrapper}>
+                    <GlassView intensity={40} borderRadius={20} style={[styles.itemCard, { borderColor: colors.glassBorder }]}>
+                        <View style={styles.itemHeader}>
+                            <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+                            <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{item.item}</Text>
+                        </View>
+                        
+                        <View style={styles.calsRow}>
+                            <Text style={[styles.itemCals, { color: colors.text }]}>{item.calories} <Text style={styles.unitSmall}>kcal</Text></Text>
+                            <Text style={[styles.itemPortion, { color: colors.textSecondary }]}>{item.portion_estimate}</Text>
+                        </View>
+                        
+                        <View style={styles.macrosList}>
+                            <View style={styles.macroRow}>
+                                <Flame size={10} color={colors.primary} />
+                                <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.protein_g}g Protéine</Text>
+                            </View>
+                            <View style={styles.macroRow}>
+                                <Wheat size={10} color={colors.success} />
+                                <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.carbs_g}g Carbs</Text>
+                            </View>
+                            <View style={styles.macroRow}>
+                                <Droplets size={10} color={colors.warning} />
+                                <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.fat_g}g Dhoune</Text>
+                            </View>
+                            <View style={styles.macroRow}>
+                                <Leaf size={10} color="#10b981" />
+                                <Text style={[styles.macroText, { color: colors.textSecondary }]}>{item.fiber_g || 0}g Fibres</Text>
+                            </View>
+                        </View>
+                    </GlassView>
+                </View>
+            ))}
+        </View>
+
+        {hasMore && (
+            <TouchableOpacity 
+                style={styles.loadMoreBtn} 
+                onPress={() => setShowAll(!showAll)}
+                activeOpacity={0.7}
+            >
+                <GlassView intensity={10} borderRadius={12} style={styles.loadMoreInner}>
+                    <Text style={[styles.loadMoreText, { color: colors.textSecondary }]}>
+                        {showAll ? 'Na9es' : `Chouf akther (${items.length - INITIAL_COUNT})`}
+                    </Text>
+                    <ChevronDown 
+                        size={14} 
+                        color={colors.textSecondary} 
+                        style={{ transform: [{ rotate: showAll ? '180deg' : '0deg' }] }}
+                    />
+                </GlassView>
+            </TouchableOpacity>
+        )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

@@ -5,161 +5,160 @@ import { useTheme } from '../../../theme/ThemeContext';
 import { GlassView } from '../../../components/GlassView';
 
 interface ScanHeroProps {
-    onCapture: () => void;
-    onGallery: () => void;
+  onCapture: () => void;
+  onGallery: () => void;
 }
 
 export const ScanHero = ({ onCapture, onGallery }: ScanHeroProps) => {
-    const { colors } = useTheme();
+  const { colors } = useTheme();
+  
+  // Brand Colors
+  const blue = colors.primary;
+  const pink = colors.accent;
+  const green = colors.success;
+  const yellow = colors.warning;
+  
+  // Animations
+  const pulseAnim = React.useRef(new Animated.Value(1)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const floatAnim = React.useRef(new Animated.Value(0)).current;
+  const entranceAnim = React.useRef(new Animated.Value(0)).current;
 
-    // Brand Colors
-    const blue = colors.primary;
-    const pink = colors.accent;
-    const green = colors.success;
-    const yellow = colors.warning;
+  React.useEffect(() => {
+    Animated.parallel([
+        Animated.timing(entranceAnim, { toValue: 1, duration: 800, useNativeDriver: true, easing: Easing.out(Easing.back(1.5)) }),
+        Animated.loop(
+          Animated.parallel([
+            Animated.sequence([
+              Animated.timing(pulseAnim, { toValue: 1.05, duration: 2000, useNativeDriver: true }),
+              Animated.timing(pulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true })
+            ]),
+            Animated.sequence([
+                Animated.timing(floatAnim, { toValue: 1, duration: 3000, useNativeDriver: true, easing: Easing.inOut(Easing.sin) }),
+                Animated.timing(floatAnim, { toValue: 0, duration: 3000, useNativeDriver: true, easing: Easing.inOut(Easing.sin) })
+            ]),
+            Animated.timing(rotateAnim, { toValue: 1, duration: 8000, easing: Easing.linear, useNativeDriver: true })
+          ])
+        )
+    ]).start();
+  }, []);
 
-    // Animations
-    const pulseAnim = React.useRef(new Animated.Value(1)).current;
-    const rotateAnim = useRef(new Animated.Value(0)).current;
-    const floatAnim = React.useRef(new Animated.Value(0)).current;
-    const entranceAnim = React.useRef(new Animated.Value(0)).current;
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+  });
 
-    React.useEffect(() => {
-        Animated.parallel([
-            Animated.timing(entranceAnim, { toValue: 1, duration: 800, useNativeDriver: true, easing: Easing.out(Easing.back(1.5)) }),
-            Animated.loop(
-                Animated.parallel([
-                    Animated.sequence([
-                        Animated.timing(pulseAnim, { toValue: 1.05, duration: 2000, useNativeDriver: true }),
-                        Animated.timing(pulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true })
-                    ]),
-                    Animated.sequence([
-                        Animated.timing(floatAnim, { toValue: 1, duration: 3000, useNativeDriver: true, easing: Easing.inOut(Easing.sin) }),
-                        Animated.timing(floatAnim, { toValue: 0, duration: 3000, useNativeDriver: true, easing: Easing.inOut(Easing.sin) })
-                    ]),
-                    Animated.timing(rotateAnim, { toValue: 1, duration: 8000, easing: Easing.linear, useNativeDriver: true })
-                ])
-            )
-        ]).start();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  const translateY = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -10]
+  });
 
-    const spin = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg']
-    });
+  const opacity = entranceAnim;
+  const scale = entranceAnim;
 
-    const translateY = floatAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -10]
-    });
+  return (
+    <View style={styles.container}>
+      {/* Dynamic Background Gradients - Multicolored */}
+      <View style={[styles.gradientOverlay, { backgroundColor: blue + '03' }]} />
+      <Animated.View style={[styles.decorCircle, { backgroundColor: pink + '05', top: -100, left: -100, transform: [{ scale: pulseAnim }] }]} />
+      <Animated.View style={[styles.decorCircle, { backgroundColor: yellow + '05', bottom: -50, right: -50, width: 200, height: 200, transform: [{ rotate: spin }] }]} />
 
-    const opacity = entranceAnim;
-    const scale = entranceAnim;
+      <Animated.View style={[styles.contentWrapper, { opacity, transform: [{ scale }] }]}>
+        {/* Main Content Area */}
+        <View style={styles.headerSection}>
+            <View style={styles.badgeContainer}>
+                <GlassView intensity={40} borderRadius={20} style={[styles.scanBadge, { borderColor: blue + '30' }]}>
+                    <Sparkles size={12} color={blue} fill={blue} />
+                    <Text style={[styles.scanBadgeText, { color: colors.text }]}>2026 AI ENGINE</Text>
+                </GlassView>
+            </View>
 
-    return (
-        <View style={styles.container}>
-            {/* Dynamic Background Gradients - Multicolored */}
-            <View style={[styles.gradientOverlay, { backgroundColor: blue + '03' }]} />
-            <Animated.View style={[styles.decorCircle, { backgroundColor: pink + '05', top: -100, left: -100, transform: [{ scale: pulseAnim }] }]} />
-            <Animated.View style={[styles.decorCircle, { backgroundColor: yellow + '05', bottom: -50, right: -50, width: 200, height: 200, transform: [{ rotate: spin }] }]} />
-
-            <Animated.View style={[styles.contentWrapper, { opacity, transform: [{ scale }] }]}>
-                {/* Main Content Area */}
-                <View style={styles.headerSection}>
-                    <View style={styles.badgeContainer}>
-                        <GlassView intensity={40} borderRadius={20} style={[styles.scanBadge, { borderColor: blue + '30' }]}>
-                            <Sparkles size={12} color={blue} fill={blue} />
-                            <Text style={[styles.scanBadgeText, { color: colors.text }]}>2026 AI ENGINE</Text>
-                        </GlassView>
-                    </View>
-
-                    <Animated.View
-                        style={[
-                            styles.iconCircleWrapper,
-                            { transform: [{ translateY }] }
-                        ]}
-                    >
-                        <View style={[styles.iconGlow, { backgroundColor: blue + '15' }]} />
-                        <GlassView intensity={50} borderRadius={60} style={[styles.iconCircle, { borderColor: blue + '20' }]}>
-                            <Camera size={44} color={blue} strokeWidth={2} />
-                            <Animated.View style={[styles.sparkleFloating, { transform: [{ rotate: spin }] }]}>
-                                <Sparkles size={20} color={yellow} fill={yellow} />
-                            </Animated.View>
-                        </GlassView>
-                        {/* Floating decorative elements */}
-                        <View style={[styles.miniDecor, { top: 0, left: -20, backgroundColor: pink }]} />
-                        <View style={[styles.miniDecor, { bottom: 10, right: -20, backgroundColor: green }]} />
+            <Animated.View 
+                style={[
+                    styles.iconCircleWrapper, 
+                    { transform: [{ translateY }] }
+                ]}
+            >
+                <View style={[styles.iconGlow, { backgroundColor: blue + '15' }]} />
+                <GlassView intensity={50} borderRadius={60} style={[styles.iconCircle, { borderColor: blue + '20' }]}>
+                    <Camera size={44} color={blue} strokeWidth={2} />
+                    <Animated.View style={[styles.sparkleFloating, { transform: [{ rotate: spin }] }]}>
+                        <Sparkles size={20} color={yellow} fill={yellow} />
                     </Animated.View>
-
-                    <Text style={[styles.title, { color: colors.text }]}>Sawar <Text style={{ color: blue }}>Sa7nek</Text></Text>
-                    <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                        Iktachef chnoua mkhabbi f&apos;makeltek b&apos;dhka l&apos;istina3i 🇹🇳
-                    </Text>
-                </View>
-
-                {/* Feature Highlights - Multi-colored per-item */}
-                <View style={styles.featureGrid}>
-                    <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
-                        <View style={[styles.featureIcon, { backgroundColor: yellow + '15' }]}>
-                            <Zap size={18} color={yellow} fill={yellow} />
-                        </View>
-                        <Text style={[styles.featureText, { color: colors.text }]}>Sari3</Text>
-                    </GlassView>
-                    <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
-                        <View style={[styles.featureIcon, { backgroundColor: green + '15' }]}>
-                            <ShieldCheck size={18} color={green} />
-                        </View>
-                        <Text style={[styles.featureText, { color: colors.text }]}>Di9a</Text>
-                    </GlassView>
-                    <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
-                        <View style={[styles.featureIcon, { backgroundColor: pink + '15' }]}>
-                            <History size={18} color={pink} />
-                        </View>
-                        <Text style={[styles.featureText, { color: colors.text }]}>Sijel</Text>
-                    </GlassView>
-                </View>
-
-                {/* Action Buttons */}
-                <View style={styles.actions}>
-                    <TouchableOpacity
-                        onPress={onCapture}
-                        activeOpacity={0.8}
-                        style={[styles.primaryBtn, { backgroundColor: blue }]}
-                    >
-                        <Camera size={22} color="#fff" strokeWidth={2.5} />
-                        <Text style={styles.primaryBtnText}>Sawar Tawa</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={onGallery}
-                        activeOpacity={0.7}
-                        style={styles.secondaryBtnWrapper}
-                    >
-                        <GlassView intensity={20} borderRadius={28} style={[styles.secondaryBtn, { borderColor: blue + '20' }]}>
-                            <ImageIcon size={20} color={colors.textSecondary} />
-                            <Text style={[styles.secondaryBtnText, { color: colors.text }]}>Gallerie</Text>
-                        </GlassView>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Pro Tip */}
-                <View style={styles.tipSection}>
-                    <Text style={[styles.tipText, { color: colors.textSecondary }]}>
-                        Nasi7a: Sawar f&apos;blasa feha dhaw behi bch tkon l&apos;analyse asda9! ✨
-                    </Text>
-                </View>
+                </GlassView>
+                {/* Floating decorative elements */}
+                <View style={[styles.miniDecor, { top: 0, left: -20, backgroundColor: pink }]} />
+                <View style={[styles.miniDecor, { bottom: 10, right: -20, backgroundColor: green }]} />
             </Animated.View>
+
+            <Text style={[styles.title, { color: colors.text }]}>Sawar <Text style={{ color: blue }}>Sa7nek</Text></Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                Iktachef chnoua mkhabbi f'makeltek b'dhka l'istina3i 🇹🇳
+            </Text>
         </View>
-    );
+
+        {/* Feature Highlights - Multi-colored per-item */}
+        <View style={styles.featureGrid}>
+            <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
+                <View style={[styles.featureIcon, { backgroundColor: yellow + '15' }]}>
+                    <Zap size={18} color={yellow} fill={yellow} />
+                </View>
+                <Text style={[styles.featureText, { color: colors.text }]}>Sari3</Text>
+            </GlassView>
+            <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
+                <View style={[styles.featureIcon, { backgroundColor: green + '15' }]}>
+                    <ShieldCheck size={18} color={green} />
+                </View>
+                <Text style={[styles.featureText, { color: colors.text }]}>Di9a</Text>
+            </GlassView>
+            <GlassView intensity={10} borderRadius={20} style={styles.featureItem}>
+                <View style={[styles.featureIcon, { backgroundColor: pink + '15' }]}>
+                    <History size={18} color={pink} />
+                </View>
+                <Text style={[styles.featureText, { color: colors.text }]}>Sijel</Text>
+            </GlassView>
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actions}>
+            <TouchableOpacity 
+                onPress={onCapture}
+                activeOpacity={0.8}
+                style={[styles.primaryBtn, { backgroundColor: blue }]}
+            >
+                <Camera size={22} color="#fff" strokeWidth={2.5} />
+                <Text style={styles.primaryBtnText}>Sawar Tawa</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                onPress={onGallery}
+                activeOpacity={0.7}
+                style={styles.secondaryBtnWrapper}
+            >
+                <GlassView intensity={20} borderRadius={28} style={[styles.secondaryBtn, { borderColor: blue + '20' }]}>
+                    <ImageIcon size={20} color={colors.textSecondary} />
+                    <Text style={[styles.secondaryBtnText, { color: colors.text }]}>Gallerie</Text>
+                </GlassView>
+            </TouchableOpacity>
+        </View>
+
+        {/* Pro Tip */}
+        <View style={styles.tipSection}>
+            <Text style={[styles.tipText, { color: colors.textSecondary }]}>
+                Nasi7a: Sawar f'blasa feha dhaw behi bch tkon l'analyse asda9! ✨
+            </Text>
+        </View>
+      </Animated.View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'transparent',
-        borderRadius: 36,
-        overflow: 'hidden',
+    container: { 
+        flex: 1, 
+        backgroundColor: 'transparent', 
+        borderRadius: 36, 
+        overflow: 'hidden', 
         position: 'relative',
     },
     gradientOverlay: {

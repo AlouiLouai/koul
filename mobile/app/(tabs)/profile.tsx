@@ -1,20 +1,19 @@
 import React from 'react';
-import { ProfileUI } from '@/features/profile/ProfileUI';
-import { useAuthState } from '@/features/auth/AuthState';
-import { useModals } from '@/modals/ModalsProvider';
-import { router } from 'expo-router';
+import { ProfileContainer } from '../../src/features/profile';
+import { useStats } from '../../src/hooks/useStats';
+import { useUI } from '../../src/hooks/UIContext';
 
 export default function ProfileScreen() {
+  const { isPro } = useStats();
+  const { logout, setShowUpgrade, isAuthenticated, setShowLoginModal } = useUI();
 
-  const { isAuthenticated, user, isPro } = useAuthState();
-  const { presentModal } = useModals()
-  return <ProfileUI
-    isAuthenticated={isAuthenticated}
-    userName={user?.email ?? 'Guest'}
-    onLogout={() => { }}
-    onShowUpgrade={() => { router.push('/upgrade') }}
-    onTriggerAuth={() => {
-      presentModal('login')
-    }}
-    isPro={isPro} />;
+  return (
+    <ProfileContainer 
+      onLogout={logout} 
+      onShowUpgrade={() => setShowUpgrade(true)}
+      isPro={isPro} 
+      isAuthenticated={isAuthenticated}
+      onTriggerAuth={() => setShowLoginModal(true)}
+    />
+  );
 }

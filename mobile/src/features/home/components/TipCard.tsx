@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Lightbulb } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
-export const TipCard = () => {
+export const TipCard = memo(() => {
   const { colors } = useTheme();
   return (
     <GlassView style={styles.tipCard} intensity={45} borderRadius={28}>
@@ -24,12 +24,12 @@ export const TipCard = () => {
 
       <View style={styles.content}>
         <Text style={[styles.tipText, { color: colors.textSecondary }]} numberOfLines={4}>
-          El zit zitouna dhheb, ama mgharfa barka tekfi! Ma tgharraghach. 🫒
+          "El zit zitouna dhheb, ama mgharfa barka tekfi! Ma tgharraghach. 🫒"
         </Text>
       </View>
     </GlassView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   tipCard: { padding: 16, height: 148, justifyContent: 'space-between' },

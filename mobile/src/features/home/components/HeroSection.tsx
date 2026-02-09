@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Zap } from 'lucide-react-native';
 import { GlassView } from '../../../components/GlassView';
 import { useTheme } from '../../../theme/ThemeContext';
 
-export const HeroSection = () => {
+export const HeroSection = memo(() => {
   const { colors } = useTheme();
   return (
     <GlassView style={styles.heroCard} intensity={20} borderRadius={32}>
@@ -12,25 +12,25 @@ export const HeroSection = () => {
         <View style={styles.headerLeft}>
         </View>
         <GlassView style={styles.streakBadge} intensity={40} borderRadius={12}>
-          <Zap size={14} color={colors.warning} fill={colors.warning} />
-          <Text style={[styles.streakText, { color: colors.warning }]}>3 Jours</Text>
+           <Zap size={14} color={colors.warning} fill={colors.warning} />
+           <Text style={[styles.streakText, { color: colors.warning }]}>3 Jours</Text>
         </GlassView>
       </View>
 
       <View style={styles.content}>
-        <Text style={[styles.heroTitle, { color: colors.text }]}>
+        <Text style={[styles.heroTitle, { color: colors.text }]}> 
           Scanni sa7nek,
-          <Text style={[styles.heroHighlight, { color: colors.primary }]}>
+          <Text style={[styles.heroHighlight, { color: colors.primary }]}> 
             {"\n"}Ebni badnek.
           </Text>
         </Text>
-        <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
+        <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}> 
           AI ychouf sa7nek, ygollek chnoua fi kerchek. 🇹🇳
         </Text>
       </View>
     </GlassView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   heroCard: { width: '100%', padding: 20, marginBottom: 24 },
