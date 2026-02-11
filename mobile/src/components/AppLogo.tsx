@@ -13,15 +13,15 @@ interface AppLogoProps {
   animated?: boolean;
 }
 
-export const AppLogo = ({ 
-  size = 40, 
-  intensity = 50, 
-  borderRadius = 12, 
+export const AppLogo = ({
+  size = 40,
+  intensity = 50,
+  borderRadius = 12,
   inverted = false,
-  animated = true 
+  animated = true
 }: AppLogoProps) => {
   const { colors } = useTheme();
-  
+
   // Animation values
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -73,6 +73,7 @@ export const AppLogo = ({
         rotate.stop();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animated]);
 
   const spin = rotateAnim.interpolate({
@@ -85,75 +86,75 @@ export const AppLogo = ({
   const sparkleSize = size * 0.35;
   // Thinner stroke for a cleaner, high-end look. 
   // We keep it between 1.2 and 2.5 for maximum clarity.
-  const strokeWidth = Math.min(2.5, Math.max(1.2, size / 45)); 
+  const strokeWidth = Math.min(2.5, Math.max(1.2, size / 45));
 
   // Colors
   const iconColor = inverted === true ? '#ffffff' : colors.primary;
   const secondaryColor = colors.warning; // Always yellow for consistency
-  
+
   const Content = () => (
     <View style={styles.innerContainer}>
-       {/* The Meal (Subject) */}
-       <Utensils 
-         size={utensilSize} 
-         color={iconColor} 
-         strokeWidth={strokeWidth}
-         style={{ marginRight: size * 0.05, marginBottom: -size * 0.02 }}
-       />
+      {/* The Meal (Subject) */}
+      <Utensils
+        size={utensilSize}
+        color={iconColor}
+        strokeWidth={strokeWidth}
+        style={{ marginRight: size * 0.05, marginBottom: -size * 0.02 }}
+      />
 
-       {/* The Prediction (AI/Magic) */}
-       <Animated.View 
-         style={[
-           styles.sparkleContainer, 
-           { 
-             top: size * 0.1, 
-             right: size * 0.1,
-             transform: [
-               { scale: pulseAnim },
-               { rotate: spin }
-             ]
-           }
-         ]}
-       >
-          <Sparkles 
-            size={sparkleSize} 
-            color={secondaryColor} 
-            fill={secondaryColor}
-            strokeWidth={0} 
-          />
-           <Sparkles 
-            size={sparkleSize} 
-            color={secondaryColor} 
-            strokeWidth={1}
-            style={{ position: 'absolute' }}
-          />
-       </Animated.View>
+      {/* The Prediction (AI/Magic) */}
+      <Animated.View
+        style={[
+          styles.sparkleContainer,
+          {
+            top: size * 0.1,
+            right: size * 0.1,
+            transform: [
+              { scale: pulseAnim },
+              { rotate: spin }
+            ]
+          }
+        ]}
+      >
+        <Sparkles
+          size={sparkleSize}
+          color={secondaryColor}
+          fill={secondaryColor}
+          strokeWidth={0}
+        />
+        <Sparkles
+          size={sparkleSize}
+          color={secondaryColor}
+          strokeWidth={1}
+          style={{ position: 'absolute' }}
+        />
+      </Animated.View>
     </View>
   );
 
   if (inverted === true) {
-      return (
-          <Animated.View style={{ transform: [{ scale: entranceAnim }] }}>
-            <LinearGradient
-              colors={[colors.primary, '#60a5fa']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[
-                  styles.container, 
-                  { width: size, height: size, borderRadius, borderWidth: 0 } 
-              ]}
-            >
-                <Content />
-            </LinearGradient>
-          </Animated.View>
-      );
+    return (
+      <Animated.View style={{ transform: [{ scale: entranceAnim }] }}>
+        <LinearGradient
+          colors={[colors.primary, '#60a5fa']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[
+            styles.container,
+            { width: size, height: size, borderRadius, borderWidth: 0 }
+          ]}
+        >
+          <Content />
+        </LinearGradient>
+      </Animated.View>
+    );
   }
 
   return (
     <Animated.View style={{ transform: [{ scale: entranceAnim }] }}>
-      <GlassView 
-        style={[styles.container, { width: size, height: size }]} 
-        intensity={intensity} 
+      <GlassView
+        style={[styles.container, { width: size, height: size }]}
+        intensity={intensity}
         borderRadius={borderRadius}
         noBorder={false}
       >
@@ -173,14 +174,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
   innerContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      height: '100%',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   sparkleContainer: {
-      position: 'absolute',
-      zIndex: 2,
+    position: 'absolute',
+    zIndex: 2,
   },
 });

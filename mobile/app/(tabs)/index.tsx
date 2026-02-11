@@ -1,26 +1,52 @@
-import React, { useCallback } from 'react';
-import { HomeContainer } from '../../src/features/home';
-import { useStats } from '../../src/hooks/useStats';
-import { useUI } from '../../src/hooks/UIContext';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '@/theme/ThemeContext';
+import { HeroSection } from '@/features/home/HeroSection';
+import { WaterTracker } from '@/features/home/WaterTracker';
+import { DailyChallenge } from '@/features/home/DailyChallenge';
+import { TipCard } from '@/features/home/TipCard';
+import { TrendingDishCard } from '@/features/home/TrendingDishCard';
+import { FeaturesList } from '@/features/home/FeaturesList';
 
 export default function HomeScreen() {
-  const { logMeal, dailyScans, incrementScans, isPro } = useStats();
-  const { isAuthenticated, setShowUpgrade, setShowLogSuccess, setShowLoginModal } = useUI();
 
-  const handleLogMeal = useCallback((totals: any) => {
-    logMeal(totals);
-  }, [logMeal]);
+
+  const { colors } = useTheme();
+
 
   return (
-    <HomeContainer 
-       onLogMeal={handleLogMeal}
-       onShowLogSuccess={() => setShowLogSuccess(true)}
-       dailyScans={dailyScans}
-       incrementScans={incrementScans}
-       isPro={isPro}
-       onShowUpgrade={() => setShowUpgrade(true)}
-       isGuest={!isAuthenticated}
-       onTriggerAuth={() => setShowLoginModal(true)}
-    />
+    <>
+      <HeroSection />
+      <View style={styles.bentoGrid}>
+        <View style={styles.leftCol}>
+          <WaterTracker />
+        </View>
+
+        <View style={styles.rightCol}>
+          <DailyChallenge />
+          <TipCard />
+        </View>
+      </View>
+
+      <View style={styles.sectionSpacing}>
+        <TrendingDishCard />
+      </View>
+
+      <View style={styles.featuresContainer}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>3lech KOUL?</Text>
+        </View>
+        <FeaturesList />
+      </View>
+    </>
   );
 }
+const styles = StyleSheet.create({
+  bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 24, width: '100%' },
+  leftCol: { flex: 1 },
+  rightCol: { flex: 1, gap: 12 },
+  sectionSpacing: { width: '100%', marginBottom: 24 },
+  sectionTitle: { fontSize: 20, fontWeight: '900' },
+  featuresContainer: { width: '100%' },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 4 },
+});
