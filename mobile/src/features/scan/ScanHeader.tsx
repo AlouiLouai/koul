@@ -21,7 +21,7 @@ function ContentWrapper({ children }: PropsWithChildren) {
             tension: 30
         }).start();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentImage, loading]);
+    }, [currentImage, loading])
     return <Animated.View style={{
         borderRadius: 36,
         overflow: 'hidden',
@@ -34,9 +34,7 @@ function ContentWrapper({ children }: PropsWithChildren) {
 
 function Content() {
     const { currentImage, loading, resetAnalysis } = useScanState()
-
     if (!currentImage) return <ScanHero />
-
     return <>
         <Image source={{ uri: currentImage }} style={{ width: '100%', height: '100%' }} />
         {loading && (
@@ -55,5 +53,5 @@ function Content() {
 
 
 export function ScanHeader() {
-    return < ContentWrapper> <Content /> </ContentWrapper>
+    return <ContentWrapper> <Content /> </ContentWrapper>
 }

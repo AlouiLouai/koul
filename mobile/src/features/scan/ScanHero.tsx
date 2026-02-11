@@ -121,7 +121,6 @@ export const ScanHero = () => {
 
                 {/* Action Buttons */}
                 <View style={styles.actions}>
-
                     <CameraButton />
                     <GalleryButton />
                 </View>

@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import {
-    User as UserIcon, Bell, History, LogOut,
+    User as UserIcon, Bell, History,
     Zap, ChevronRight
 } from 'lucide-react-native';
 import { GlassView } from '@/components/GlassView';
 import { useTheme } from '@/theme/ThemeContext';
 import { useAuthState } from '@/features/auth/AuthState';
 import { useModals } from '@/modals/ModalsProvider';
-import { useLogout } from '../auth/useLogout';
 
 const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switchValue, onSwitchChange, disabled }: any) => {
     const { colors } = useTheme();
@@ -49,7 +48,6 @@ export function SettingsList() {
     const { colors } = useTheme();
     const { isAuthenticated, isGuest } = useAuthState();
     const { presentModal } = useModals();
-    const { handleLogout, isLoading } = useLogout();
     return (
         <View style={styles.settingsGroup}>
             <Text style={styles.groupTitle}>PARAMETRES</Text>
@@ -79,18 +77,6 @@ export function SettingsList() {
                     color="#6366f1"
                     disabled={isGuest}
                 />
-                {isAuthenticated && (
-                    <>
-                        <View style={[styles.divider, { backgroundColor: colors.glassBorder }]} />
-                        <SettingItem
-                            icon={LogOut}
-                            label="Okhroj"
-                            color={colors.error}
-                            disabled={isLoading}
-                            onPress={() => handleLogout()}
-                        />
-                    </>
-                )}
             </GlassView>
         </View>
     );
