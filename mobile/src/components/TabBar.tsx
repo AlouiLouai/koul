@@ -73,11 +73,6 @@ const tabStyles = StyleSheet.create({
         maxWidth: 360,
         paddingHorizontal: 8,
         paddingVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.1,
-        shadowRadius: 24,
-        elevation: 12,
     },
     innerContainer: {
         flexDirection: 'row',

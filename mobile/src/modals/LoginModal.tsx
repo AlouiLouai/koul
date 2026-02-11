@@ -1,4 +1,4 @@
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetView, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { ShieldCheck } from 'lucide-react-native';
@@ -12,12 +12,8 @@ import { GlassView } from "@/components/GlassView";
 const MODAL_NAME = 'login';
 const LoginModal = React.forwardRef<BottomSheetModal>((_, ref) => {
     const { colors, mode } = useTheme();
-    const handleClose = () => {
-        if (ref && 'current' in ref) {
-            ref.current?.close();
-        }
-    }
-    const { handleGoogleLogin, isLoading } = useGoogleLogin(handleClose);
+    const { dismiss } = useBottomSheetModal();
+    const { handleGoogleLogin, isLoading } = useGoogleLogin(() => dismiss(MODAL_NAME));
     return (
         <BottomSheetModal ref={ref} name={MODAL_NAME}
             backgroundStyle={{

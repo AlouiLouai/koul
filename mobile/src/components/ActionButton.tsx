@@ -19,9 +19,9 @@ export const ActionButton = ({ onPress, text, variant = 'primary', icon, flex, s
 
   const containerStyle = [
     styles.base,
-    isPrimary 
-        ? { backgroundColor: colors.accent, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 } 
-        : { borderColor: colors.glassBorder, borderWidth: 1, backgroundColor: mode === 'dark' ? '#ffffff10' : '#00000005' },
+    isPrimary
+      ? { backgroundColor: colors.accent, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 }
+      : { borderColor: colors.glassBorder, borderWidth: 1, backgroundColor: mode === 'dark' ? '#ffffff10' : '#00000005' },
     flex ? { flex } : {},
     disabled ? { opacity: 0.5 } : {},
     style
@@ -52,5 +52,6 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: 'bold',
     fontSize: 16,
+    textAlign: 'center',
   },
 });

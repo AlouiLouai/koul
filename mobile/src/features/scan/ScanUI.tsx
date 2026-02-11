@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView, Easing, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Easing, Dimensions } from 'react-native';
 import { Trash2, CheckCircle2, ChevronLeft } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { GlassView } from '@/components/GlassView';
@@ -46,6 +46,7 @@ export const ScanUI = ({
     const resetBtnScale = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
+        logger.info('result', result);
         if (result && !loading) {
             Animated.parallel([
                 Animated.timing(buttonsOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
@@ -110,7 +111,7 @@ export const ScanUI = ({
         }
         try {
             const res = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: 'images',
                 allowsEditing: true,
                 quality: 0.7,
             });
@@ -155,93 +156,76 @@ export const ScanUI = ({
     }, [currentImage, loading]);
 
     return (
-        <View style={styles.container}>
-            <ScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-                bounces={true}
-            >
-                <View style={styles.padding}>
-
-                    <Animated.View style={[styles.imageContainer, { height: containerHeight }]}>
-                        {currentImage ? (
-                            <>
-                                <Image source={{ uri: currentImage }} style={styles.fullImage} />
-                                {loading && (
-                                    <ScanLoading
-                                        scanMessage={scanMessage}
-                                        scanningProgress={scanningProgress}
-                                        beamAnim={beamAnim}
-                                        containerHeight={480}
-                                    />
-                                )}
-                                {!loading && (
-                                    <TouchableOpacity onPress={onReset} style={styles.backBtn}>
-                                        <GlassView intensity={40} borderRadius={20} style={styles.iconBtn}>
-                                            <ChevronLeft size={24} color="#fff" />
-                                        </GlassView>
-                                    </TouchableOpacity>
-                                )}
-                            </>
-                        ) : (
-                            <GlassView intensity={20} borderRadius={36} style={styles.heroWrapper}>
-                                <ScanHero onCapture={handleCapture} onGallery={handleGallery} />
-                            </GlassView>
+        <>
+            <Animated.View style={[styles.imageContainer, { height: containerHeight }]}>
+                {currentImage ? (
+                    <>
+                        <Image source={{ uri: currentImage }} style={styles.fullImage} />
+                        {loading && (
+                            <ScanLoading
+                                scanMessage={scanMessage}
+                                scanningProgress={scanningProgress}
+                                beamAnim={beamAnim}
+                                containerHeight={480}
+                            />
                         )}
-                    </Animated.View>
+                        {!loading && (
+                            <TouchableOpacity onPress={onReset} style={styles.backBtn}>
+                                <GlassView intensity={40} borderRadius={20} style={styles.iconBtn}>
+                                    <ChevronLeft size={24} color="#fff" />
+                                </GlassView>
+                            </TouchableOpacity>
+                        )}
+                    </>
+                ) : (
+                    <ScanHero onCapture={handleCapture} onGallery={handleGallery} />
+                )}
+            </Animated.View>
+            {result && !loading && (
+                <View style={styles.resultAnimationWrapper}>
+                    <AnalysisResult data={result} />
 
-                    {result && !loading && (
-                        <View style={styles.resultAnimationWrapper}>
-                            <AnalysisResult data={result} />
-
-                            <Animated.View style={[
-                                styles.actionRow,
-                                { opacity: buttonsOpacity, transform: [{ translateY: buttonsTranslateY }] }
-                            ]}>
-                                <TouchableOpacity
-                                    style={styles.resetBtnWrapper}
-                                    onPress={onReset}
-                                    onPressIn={() => handlePressIn(resetBtnScale)}
-                                    onPressOut={() => handlePressOut(resetBtnScale)}
-                                    activeOpacity={1}
-                                >
-                                    <Animated.View style={{ transform: [{ scale: resetBtnScale }] }}>
-                                        <View style={[styles.resetBtn, { borderColor: colors.error }]}>
-                                            <Trash2 size={22} color={colors.error} />
-                                            <Text style={[styles.resetText, { color: colors.error }]}>Fasakh</Text>
-                                        </View>
-                                    </Animated.View>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={styles.logBtnWrapper}
-                                    onPress={onLogMeal}
-                                    onPressIn={() => handlePressIn(logBtnScale)}
-                                    onPressOut={() => handlePressOut(logBtnScale)}
-                                    activeOpacity={1}
-                                >
-                                    <Animated.View style={{ transform: [{ scale: logBtnScale }] }}>
-                                        <View style={[styles.logBtn, { backgroundColor: '#e11d48' }]}>
-                                            <CheckCircle2 size={22} color="#fff" strokeWidth={2} />
-                                            <Text style={styles.logText}>Kayed Fatourek</Text>
-                                        </View>
-                                    </Animated.View>
-                                </TouchableOpacity>
+                    <Animated.View style={[
+                        styles.actionRow,
+                        { opacity: buttonsOpacity, transform: [{ translateY: buttonsTranslateY }] }
+                    ]}>
+                        <TouchableOpacity
+                            style={styles.resetBtnWrapper}
+                            onPress={onReset}
+                            onPressIn={() => handlePressIn(resetBtnScale)}
+                            onPressOut={() => handlePressOut(resetBtnScale)}
+                            activeOpacity={1}
+                        >
+                            <Animated.View style={{ transform: [{ scale: resetBtnScale }] }}>
+                                <View style={[styles.resetBtn, { borderColor: colors.error }]}>
+                                    <Trash2 size={22} color={colors.error} />
+                                    <Text style={[styles.resetText, { color: colors.error }]}>Fasakh</Text>
+                                </View>
                             </Animated.View>
-                        </View>
-                    )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.logBtnWrapper}
+                            onPress={onLogMeal}
+                            onPressIn={() => handlePressIn(logBtnScale)}
+                            onPressOut={() => handlePressOut(logBtnScale)}
+                            activeOpacity={1}
+                        >
+                            <Animated.View style={{ transform: [{ scale: logBtnScale }] }}>
+                                <View style={[styles.logBtn, { backgroundColor: '#e11d48' }]}>
+                                    <CheckCircle2 size={22} color="#fff" strokeWidth={2} />
+                                    <Text style={styles.logText}>Kayed Fatourek</Text>
+                                </View>
+                            </Animated.View>
+                        </TouchableOpacity>
+                    </Animated.View>
                 </View>
-            </ScrollView>
-        </View>
+            )}
+        </>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    scrollView: { flex: 1 },
-    scrollContent: { paddingBottom: 140, paddingTop: 10 },
-    padding: { paddingHorizontal: 20 },
     imageContainer: {
         borderRadius: 36,
         overflow: 'hidden',

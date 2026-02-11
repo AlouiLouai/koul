@@ -11,8 +11,6 @@ const MODAL_NAME = 'logSuccess';
 
 const LogSuccessModal = React.forwardRef<BottomSheetModal>((_, ref) => {
   const { colors } = useTheme();
-
-
   const { dismiss } = useBottomSheetModal()
 
   return (

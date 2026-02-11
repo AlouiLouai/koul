@@ -22,7 +22,7 @@ export default function TabsLayout() {
                   <ScrollView
                     showsVerticalScrollIndicator={false}
                     bounces={false}
-                    contentContainerStyle={{ paddingBottom: 110 }}>
+                    contentContainerStyle={{ paddingBottom: 110, paddingTop: 10, }}>
                     {children}
                   </ScrollView>
                 );

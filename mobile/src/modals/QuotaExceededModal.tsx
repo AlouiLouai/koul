@@ -1,11 +1,12 @@
 import React from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Lock, Crown } from 'lucide-react-native';
+import { Lock, Crown, Sparkles } from 'lucide-react-native';
 import { ActionButton } from '@/components/ActionButton';
 import { GlassView } from '@/components/GlassView';
 import { useTheme } from '@/theme/ThemeContext';
-import { useModals } from './ModalsProvider';
+import { router } from 'expo-router';
+import { useAuthState } from '@/features/auth/AuthState';
 
 const MODAL_NAME = 'quotaExceeded';
 
@@ -15,24 +16,16 @@ export type QuotaExceededModalOptions = {
 
 const QuotaExceededModal = React.forwardRef<BottomSheetModal>((_, ref) => {
   const { colors } = useTheme();
-  const { dismissModal, getModalOptions } = useModals();
-  const options = getModalOptions(MODAL_NAME) as QuotaExceededModalOptions | undefined;
+  const { dismiss } = useBottomSheetModal();
+  const { isGuest, isAuthenticated } = useAuthState();
 
-  const handleUpgrade = () => {
-    options?.onUpgrade?.();
-    dismissModal(MODAL_NAME);
-  };
-
-  const handleCancel = () => {
-    dismissModal(MODAL_NAME);
-  };
 
   return (
     <BottomSheetModal
       ref={ref}
       name={MODAL_NAME}
       enableDynamicSizing={false}
-      snapPoints={[420]}
+      snapPoints={[380]}
       enableOverDrag={false}
       enableHandlePanningGesture={false}
       enablePanDownToClose={false}
@@ -56,28 +49,44 @@ const QuotaExceededModal = React.forwardRef<BottomSheetModal>((_, ref) => {
           <View style={styles.content}>
             <View style={[styles.iconBg, { backgroundColor: colors.warning + '20', borderColor: colors.warning }]}>
               <Lock size={40} color={colors.warning} strokeWidth={2.5} />
-              <View style={[styles.badge, { backgroundColor: colors.accent }]}>
-                <Crown size={12} color="#fff" fill="#fff" />
+              <View style={[styles.badge, isAuthenticated && { backgroundColor: colors.accent }]}>
+                {
+                  isGuest ?
+                    <Sparkles size={12} color="#fff" fill="#fff" /> : <Crown size={12} color="#fff" fill="#fff" />
+                }
               </View>
             </View>
 
-            <Text style={[styles.title, { color: colors.text }]}>Kammalt l&apos;Quota! 🛑</Text>
-            <Text style={[styles.message, { color: colors.textSecondary }]}>
+            <Text style={[styles.title, { color: colors.text }]}>{isGuest ? 'Wfet l\'tjarib! 🛑' : 'Kammalt l\'Quota! 🛑'}</Text>
+            {isGuest && <Text style={[styles.message, { color: colors.textSecondary }]}>
+              Kammalt l&apos;3 scans mta3ek l&apos;youm. <Text style={[styles.highlight, { color: colors.primary }]}>Connecti</Text> tawa bach t7afedh 3la tsawrek w stats mta3ek!
+            </Text>}
+            {isAuthenticated && <Text style={[styles.message, { color: colors.textSecondary }]}>
               Yezzi ma sawart lyoum! 3 scans/jour houa l&apos;limit mta3ek.
               <Text style={[styles.highlight, { color: colors.accent }]}>Walli Premium</Text> bach t7allel makletek bla 7seb.
-            </Text>
+            </Text>}
 
             <View style={styles.actions}>
-              <ActionButton
+              {isAuthenticated && <ActionButton
                 text="Walli Premium (5 TND)"
                 variant="primary"
-                onPress={handleUpgrade}
-                flex={1}
-                style={{ backgroundColor: colors.text }}
+                onPress={() => router.push('/upgrade')}
+                style={{ backgroundColor: colors.text, width: '50%' }}
+              />}
+              {isGuest && <ActionButton
+                text="Connecti Tawa"
+                variant="primary"
+                onPress={() => router.push('/login')}
+
+                style={{ width: '50%' }}
+              />}
+              <ActionButton
+                text="Batel, ghodwa nkamal"
+                variant="secondary"
+                onPress={() => dismiss(MODAL_NAME)}
+
+                style={{ width: '50%' }}
               />
-              <TouchableOpacity onPress={handleCancel} style={styles.cancelBtn}>
-                <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>Batel, ghodwa nkamal</Text>
-              </TouchableOpacity>
             </View>
           </View>
         </GlassView>
@@ -99,13 +108,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    borderWidth: 2,
+    borderWidth: 1,
     position: 'relative',
   },
   badge: {
     position: 'absolute',
     bottom: 0,
     right: 0,
+    backgroundColor: '#3b82f6',
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -121,25 +131,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   message: {
-    fontSize: 15,
+    fontSize: 14,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
     marginBottom: 32,
+    maxWidth: '85%',
   },
   highlight: {
+    color: '#2563eb',
     fontWeight: 'bold',
   },
   actions: {
-    width: '100%',
-    alignItems: 'center',
+    flexDirection: 'row',
     gap: 12,
-  },
-  cancelBtn: {
-    paddingVertical: 12,
-  },
-  cancelBtnText: {
-    fontWeight: '600',
-    fontSize: 14,
+    width: '100%',
   },
 });
 
