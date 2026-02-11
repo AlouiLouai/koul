@@ -53,5 +53,9 @@ function Content() {
 
 
 export function ScanHeader() {
-    return <ContentWrapper> <Content /> </ContentWrapper>
+    return (
+        <ContentWrapper>
+            <Content />
+        </ContentWrapper>
+    )
 }
