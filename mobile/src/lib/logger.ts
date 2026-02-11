@@ -1,23 +1,23 @@
 export const logger = {
-    log: (message?: any, ...optionalParams: any[]) => {
+    log: (message?: any, object?: any, ...optionalParams: any[]) => {
         if (__DEV__)
-            console.log(message, ...optionalParams);
+            console.log(message, JSON.stringify(object, null, 2), ...optionalParams);
     },
-    error: (message?: any, ...optionalParams: any[]) => {
+    error: (message?: any, object?: any, ...optionalParams: any[]) => {
         if (__DEV__)
-            console.error(message, ...optionalParams);
+            console.error(message, JSON.stringify(object, null, 2), ...optionalParams);
     },
-    warn: (message?: any, ...optionalParams: any[]) => {
+    warn: (message?: any, object?: any, ...optionalParams: any[]) => {
         if (__DEV__)
-            console.warn(message, ...optionalParams);
+            console.warn(message, JSON.stringify(object, null, 2), ...optionalParams);
     },
-    info: (message?: any, ...optionalParams: any[]) => {
+    info: (message?: any, object?: any, ...optionalParams: any[]) => {
         if (__DEV__)
-            console.info(message, ...optionalParams);
+            console.info(message, JSON.stringify(object, null, 2), ...optionalParams);
     },
-    debug: (message?: any, ...optionalParams: any[]) => {
+    debug: (message: string, object?: any, ...optionalParams: any[]) => {
         if (__DEV__)
-            console.debug(message, ...optionalParams);
+            console.debug(message, JSON.stringify(object, null, 2), ...optionalParams);
     },
     trace: (message?: any, ...optionalParams: any[]) => {
         if (__DEV__)
