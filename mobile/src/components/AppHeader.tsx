@@ -3,21 +3,17 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AppLogo } from '@/components/AppLogo';
 import { GlassView } from '@/components/GlassView';
 import { Sun, Moon } from 'lucide-react-native';
-import { GoogleLogo } from '@/components/GoogleLogo';
 import { useTheme } from '@/theme/ThemeContext';
 import { useRouter } from 'expo-router';
-import { useAuthState } from '@/features/auth/AuthState';
+import { UserMenu } from '@/features/auth/UserMenu';
 
 
 export function AppHeader() {
     const { colors, mode, toggleTheme } = useTheme();
-    const { user } = useAuthState();
     const router = useRouter();
-
     const handleGoHome = () => {
         router.replace('/');
     };
-
     return (
         <View style={styles.header}>
             <TouchableOpacity
@@ -42,17 +38,7 @@ export function AppHeader() {
                     </GlassView>
                 </TouchableOpacity>
 
-                {user ? (
-                    <GlassView style={styles.userAvatar} intensity={30} borderRadius={20}>
-                        <Text style={{ fontWeight: 'bold', color: colors.primary }}>{user.email?.charAt(0).toUpperCase()}</Text>
-                    </GlassView>
-                ) : (
-                    <TouchableOpacity onPress={() => router.push('/login')} activeOpacity={0.8}>
-                        <GlassView style={styles.iconBtn} intensity={30} borderRadius={20}>
-                            <GoogleLogo size={20} />
-                        </GlassView>
-                    </TouchableOpacity>
-                )}
+                <UserMenu />
             </View>
         </View>
     );
