@@ -42,7 +42,6 @@ yarn-error.*
 
 # Ignore files and directories that EAS Build doesn't need to build your app
 /docs
-/server
 
 # Ignore native directories (if you are using EAS Build)
 /android
@@ -50,6 +49,4 @@ yarn-error.*
 
 # Ignore test coverage reports
 /coverage
-
-
-deploy-to-azure.ps1
+.gitignore
