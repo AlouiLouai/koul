@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Animated, Dimensions, Easing } from 'react-native';
 import { Crown, Zap, } from 'lucide-react-native';
 import { ActionButton } from '@/components/ActionButton';
 import { useTheme } from '@/theme/ThemeContext';
@@ -9,11 +9,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LiquidBackground } from '@/components/LiquidBackground';
 
 
-
+const { width } = Dimensions.get('window');
 
 export default function UpgradeScreen() {
     const { colors } = useTheme();
     const [selectedPlan, setSelectedPlan] = useState('free');
+    const orbRotate = useRef(new Animated.Value(0)).current;
+    const orbScale = useRef(new Animated.Value(1)).current;
 
     const plans = [
         {
@@ -43,17 +45,44 @@ export default function UpgradeScreen() {
         }
     ];
 
+
     const handleSelect = (planId: string) => {
         setSelectedPlan(planId);
     };
 
     const activeColor = plans.find(p => p.id === selectedPlan)?.color || colors.primary;
+    const spin = orbRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+
+
+    useEffect(() => {
+        // Orb Dynamics
+        Animated.loop(
+            Animated.parallel([
+                Animated.sequence([
+                    Animated.timing(orbScale, { toValue: 1.2, duration: 6000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+                    Animated.timing(orbScale, { toValue: 1, duration: 6000, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
+                ]),
+                Animated.timing(orbRotate, { toValue: 1, duration: 40000, useNativeDriver: true, easing: Easing.linear })
+            ])
+        ).start();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     return (
 
         <SafeAreaView style={{ flex: 1, }} edges={['top', 'left', 'right']}>
             <LiquidBackground>
                 <View style={styles.container}>
+                    {/* Living Background Orb - Matching Main Screen Blue */}
+                    <Animated.View style={[
+                        styles.orb,
+                        {
+                            backgroundColor: colors.primary,
+                            transform: [{ scale: orbScale }, { rotate: spin }],
+                            opacity: 0.1
+                        }
+                    ]} />
                     <View style={styles.heroSection}>
                         <View style={[styles.iconBg, { backgroundColor: colors.warning + '15', borderColor: colors.warning + '30' }]}>
                             <Crown size={36} color={colors.warning} fill={colors.warning} />
@@ -103,7 +132,17 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         flex: 1,
-        paddingVertical: 10, paddingHorizontal: 20
+        paddingVertical: 10, paddingHorizontal: 20,
+        backgroundColor: 'transparent'
+    },
+    orb: {
+        position: 'absolute',
+        top: -width * 0.5,
+        left: -width * 0.2,
+        width: width * 1.4,
+        height: width * 1.4,
+        borderRadius: width * 0.7,
+        zIndex: 0,
     },
     closeBtn: { zIndex: 10 },
     closeIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },

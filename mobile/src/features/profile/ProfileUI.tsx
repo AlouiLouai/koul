@@ -81,11 +81,7 @@ export const ProfileUI = ({
     const { colors, mode } = useTheme();
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-        >
+        <>
             {/* Profile Header Card */}
             <GlassView style={styles.headerCard} intensity={50} borderRadius={32}>
                 {isAuthenticated ? (
@@ -236,7 +232,7 @@ export const ProfileUI = ({
             </View>
 
             <Text style={[styles.versionText, { color: colors.textSecondary }]}>KOUL Tunisia v1.0.0 🇹🇳</Text>
-        </ScrollView>
+        </>
     );
 };
 
