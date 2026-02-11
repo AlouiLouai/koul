@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Activity, AlertTriangle, Crown, Star, Trophy } from 'lucide-react-native';
-import { GlassView } from '../../../components/GlassView';
-import { useTheme } from '../../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface RarityScoreCardProps {
   score: number;

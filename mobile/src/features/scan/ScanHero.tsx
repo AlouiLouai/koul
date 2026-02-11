@@ -1,15 +1,14 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
-import { Camera, Image as ImageIcon, Sparkles, Zap, ShieldCheck, History } from 'lucide-react-native';
-import { useTheme } from '../../../theme/ThemeContext';
-import { GlassView } from '../../../components/GlassView';
+import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { Camera, Sparkles, Zap, ShieldCheck, History } from 'lucide-react-native';
+import { useTheme } from '@/theme/ThemeContext';
+import { GlassView } from '@/components/GlassView';
+import { GalleryButton } from './GalleryButton';
+import { CameraButton } from './CameraButton';
 
-interface ScanHeroProps {
-    onCapture: () => void;
-    onGallery: () => void;
-}
 
-export const ScanHero = ({ onCapture, onGallery }: ScanHeroProps) => {
+
+export const ScanHero = () => {
     const { colors } = useTheme();
 
     // Brand Colors
@@ -122,31 +121,15 @@ export const ScanHero = ({ onCapture, onGallery }: ScanHeroProps) => {
 
                 {/* Action Buttons */}
                 <View style={styles.actions}>
-                    <TouchableOpacity
-                        onPress={onCapture}
-                        activeOpacity={0.8}
-                        style={[styles.primaryBtn, { backgroundColor: blue }]}
-                    >
-                        <Camera size={22} color="#fff" strokeWidth={2.5} />
-                        <Text style={styles.primaryBtnText}>Sawar Tawa</Text>
-                    </TouchableOpacity>
 
-                    <TouchableOpacity
-                        onPress={onGallery}
-                        activeOpacity={0.7}
-                        style={styles.secondaryBtnWrapper}
-                    >
-                        <GlassView intensity={20} borderRadius={28} style={[styles.secondaryBtn, { borderColor: blue + '20' }]}>
-                            <ImageIcon size={20} color={colors.textSecondary} />
-                            <Text style={[styles.secondaryBtnText, { color: colors.text }]}>Gallerie</Text>
-                        </GlassView>
-                    </TouchableOpacity>
+                    <CameraButton />
+                    <GalleryButton />
                 </View>
 
                 {/* Pro Tip */}
                 <View style={styles.tipSection}>
                     <Text style={[styles.tipText, { color: colors.textSecondary }]}>
-                        Nasi7a: Sawar f&apos;blasa feha dhaw behi bch tkon l&apos;analyse asda9! ✨
+                        Nasi7a: Sawar f&apos;blasa feha dhaw behi bch tkon l&apos;analyse perfect! ✨
                     </Text>
                 </View>
             </Animated.View>
@@ -276,39 +259,7 @@ const styles = StyleSheet.create({
         gap: 10,
         marginBottom: 16,
     },
-    primaryBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 14,
-        borderRadius: 24,
-        gap: 10,
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 15,
-    },
-    primaryBtnText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '900',
-    },
-    secondaryBtnWrapper: {
-        width: '100%',
-    },
-    secondaryBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        gap: 8,
-        borderWidth: 1.5,
-    },
-    secondaryBtnText: {
-        fontSize: 15,
-        fontWeight: '800',
-    },
+
     tipSection: {
         paddingHorizontal: 15,
     },

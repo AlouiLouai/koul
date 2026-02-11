@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Droplets, Flame, Wheat, Leaf, ChevronDown } from 'lucide-react-native';
-import { GlassView } from '../../../components/GlassView';
-import { useTheme } from '../../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface MealItem {
     item: string;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@/lib/react-query';
-import { API_CONFIG } from '../apiConfig';
-import type { AnalysisResponse } from '../types';
+import { API_CONFIG } from '@/apiConfig';
+import type { AnalysisResponse } from '@/types';
 import { logger } from '@/lib/logger';
 
 export const useImageAnalysis = () => {

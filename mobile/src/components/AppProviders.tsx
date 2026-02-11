@@ -1,4 +1,3 @@
-import { UIProvider } from "@/hooks/UIContext";
 import { queryClient, QueryClientProvider } from "@/lib/react-query";
 import { ThemeProvider } from "@/theme/ThemeContext";
 import { PropsWithChildren } from "react";
@@ -9,9 +8,7 @@ export function AppProviders({ children }: PropsWithChildren) {
         <SafeAreaProvider>
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
-                    <UIProvider>
-                        {children}
-                    </UIProvider>
+                    {children}
                 </ThemeProvider>
             </QueryClientProvider>
         </SafeAreaProvider>

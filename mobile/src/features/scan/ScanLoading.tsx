@@ -1,53 +1,21 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet, Platform, Image, Easing } from 'react-native';
+import React from 'react';
+import { View, Text, Animated, StyleSheet, Platform, Image } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Sparkles, Search, Info } from 'lucide-react-native';
 import { useTheme } from '@/theme/ThemeContext';
 import { GlassView } from '@/components/GlassView';
 import { AppLogo } from '@/components/AppLogo';
+import { useLoadingAnimation } from './useLoadingAnimation';
 
 interface ScanLoadingProps {
-    scanMessage: string;
-    scanningProgress: Animated.Value;
-    beamAnim: Animated.Value;
     backgroundImage?: string | null;
     containerHeight?: number;
 }
 
-export const ScanLoading = ({ scanMessage, scanningProgress, beamAnim, backgroundImage, containerHeight = 540 }: ScanLoadingProps) => {
+export const ScanLoading = ({ backgroundImage, containerHeight = 480 }: ScanLoadingProps) => {
     const { colors, mode } = useTheme();
     const yellowColor = '#f59e0b'; // Signature Tunisian Amber
-
-    // Animation Values
-    const pulseAnim = useRef(new Animated.Value(1)).current;
-    const rotateAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        Animated.loop(
-            Animated.parallel([
-                Animated.sequence([
-                    Animated.timing(pulseAnim, { toValue: 1.1, duration: 1500, useNativeDriver: true, easing: Easing.inOut(Easing.sin) }),
-                    Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true, easing: Easing.inOut(Easing.sin) })
-                ]),
-                Animated.timing(rotateAnim, { toValue: 1, duration: 5000, easing: Easing.linear, useNativeDriver: true })
-            ])
-        ).start();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const spin = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg']
-    });
-
-    // Tunisian friendly messages in Derja - Improved and "Soulful"
-    const getDerjaMessage = (msg: string) => {
-        if (msg.includes("3maliyet")) return "Sbar chwaya, 9a3din nfixiw fil tsawer...";
-        if (msg.includes("moukawinet")) return "Chwaya sabr, el AI mte3na dhahra fih ji3an...";
-        if (msg.includes("calories")) return "El mekla dhahra bnina! N7asbou fil calories...";
-        if (msg.includes("Verdict")) return "Sa7tek t'hemna, 7adhret el resultet...";
-        return msg;
-    };
+    const { hintMessage, scanningProgress, beamAnim, pulseAnim, spin } = useLoadingAnimation();
 
     return (
         <View style={styles.container}>
@@ -101,8 +69,8 @@ export const ScanLoading = ({ scanMessage, scanningProgress, beamAnim, backgroun
 
                     <GlassView intensity={15} borderRadius={24} style={[styles.messageCard, { borderColor: yellowColor + '20' }]}>
                         <Search size={18} color={yellowColor} />
-                        <Text style={[styles.derjaMessage, { color: colors.text }]}>
-                            {getDerjaMessage(scanMessage)}
+                        <Text style={[styles.hintMessage, { color: colors.text }]}>
+                            {hintMessage}
                         </Text>
                     </GlassView>
                 </View>
@@ -165,7 +133,7 @@ const styles = StyleSheet.create({
 
     messageCard: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingVertical: 14, borderWidth: 1, width: '100%' },
 
-    derjaMessage: { fontSize: 15, fontWeight: '700', textAlign: 'center', flex: 1 },
+    hintMessage: { fontSize: 15, fontWeight: '700', textAlign: 'center', flex: 1 },
 
 
 
@@ -174,8 +142,6 @@ const styles = StyleSheet.create({
     progressBarBg: { width: '100%', height: 8, borderRadius: 4, overflow: 'hidden' },
 
     progressBarFill: { height: '100%', borderRadius: 4 },
-
-
 
     footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 

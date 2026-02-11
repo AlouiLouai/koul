@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { RarityScoreCard } from '../features/scan/components/RarityScoreCard';
-import { MacroGrid } from '../features/scan/components/MacroGrid';
-import { OilEstimate } from '../features/scan/components/OilEstimate';
-import { NutritionistInsight } from '../features/scan/components/NutritionistInsight';
-import { MealItemList } from '../features/scan/components/MealItemList';
+import { RarityScoreCard } from '../features/scan/RarityScoreCard';
+import { MacroGrid } from '../features/scan/MacroGrid';
+import { OilEstimate } from '../features/scan/OilEstimate';
+import { NutritionistInsight } from '../features/scan/NutritionistInsight';
+import { MealItemList } from '../features/scan/MealItemList';
 import type { AnalysisResponse } from '../types';
 
 interface AnalysisResultProps {
