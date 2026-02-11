@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Lightbulb } from 'lucide-react-native';
-import { GlassView } from '../../../components/GlassView';
-import { useTheme } from '../../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
 
 export const TipCard = () => {
   const { colors } = useTheme();

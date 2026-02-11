@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Flame, CheckCircle2, Trophy, ArrowRight } from 'lucide-react-native';
-import { GlassView } from '../../../components/GlassView';
-import { useTheme } from '../../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
 
 export const DailyChallenge = () => {
   const [completed, setCompleted] = useState(false);
   const { colors, mode } = useTheme();
-  
+
   // Interaction scale animation
   const scale = React.useRef(new Animated.Value(1)).current;
 
@@ -20,16 +20,16 @@ export const DailyChallenge = () => {
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
-      <TouchableOpacity 
-        activeOpacity={0.9} 
+      <TouchableOpacity
+        activeOpacity={0.9}
         onPress={handlePress}
       >
-        <GlassView 
+        <GlassView
           style={[
-            styles.challengeCard, 
+            styles.challengeCard,
             completed && { borderColor: colors.success + '80' }
-          ]} 
-          intensity={mode === 'dark' ? 60 : 80} 
+          ]}
+          intensity={mode === 'dark' ? 60 : 80}
           borderRadius={28}
         >
           <View style={[styles.glowBlob, { backgroundColor: completed ? colors.success : colors.accent }]} />

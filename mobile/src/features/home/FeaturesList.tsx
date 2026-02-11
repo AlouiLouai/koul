@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Camera, Zap, Shield, Heart } from 'lucide-react-native';
-import { GlassView } from '../../../components/GlassView';
-import { useTheme } from '../../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
+import { useTheme } from '../../theme/ThemeContext';
 
 const FEATURES = [
   { id: '1', title: 'Sawar w 7alel', sub: 'Macros f\'thania', icon: Camera, color: '#2563eb' },
@@ -15,34 +15,34 @@ export const FeaturesList = () => {
   const { colors } = useTheme();
 
   const getFeatureColor = (id: string) => {
-    switch(id) {
-        case '1': return colors.primary;
-        case '2': return colors.warning;
-        case '3': return colors.success;
-        case '4': return colors.accent;
-        default: return colors.primary;
+    switch (id) {
+      case '1': return colors.primary;
+      case '2': return colors.warning;
+      case '3': return colors.success;
+      case '4': return colors.accent;
+      default: return colors.primary;
     }
   };
 
   return (
-    <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        contentContainerStyle={styles.scrollContent}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
     >
       {FEATURES.map((item) => {
         const itemColor = getFeatureColor(item.id);
         return (
           <View key={item.id} style={styles.cardWrapper}>
-              <GlassView intensity={20} borderRadius={24} style={styles.featureCard}>
-                  <View style={[styles.iconBg, { backgroundColor: itemColor + '15' }]}>
-                      <item.icon size={24} color={itemColor} />
-                  </View>
-                  <View>
-                      <Text style={[styles.featureTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-                      <Text style={[styles.featureDesc, { color: colors.textSecondary }]} numberOfLines={1}>{item.sub}</Text>
-                  </View>
-              </GlassView>
+            <GlassView intensity={20} borderRadius={24} style={styles.featureCard}>
+              <View style={[styles.iconBg, { backgroundColor: itemColor + '15' }]}>
+                <item.icon size={24} color={itemColor} />
+              </View>
+              <View>
+                <Text style={[styles.featureTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+                <Text style={[styles.featureDesc, { color: colors.textSecondary }]} numberOfLines={1}>{item.sub}</Text>
+              </View>
+            </GlassView>
           </View>
         );
       })}

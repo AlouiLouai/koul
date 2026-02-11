@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { TabBar } from '@/components/TabBar';
 import { AppHeader } from '@/components/AppHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { LiquidBackground } from '@/components/LiquidBackground';
 
 export default function TabsLayout() {
@@ -13,13 +13,24 @@ export default function TabsLayout() {
           <View style={{ paddingHorizontal: 20, }}>
             <AppHeader />
           </View>
-          <View style={{ flex: 1, paddingHorizontal: 20, }}>
+          <View style={{ flex: 1, paddingHorizontal: 14, }}>
             <Tabs
               tabBar={props => <TabBar {...props} />}
+              detachInactiveScreens={true}
+              screenLayout={({ children }) => {
+                return (
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
+                    contentContainerStyle={{ paddingBottom: 110 }}>
+                    {children}
+                  </ScrollView>
+                );
+              }}
               screenOptions={{
                 headerShown: false,
                 tabBarShowLabel: false,
-                sceneStyle: { backgroundColor: 'transparent' },
+                sceneStyle: { backgroundColor: 'transparent' }
               }}
             >
               <Tabs.Screen name="index" options={{ title: 'Home' }} />

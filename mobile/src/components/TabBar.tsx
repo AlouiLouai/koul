@@ -62,7 +62,7 @@ export function TabBar({ state, navigation }: any) {
 const tabStyles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 24,
+        bottom: 18,
         left: 20,
         right: 20,
         alignItems: 'center',
