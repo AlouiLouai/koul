@@ -30,7 +30,7 @@ function AuthStateProvider({ children }: { children: React.ReactNode }) {
 
 
     useEffect(() => {
-        logger.debug('authState', authState);
+        logger.debug('AuthState', authState);
     }, [authState]);
 
     useEffect(() => {
