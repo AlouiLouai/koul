@@ -11,9 +11,13 @@ let client: SupabaseClient;
 
 export async function initializeSupabaseClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
+    /* 
     throw new Error(
       'Missing Supabase environment variables. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.',
     );
+    */
+    console.warn('Missing Supabase environment variables. Continuing without Supabase initialization.');
+    return null;
   }
   if (!client) {
     const key = 'supabase-encryption-key';
@@ -49,4 +53,5 @@ export async function initializeSupabaseClient() {
   return AppState.addEventListener('change', handleAppStateChange)
 }
 
-export { client as supabase };
+// export { client as supabase };
+export const supabase = client;

@@ -60,7 +60,7 @@ export default function RootLayout() {
               <Stack.Screen name="payment" options={{ presentation: 'modal' }} />
             </Stack>
           </ModalsProvider>
-          <StatusBar style="auto" />
+          <StatusBar style="dark" />
         </GestureHandlerRootView>
       </AuthStateProvider>
     </AppProviders>

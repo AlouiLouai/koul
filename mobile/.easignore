@@ -1,8 +1,5 @@
-.git
-.github
-.vscode
-
-
+# EAS Build Ignore File
+# Documentation: https://docs.expo.dev/build/eas-json/#easignore
 
 # dependencies
 node_modules/
@@ -21,6 +18,8 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+ios/
+android/
 
 # Metro
 .metro-health-check*
@@ -35,18 +34,9 @@ yarn-error.*
 *.pem
 
 # local env files
+# If you use EAS Secrets, ignore all .env files locally.
+.env*
 .env*.local
 
 # typescript
 *.tsbuildinfo
-
-# Ignore files and directories that EAS Build doesn't need to build your app
-/docs
-
-# Ignore native directories (if you are using EAS Build)
-/android
-/ios
-
-# Ignore test coverage reports
-/coverage
-.gitignore

@@ -85,6 +85,15 @@ interface AnalysisResponse {
 
 ## 🚀 Developer Workflow
 
+### ⚠️ Current Environment Status: Expo Go
+To facilitate rapid development without constant native builds or EAS dependency, several native-only features have been **commented out** (not removed):
+- **EAS Build:** `app.json` plugins and `projectId` are renamed/disabled. GitHub workflows are muted.
+- **MMKV:** `react-native-mmkv` is replaced by an in-memory fallback in `src/lib/mmkv.ts`.
+- **Google OAuth:** Native Google Sign-In is disabled in `src/features/auth/useGoogleLogin.ts`.
+- **Supabase:** Logic in `src/lib/supabase.ts` and `AuthState.tsx` is commented to prevent crashes when environment variables are missing.
+
+**DO NOT** uncomment these unless explicitly instructed to return to Native/EAS development. Work within these constraints for the UI/Logic phase.
+
 - **Type Checking:** Run `npm run typecheck` before pushing.
 - **Adding Features:**
   1. Define types in `src/types.ts`.

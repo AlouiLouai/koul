@@ -1,36 +1,63 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Flame, Wheat, Droplets } from 'lucide-react-native';
-import { GlassView } from '../../components/GlassView';
+import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '../../theme/ThemeContext';
+import { GlassView } from '../../components/GlassView';
 
-interface MacroCardProps {
+interface CircularProgressProps {
   label: string;
-  value: string | number;
+  value: number;
+  total: number;
   unit: string;
-  color: {
-    bg: string;
-    text: string;
-  };
-  icon: any;
+  color: string;
 }
 
-const MacroCard = ({ label, value, unit, color, icon: Icon }: MacroCardProps) => {
+const CircularProgress = ({ label, value, total, unit, color }: CircularProgressProps) => {
   const { colors } = useTheme();
+  const size = 80;
+  const strokeWidth = 8;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  
+  // Calculate percentage, maxing at 100%
+  const percentage = Math.min(value / total, 1);
+  const strokeDashoffset = circumference - (percentage * circumference);
 
   return (
-    <GlassView intensity={20} borderRadius={20} style={styles.macroCard}>
-      <View style={styles.cardHeader}>
-        <Text style={[styles.label, { color: colors.textSecondary }]} numberOfLines={1}>{label}</Text>
-        <View style={[styles.iconCircle, { backgroundColor: color.bg + '15' }]}>
-          <Icon size={12} color={color.text} strokeWidth={2.5} />
+    <View style={styles.macroItem}>
+      <View style={styles.svgWrapper}>
+        <Svg width={size} height={size}>
+          {/* Background Circle */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={colors.glassBorder}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            opacity={0.2}
+          />
+          {/* Progress Circle */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            fill="transparent"
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+        </Svg>
+        <View style={styles.innerValue}>
+          <Text style={[styles.valueText, { color: colors.text }]}>{value.toFixed(0)}</Text>
+          <Text style={[styles.unitText, { color: colors.textSecondary }]}>{unit}</Text>
         </View>
       </View>
-      <View style={styles.valueRow}>
-        <Text style={[styles.value, { color: colors.text }]}>{value}</Text>
-        <Text style={[styles.unit, { color: colors.textSecondary }]}>{unit}</Text>
-      </View>
-    </GlassView>
+      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+    </View>
   );
 };
 
@@ -42,41 +69,79 @@ interface MacroGridProps {
 
 export const MacroGrid = ({ protein, carbs, fat }: MacroGridProps) => {
   const { colors } = useTheme();
+  
+  // Reasonable max values for the circular scale
+  const maxProtein = 100;
+  const maxCarbs = 150;
+  const maxFat = 80;
 
   return (
-    <View style={styles.grid}>
-      <MacroCard
-        label="Protéine"
-        value={protein.toFixed(1)}
-        unit="g"
-        color={{ bg: colors.primary, text: colors.primary }}
-        icon={Flame}
-      />
-      <MacroCard
-        label="Carbs"
-        value={carbs.toFixed(0)}
-        unit="g"
-        color={{ bg: colors.success, text: colors.success }}
-        icon={Wheat}
-      />
-      <MacroCard
-        label="Dhoune"
-        value={fat.toFixed(0)}
-        unit="g"
-        color={{ bg: colors.warning, text: colors.warning }}
-        icon={Droplets}
-      />
-    </View>
+    <GlassView intensity={20} borderRadius={32} style={styles.container}>
+      <View style={styles.grid}>
+        <CircularProgress
+          label="Proteine"
+          value={protein}
+          total={maxProtein}
+          unit="g"
+          color={colors.primary}
+        />
+        <CircularProgress
+          label="Carbs"
+          value={carbs}
+          total={maxCarbs}
+          unit="g"
+          color={colors.success}
+        />
+        <CircularProgress
+          label="Dhoune"
+          value={fat}
+          total={maxFat}
+          unit="g"
+          color={colors.warning}
+        />
+      </View>
+    </GlassView>
   );
 };
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', gap: 10, marginBottom: 20, marginTop: 8 },
-  macroCard: { flex: 1, padding: 12, height: 85, justifyContent: 'space-between', backgroundColor: 'transparent' },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  iconCircle: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
-  label: { fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 },
-  valueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 1 },
-  value: { fontSize: 20, fontWeight: '900' },
-  unit: { fontSize: 11, fontWeight: '800' }
+  container: {
+    width: '100%',
+    padding: 20,
+    marginBottom: 20,
+  },
+  grid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  macroItem: {
+    alignItems: 'center',
+    gap: 10,
+  },
+  svgWrapper: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerValue: {
+    position: 'absolute',
+    alignItems: 'center',
+  },
+  valueText: {
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  unitText: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: -2,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
 });

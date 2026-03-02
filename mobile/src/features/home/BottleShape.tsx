@@ -1,161 +1,177 @@
-import React from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import { View, Text, Animated, StyleSheet, Easing } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
+import Svg, { Path } from 'react-native-svg';
 
-interface BottleShapeProps {
-    isComplete: boolean;
-    waterTranslateY: Animated.AnimatedInterpolation<number | string>;
-    bubbleAnims: Animated.Value[];
+export interface BottleRef {
+  triggerWave: () => void;
 }
 
-export const BottleShape = ({ isComplete, waterTranslateY, bubbleAnims }: BottleShapeProps) => {
-    const { colors, mode } = useTheme();
+interface BottleShapeProps {
+    fillLevel: number; // 0 to 1
+    height?: number;
+}
 
-    const getBubbleStyle = (anim: Animated.Value, left: number) => ({
-        position: 'absolute' as 'absolute',
-        bottom: 0,
-        left: left,
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: 'rgba(255,255,255,0.4)',
-        transform: [
-            { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [0, -180] }) },
-            { scale: anim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.5, 1, 0] }) }
-        ]
+export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel, height = 200 }, ref) => {
+    const { colors, mode } = useTheme();
+    const waveAnim = useRef(new Animated.Value(0)).current;
+    const waveIntensity = useRef(new Animated.Value(0)).current;
+
+    const bodyHeight = height * 0.8;
+    const neckHeight = height * 0.12;
+    const capHeight = height * 0.08;
+    const bottleWidth = height * 0.4;
+
+    useImperativeHandle(ref, () => ({
+        triggerWave: () => {
+            Animated.sequence([
+                Animated.timing(waveIntensity, {
+                    toValue: 1,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(waveIntensity, {
+                    toValue: 0,
+                    duration: 1500,
+                    easing: Easing.out(Easing.quad),
+                    useNativeDriver: true,
+                })
+            ]).start();
+        }
+    }));
+
+    useEffect(() => {
+        Animated.loop(
+            Animated.timing(waveAnim, {
+                toValue: 1,
+                duration: 2500,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            })
+        ).start();
+    }, [waveAnim]);
+
+    const translateX = waveAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [-40, 0],
     });
 
+    const translateY = (1 - fillLevel) * bodyHeight;
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { height, width: bottleWidth + 10 }]}>
+            {/* Bottle Cap */}
+            <View style={[styles.cap, { backgroundColor: '#2563eb', height: capHeight, width: bottleWidth * 0.35 }]} />
+            
+            {/* Bottle Neck */}
+            <View style={[styles.neck, { borderColor: colors.glassBorder, height: neckHeight, width: bottleWidth * 0.3 }]} />
+
             {/* Bottle Body */}
-            <View
-                style={[
-                    styles.bottleBody,
-                    {
-                        borderColor: isComplete ? 'rgba(255,255,255,0.5)' : colors.glassBorder,
-                        backgroundColor: mode === 'dark' || isComplete ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
-                    }
-                ]}
-            >
-                <View style={styles.waterContainer}>
-                    <Animated.View
-                        style={[
-                            styles.water,
-                            {
-                                transform: [{ translateY: waterTranslateY }],
-                                backgroundColor: isComplete ? '#fff' : '#3b82f6',
-                                opacity: isComplete ? 0.9 : 0.8
-                            }
-                        ]}
-                    >
-                        <Animated.View style={getBubbleStyle(bubbleAnims[0], 20)} />
-                        <Animated.View style={getBubbleStyle(bubbleAnims[1], 55)} />
-                        <Animated.View style={getBubbleStyle(bubbleAnims[2], 85)} />
+            <View style={[styles.body, { 
+                borderColor: colors.glassBorder,
+                height: bodyHeight,
+                width: bottleWidth,
+                borderRadius: bottleWidth * 0.25,
+                backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.2)'
+            }]}>
+                <View style={styles.waterWrapper}>
+                    <Animated.View style={[
+                        styles.waterContent, 
+                        { 
+                            transform: [{ translateY }],
+                        }
+                    ]}>
+                        <Animated.View style={{ transform: [{ translateX }] }}>
+                            <Svg height="40" width="200" viewBox="0 0 200 40" style={styles.waveSvg}>
+                                <Path
+                                    d="M0 20 Q 25 5, 50 20 T 100 20 T 150 20 T 200 20 V 40 H 0 Z"
+                                    fill="#3b82f6"
+                                />
+                            </Svg>
+                        </Animated.View>
+                        <View style={styles.deepWater} />
                     </Animated.View>
                 </View>
 
-                {/* Bottle Label */}
-                <View
-                    style={[
-                        styles.label,
-                        { backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : colors.background[0] }
-                    ]}
-                >
-                    <Text style={[styles.labelText, { color: isComplete ? '#fff' : colors.primary }]}>3L SAFIA</Text>
+                {/* Hayet Label */}
+                <View style={styles.labelContainer}>
+                    <View style={styles.hayetBlueStrip}>
+                        <Text style={[styles.hayetText, { fontSize: bottleWidth * 0.16 }]}>HAYET</Text>
+                        <Text style={[styles.volumeText, { fontSize: bottleWidth * 0.08 }]}>3L</Text>
+                    </View>
+                    <View style={styles.hayetRedStrip} />
                 </View>
-
-                {/* Measure Lines */}
-                <View style={[styles.measureLine, { bottom: '25%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
-                <View style={[styles.measureLine, { bottom: '50%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
-                <View style={[styles.measureLine, { bottom: '75%', backgroundColor: isComplete ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }]} />
             </View>
-
-            {/* Bottle Neck & Cap */}
-            <View
-                style={[
-                    styles.bottleNeck,
-                    {
-                        borderColor: isComplete ? 'rgba(255,255,255,0.5)' : colors.glassBorder,
-                        backgroundColor: isComplete ? 'rgba(255,255,255,0.2)' : (mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)')
-                    }
-                ]}
-            />
-            <View
-                style={[
-                    styles.bottleCap,
-                    { backgroundColor: isComplete ? '#fff' : colors.primary }
-                ]}
-            />
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {
-        width: 110,
-        height: 210,
-        position: 'relative',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    bottleBody: {
-        width: 105,
-        height: 180,
-        borderRadius: 18,
-        borderWidth: 2.5,
-        position: 'absolute',
-        bottom: 0,
-        overflow: 'hidden',
-    },
-    waterContainer: {
-        flex: 1,
-        overflow: 'hidden',
-        position: 'relative',
-    },
-    water: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        left: 0,
-        top: 0,
-    },
-    label: {
-        position: 'absolute',
-        top: '45%',
-        left: 0,
-        right: 0,
-        height: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: 0.9,
     },
-    labelText: {
-        fontSize: 12,
+    cap: {
+        borderRadius: 4,
+        zIndex: 2,
+    },
+    neck: {
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+        backgroundColor: 'transparent',
+        zIndex: 1,
+    },
+    body: {
+        borderWidth: 2,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    waterWrapper: {
+        flex: 1,
+        overflow: 'hidden',
+    },
+    waterContent: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    waveSvg: {
+        position: 'absolute',
+        top: -20,
+        left: 0,
+    },
+    deepWater: {
+        flex: 1,
+        marginTop: 20,
+        backgroundColor: '#3b82f6',
+    },
+    labelContainer: {
+        position: 'absolute',
+        top: '35%',
+        left: 0,
+        right: 0,
+        zIndex: 3,
+    },
+    hayetBlueStrip: {
+        backgroundColor: '#1e40af',
+        paddingVertical: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    hayetRedStrip: {
+        backgroundColor: '#e11d48',
+        height: 6,
+    },
+    hayetText: {
+        color: 'white',
         fontWeight: '900',
         letterSpacing: 1.5,
     },
-    measureLine: {
-        width: 14,
-        height: 1.5,
-        position: 'absolute',
-        right: 4,
-    },
-    bottleNeck: {
-        width: 45,
-        height: 25,
-        borderTopWidth: 2.5,
-        borderLeftWidth: 2.5,
-        borderRightWidth: 2.5,
-        borderTopLeftRadius: 8,
-        borderTopRightRadius: 8,
-        position: 'absolute',
-        top: 5,
-    },
-    bottleCap: {
-        width: 50,
-        height: 10,
-        borderRadius: 2,
-        position: 'absolute',
-        top: 0,
+    volumeText: {
+        color: 'white',
+        fontWeight: '700',
+        marginTop: -2,
     }
 });

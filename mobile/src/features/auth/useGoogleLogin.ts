@@ -1,27 +1,38 @@
 import { useState } from "react";
+/* 
 import {
     GoogleSignin,
     isSuccessResponse,
     isErrorWithCode,
     statusCodes,
 } from "@react-native-google-signin/google-signin";
+*/
 import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
+import { Alert } from "react-native";
 
 // Configure Google Sign-In once at module level.
 // webClientId is REQUIRED — it tells Google to issue an idToken for your
 // Supabase (web) OAuth client so signInWithIdToken works server-side.
 // iosClientId is needed for the native iOS sign-in flow.
+/* 
 GoogleSignin.configure({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     offlineAccess: false,
 });
+*/
 
 export function useGoogleLogin(onAuthenticated: (user: any) => void) {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleGoogleLogin = async () => {
+        logger.debug("handleGoogleLogin - start (Expo Go Fallback)");
+        Alert.alert("Google Sign-In", "Google Sign-In requires a native build and is not available in Expo Go.");
+        setIsLoading(false);
+        return;
+
+        /*
         logger.debug("handleGoogleLogin - start");
         setIsLoading(true);
 
@@ -80,6 +91,7 @@ export function useGoogleLogin(onAuthenticated: (user: any) => void) {
         } finally {
             setIsLoading(false);
         }
+        */
     };
 
     return { handleGoogleLogin, isLoading };

@@ -17,9 +17,9 @@ export interface ThemeColors {
 // Synchronized with ThemeContext.tsx for absolute consistency
 export const COLORS = {
   light: {
-    background: ['#fdfcf0', '#f1f5f9', '#e0f2fe'], // Warmer "Sahara/Oasis" vibe
-    glass: 'rgba(255, 255, 255, 0.3)',
-    glassBorder: 'rgba(15, 23, 42, 0.18)',
+    background: ['#f8fafc', '#f1f5f9', '#e2e8f0'], // Softer, less "eye-straining" white (Slate 50/100/200)
+    glass: 'rgba(255, 255, 255, 0.4)',
+    glassBorder: 'rgba(15, 23, 42, 0.12)',
     text: '#0f172a', // Slate 900
     textSecondary: '#475569', // Slate 600
     primary: '#2563eb', // Blue 600 - The new App Color

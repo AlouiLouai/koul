@@ -34,12 +34,16 @@ function AuthStateProvider({ children }: { children: React.ReactNode }) {
     }, [authState]);
 
     useEffect(() => {
+        /* Commented out for Expo Go compatibility / Missing Env Vars
         supabase.auth.initialize().then(({ error }) => {
             setAuthState((prev) => ({ ...prev, error: error }));
         });
+        */
+        setAuthState((prev) => ({ ...prev, isLoading: false }));
     }, []);
 
     useEffect(() => {
+        /* Commented out for Expo Go compatibility / Missing Env Vars
         //  https://supabase.com/docs/reference/javascript/auth-onauthstatechange
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setAuthState((prev) => ({
@@ -54,6 +58,7 @@ function AuthStateProvider({ children }: { children: React.ReactNode }) {
             }));
         });
         return () => subscription.unsubscribe();
+        */
     }, []);
 
     return <AuthStateContext.Provider value={authState}>{children}</AuthStateContext.Provider>;
