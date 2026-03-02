@@ -38,6 +38,10 @@ export function AppHeader() {
                     </GlassView>
                 </TouchableOpacity>
 
+                <GlassView style={styles.streakBadge} intensity={40} borderRadius={16}>
+                    <Text style={styles.streakText}>🔥 3 Jours</Text>
+                </GlassView>
+
                 <UserMenu />
             </View>
         </View>
@@ -78,5 +82,20 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '900',
         letterSpacing: -0.5,
+    },
+    streakBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        marginRight: 10,
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(245, 158, 11, 0.2)',
+    },
+    streakText: {
+        fontWeight: '900',
+        fontSize: 12,
+        color: '#f59e0b',
     },
 });

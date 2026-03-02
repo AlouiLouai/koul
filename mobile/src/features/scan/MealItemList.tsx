@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Droplets, Flame, Wheat, Leaf, ChevronDown } from 'lucide-react-native';
+import { Flame, Wheat, Droplets, Leaf, ChevronDown } from 'lucide-react-native';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     container: { width: '100%', marginBottom: 32 },
     headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingHorizontal: 4 },
     sectionTitle: { fontSize: 14, fontWeight: '900', opacity: 0.8 },
-    countBadge: { display: 'none' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12 },
     cardWrapper: { width: '48%' },
     itemCard: { padding: 12, borderWidth: 0, minHeight: 140, backgroundColor: 'transparent' },

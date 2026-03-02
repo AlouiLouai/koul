@@ -15,13 +15,13 @@ export function ScanResult() {
     const { logMeal } = useStatsStore()
     const { presentModal } = useModals();
     if (!result || loading) return null;
-    return <View style={styles.resultAnimationWrapper}>
+    return <Animated.View style={[
+        styles.resultAnimationWrapper,
+        { opacity: buttonsOpacity, transform: [{ translateY: buttonsTranslateY }] }
+    ]}>
         <AnalysisResult data={result} />
 
-        <Animated.View style={[
-            styles.actionRow,
-            { opacity: buttonsOpacity, transform: [{ translateY: buttonsTranslateY }] }
-        ]}>
+        <View style={styles.actionRow}>
             <TouchableOpacity
                 style={styles.resetBtnWrapper}
                 onPress={resetAnalysis}
@@ -58,8 +58,8 @@ export function ScanResult() {
                     </View>
                 </Animated.View>
             </TouchableOpacity>
-        </Animated.View>
-    </View>
+        </View>
+    </Animated.View>
 }
 const styles = StyleSheet.create({
     resultAnimationWrapper: { width: '100%' },

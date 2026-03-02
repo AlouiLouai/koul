@@ -1,20 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useMutation, useQuery, useQueryClient } from '@/lib/react-query';
+import { useMutation } from '@/lib/react-query';
 import { API_CONFIG } from '@/apiConfig';
 import type { AnalysisResponse } from '@/types';
 import { logger } from '@/lib/logger';
 
 export const useImageAnalysis = () => {
   const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  const { data: result } = useQuery<AnalysisResponse | null>({
-    queryKey: ['analysis', 'last'],
-    queryFn: async () => null,
-    initialData: null,
-    enabled: false,
-  });
+  const [result, setResult] = useState<AnalysisResponse | null>(null);
 
   const mutation = useMutation({
     mutationFn: async ({ uri, type, fileName }: { uri: string; type: string; fileName: string }) => {
@@ -37,14 +30,14 @@ export const useImageAnalysis = () => {
     },
     retry: 0,
     onSuccess: (data) => {
-      queryClient.setQueryData(['analysis', 'last'], data);
+      setResult(data);
     },
   });
 
   const analyzeImage = async (uri: string, type: string, fileName: string) => {
     mutation.reset();
+    setResult(null);
     setCurrentImage(uri);
-    queryClient.setQueryData(['analysis', 'last'], null);
     try {
       await mutation.mutateAsync({ uri, type, fileName });
     } catch {
@@ -53,7 +46,7 @@ export const useImageAnalysis = () => {
   };
 
   const resetAnalysis = () => {
-    queryClient.setQueryData(['analysis', 'last'], null);
+    setResult(null);
     setCurrentImage(null);
   };
 

@@ -3,50 +3,51 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/ThemeContext';
 import { HeroSection } from '@/features/home/HeroSection';
 import { WaterTracker } from '@/features/home/WaterTracker';
-import { DailyChallenge } from '@/features/home/DailyChallenge';
-import { TipCard } from '@/features/home/TipCard';
+import { MealTimeline } from '@/features/home/MealTimeline';
+import { AIVerdict } from '@/features/home/AIVerdict';
 import { TrendingDishCard } from '@/features/home/TrendingDishCard';
-import { FeaturesList } from '@/features/home/FeaturesList';
 
 export default function HomeScreen() {
-
-
   const { colors } = useTheme();
-
 
   return (
     <>
       <HeroSection />
-      <View style={styles.bentoGrid}>
+      
+      <View style={styles.sectionHeader}>
+        <View style={styles.liveBadge}>
+          <View style={[styles.pulseDot, { backgroundColor: colors.primary }]} />
+          <Text style={[styles.liveText, { color: colors.primary }]}>DIMA JIDID</Text>
+        </View>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Taw w l'Youm</Text>
+      </View>
+
+      <View style={styles.gridRow}>
         <View style={styles.leftCol}>
           <WaterTracker />
         </View>
 
         <View style={styles.rightCol}>
-          <DailyChallenge />
-          <TipCard />
+          <MealTimeline />
+          <AIVerdict />
         </View>
       </View>
 
       <View style={styles.sectionSpacing}>
         <TrendingDishCard />
       </View>
-
-      <View style={styles.featuresContainer}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>3lech KOUL?</Text>
-        </View>
-        <FeaturesList />
-      </View>
     </>
   );
 }
+
 const styles = StyleSheet.create({
-  bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 24, width: '100%' },
-  leftCol: { flex: 1 },
-  rightCol: { flex: 1, gap: 12 },
-  sectionSpacing: { width: '100%', marginBottom: 24 },
-  sectionTitle: { fontSize: 20, fontWeight: '900' },
-  featuresContainer: { width: '100%' },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 4 },
+  gridRow: { flexDirection: 'row', gap: 12, marginBottom: 24, width: '100%', alignItems: 'flex-start' },
+  leftCol: { width: '45%' },
+  rightCol: { width: '51%', gap: 12 },
+  sectionSpacing: { width: '100%', marginBottom: 110 }, // Space for TabBar
+  sectionTitle: { fontSize: 24, fontWeight: '900', letterSpacing: -1 },
+  sectionHeader: { marginBottom: 16, paddingHorizontal: 4 },
+  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  pulseDot: { width: 6, height: 6, borderRadius: 3 },
+  liveText: { fontSize: 10, fontWeight: '900', letterSpacing: 1 },
 });

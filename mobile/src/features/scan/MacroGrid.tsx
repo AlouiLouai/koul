@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '../../theme/ThemeContext';
-import { GlassView } from '../../components/GlassView';
+import { Flame, Wheat, Droplets } from 'lucide-react-native';
 
 interface CircularProgressProps {
   label: string;
@@ -10,16 +10,16 @@ interface CircularProgressProps {
   total: number;
   unit: string;
   color: string;
+  icon: any;
 }
 
-const CircularProgress = ({ label, value, total, unit, color }: CircularProgressProps) => {
+const CircularProgress = ({ label, value, total, unit, color, icon: Icon }: CircularProgressProps) => {
   const { colors } = useTheme();
-  const size = 80;
-  const strokeWidth = 8;
+  const size = 95;
+  const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   
-  // Calculate percentage, maxing at 100%
   const percentage = Math.min(value / total, 1);
   const strokeDashoffset = circumference - (percentage * circumference);
 
@@ -27,17 +27,14 @@ const CircularProgress = ({ label, value, total, unit, color }: CircularProgress
     <View style={styles.macroItem}>
       <View style={styles.svgWrapper}>
         <Svg width={size} height={size}>
-          {/* Background Circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={colors.glassBorder}
+            stroke={color + '20'}
             strokeWidth={strokeWidth}
             fill="transparent"
-            opacity={0.2}
           />
-          {/* Progress Circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -51,12 +48,14 @@ const CircularProgress = ({ label, value, total, unit, color }: CircularProgress
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         </Svg>
-        <View style={styles.innerValue}>
-          <Text style={[styles.valueText, { color: colors.text }]}>{value.toFixed(0)}</Text>
-          <Text style={[styles.unitText, { color: colors.textSecondary }]}>{unit}</Text>
+        <View style={styles.innerContent}>
+          <Icon size={16} color={color} fill={color} style={styles.icon} />
+          <Text style={[styles.labelInternal, { color: colors.textSecondary }]}>{label}</Text>
+          <Text style={[styles.valueText, { color: colors.text }]}>
+            {value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)}<Text style={styles.unitText}>{unit}</Text>
+          </Text>
         </View>
       </View>
-      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
     </View>
   );
 };
@@ -68,46 +67,47 @@ interface MacroGridProps {
 }
 
 export const MacroGrid = ({ protein, carbs, fat }: MacroGridProps) => {
-  const { colors } = useTheme();
   
-  // Reasonable max values for the circular scale
   const maxProtein = 100;
   const maxCarbs = 150;
   const maxFat = 80;
 
   return (
-    <GlassView intensity={20} borderRadius={32} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.grid}>
         <CircularProgress
-          label="Proteine"
+          label="Protéine"
           value={protein}
           total={maxProtein}
           unit="g"
-          color={colors.primary}
+          color="#3b82f6"
+          icon={Droplets}
         />
         <CircularProgress
           label="Carbs"
           value={carbs}
           total={maxCarbs}
           unit="g"
-          color={colors.success}
+          color="#10b981"
+          icon={Wheat}
         />
         <CircularProgress
           label="Dhoune"
           value={fat}
           total={maxFat}
           unit="g"
-          color={colors.warning}
+          color="#f59e0b"
+          icon={Flame}
         />
       </View>
-    </GlassView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    padding: 20,
+    paddingVertical: 10,
     marginBottom: 20,
   },
   grid: {
@@ -117,31 +117,32 @@ const styles = StyleSheet.create({
   },
   macroItem: {
     alignItems: 'center',
-    gap: 10,
   },
   svgWrapper: {
-    width: 80,
-    height: 80,
+    width: 95,
+    height: 95,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  innerValue: {
+  innerContent: {
     position: 'absolute',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    marginBottom: 2,
+  },
+  labelInternal: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 1,
   },
   valueText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
   },
   unitText: {
-    fontSize: 10,
-    fontWeight: '700',
-    marginTop: -2,
-  },
-  label: {
     fontSize: 12,
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontWeight: '700',
   },
 });

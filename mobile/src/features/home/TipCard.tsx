@@ -1,30 +1,51 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Lightbulb } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import { Lightbulb, Share2 } from 'lucide-react-native';
 import { GlassView } from '../../components/GlassView';
 import { useTheme } from '../../theme/ThemeContext';
 
 export const TipCard = () => {
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
+  
+  const tipContent = "El zit zitouna dhheb, ama mgharfa barka tekfi! Ma tgharraghach. 🫒";
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Klem Kibar men KOUL: "${tipContent}"`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Parchment color logic
+  const parchmentBg = mode === 'dark' ? 'rgba(253, 246, 227, 0.15)' : 'rgba(253, 246, 227, 0.8)';
+  const parchmentBorder = mode === 'dark' ? 'rgba(253, 246, 227, 0.2)' : '#e6d5b8';
+
   return (
-    <GlassView style={styles.tipCard} intensity={45} borderRadius={28}>
-      <View style={[styles.glowBlob, { backgroundColor: colors.warning }]} />
-      <View style={[styles.ribbon, { backgroundColor: colors.warning }]} />
+    <GlassView 
+      style={[styles.tipCard, { backgroundColor: parchmentBg, borderColor: parchmentBorder }]} 
+      intensity={50} 
+      borderRadius={32}
+    >
+      <View style={[styles.glowBlob, { backgroundColor: '#b8860b' }]} />
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
-          <View style={[styles.miniIcon, { backgroundColor: colors.warning + '20' }]}>
-            <Lightbulb size={12} color={colors.warning} fill={colors.warning} />
+          <View style={[styles.miniIcon, { backgroundColor: '#b8860b20' }]}>
+            <Lightbulb size={12} color="#b8860b" fill="#b8860b" />
           </View>
-          <Text style={[styles.tagText, { color: colors.warning }]}>KLEM KBAR</Text>
+          <Text style={[styles.tagText, { color: '#b8860b' }]}>KLEM KBAR</Text>
         </View>
-        <View style={[styles.tipBadge, { backgroundColor: colors.warning + '18', borderColor: colors.warning + '60' }]}>
-          <Text style={[styles.tipBadgeText, { color: colors.warning }]}>HIKMA</Text>
-        </View>
+        
+        <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
+          <Share2 size={16} color="#b8860b" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
-        <Text style={[styles.tipText, { color: colors.textSecondary }]} numberOfLines={4}>
-          El zit zitouna dhheb, ama mgharfa barka tekfi! Ma tgharraghach. 🫒
+        <Text style={[styles.tipText, { color: mode === 'dark' ? colors.textSecondary : '#5d4037' }]} numberOfLines={4}>
+          "{tipContent}"
         </Text>
       </View>
     </GlassView>
@@ -32,15 +53,13 @@ export const TipCard = () => {
 }
 
 const styles = StyleSheet.create({
-  tipCard: { padding: 16, height: 148, justifyContent: 'space-between' },
-  glowBlob: { position: 'absolute', right: -26, top: -18, width: 110, height: 110, borderRadius: 55, opacity: 0.18 },
-  ribbon: { position: 'absolute', left: 0, top: 16, width: 4, height: 44, borderRadius: 3 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  tipCard: { padding: 20, height: 148, justifyContent: 'space-between', borderWidth: 1 },
+  glowBlob: { position: 'absolute', right: -26, top: -18, width: 110, height: 110, borderRadius: 55, opacity: 0.1 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   miniIcon: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   tagText: { fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
-  tipBadge: { borderWidth: 1, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 999 },
-  tipBadgeText: { fontSize: 9, fontWeight: '900', letterSpacing: 1 },
+  shareBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.05)' },
   content: { flex: 1, justifyContent: 'center' },
-  tipText: { fontSize: 13, fontWeight: '800', lineHeight: 18, fontStyle: 'italic' },
+  tipText: { fontSize: 14, fontWeight: '800', lineHeight: 20, fontStyle: 'italic', textAlign: 'center' },
 });

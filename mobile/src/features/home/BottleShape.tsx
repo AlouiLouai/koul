@@ -10,9 +10,10 @@ export interface BottleRef {
 interface BottleShapeProps {
     fillLevel: number; // 0 to 1
     height?: number;
+    color?: string;
 }
 
-export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel, height = 200 }, ref) => {
+export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel, height = 200, color = "#3b82f6" }, ref) => {
     const { colors, mode } = useTheme();
     const waveAnim = useRef(new Animated.Value(0)).current;
     const waveIntensity = useRef(new Animated.Value(0)).current;
@@ -85,11 +86,11 @@ export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel,
                             <Svg height="40" width="200" viewBox="0 0 200 40" style={styles.waveSvg}>
                                 <Path
                                     d="M0 20 Q 25 5, 50 20 T 100 20 T 150 20 T 200 20 V 40 H 0 Z"
-                                    fill="#3b82f6"
+                                    fill={color}
                                 />
                             </Svg>
                         </Animated.View>
-                        <View style={styles.deepWater} />
+                        <View style={[styles.deepWater, { backgroundColor: color }]} />
                     </Animated.View>
                 </View>
 

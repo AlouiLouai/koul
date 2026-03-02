@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
-import { RarityScoreCard } from '../features/scan/RarityScoreCard';
+import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MacroGrid } from '../features/scan/MacroGrid';
 import { OilEstimate } from '../features/scan/OilEstimate';
-import { NutritionistInsight } from '../features/scan/NutritionistInsight';
 import { MealItemList } from '../features/scan/MealItemList';
-import { useTheme } from '../theme/ThemeContext';
+import { Flame, Heart, Scale } from 'lucide-react-native';
 import type { AnalysisResponse } from '../types';
 
 interface AnalysisResultProps {
@@ -14,28 +12,19 @@ interface AnalysisResultProps {
 }
 
 export const AnalysisResult = ({ data }: AnalysisResultProps) => {
-  const { colors } = useTheme();
-  
-  const getDerjaVerdict = (d: AnalysisResponse['totals'], s: number) => {
-    if (s >= 9) return "W7ach protein! 💪 Hédhi mekla thez biha l'coupe 🏆";
-    if (s >= 7) return "Sa7a! Mekla ndhifa, w mouch mcharwtra b'zit.";
-    if (d.fat > 30) return "Rod belek mel zit! T9oul mekel 'Brik' 3la sbe7 🛢️";
-    if (d.calories > 1000) return "Ouh! Hédhi 'Bomb' calorique... Barcha 3jin (Mlewi/Chapati?) 🥖";
-    return "Mouch khayeb, ama rod belek 3la sa7tek. Na9es khobz!";
-  };
-
-  const verdictText = getDerjaVerdict(data.totals, data.health_score ?? 0);
-
   return (
-    <View style={styles.container}>
-      {/* Restore Rarity Score Card & Verdict */}
-      <RarityScoreCard
-        score={data.health_score ?? 0}
-        calories={data.totals.calories}
-        verdict={verdictText}
-      />
+    <View style={[styles.container, { backgroundColor: '#fff' }]}>
+      <View style={styles.badgeRow}>
+          <View style={[styles.badge, { backgroundColor: '#10b981' }]}>
+              <Heart size={14} color="#fff" fill="#fff" />
+              <Text style={styles.badgeText}>SA77A</Text>
+          </View>
+          <View style={[styles.badge, { backgroundColor: '#f59e0b' }]}>
+              <Scale size={14} color="#fff" />
+              <Text style={styles.badgeText}>TAN9IS</Text>
+          </View>
+      </View>
 
-      {/* Macro Grid with Circular Bars */}
       <MacroGrid
         protein={data.totals.protein}
         carbs={data.totals.carbs}
@@ -49,52 +38,75 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
         />
       )}
 
-      <NutritionistInsight />
-
-      {/* Moukawinet Sa7n - Keep as is */}
       <MealItemList items={data.meal_analysis} />
     </View>
   );
 };
 
-// Exported for use in ScanHeader overlay
+// Redesigned Calorie Gauge
 export const CalorieCircle = ({ calories }: { calories: number }) => {
-    const { colors } = useTheme();
-    const size = 90;
-    const strokeWidth = 8;
+    const size = 160;
+    const strokeWidth = 14;
+    const center = size / 2;
     const radius = (size - strokeWidth) / 2;
-    const circumference = radius * 2 * Math.PI;
+    
+    const startAngle = -210;
+    const endAngle = 30;
     const maxCalories = 2000;
     const percentage = Math.min(calories / maxCalories, 1);
-    const strokeDashoffset = circumference - (percentage * circumference);
+    const currentAngle = startAngle + (percentage * (endAngle - startAngle));
+
+    const polarToCartesian = (centerX: number, centerY: number, r: number, angleInDegrees: number) => {
+        const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
+        return {
+            x: centerX + r * Math.cos(angleInRadians),
+            y: centerY + r * Math.sin(angleInRadians),
+        };
+    };
+
+    const describeArc = (x: number, y: number, r: number, startA: number, endA: number) => {
+        const start = polarToCartesian(x, y, r, endA);
+        const end = polarToCartesian(x, y, r, startA);
+        const largeArcFlag = endA - startA <= 180 ? "0" : "1";
+        return [
+            "M", start.x, start.y,
+            "A", r, r, 0, largeArcFlag, 0, end.x, end.y
+        ].join(" ");
+    };
+
+    const backgroundPath = describeArc(center, center, radius, startAngle, endAngle);
+    const progressPath = describeArc(center, center, radius, startAngle, currentAngle);
 
     return (
-        <View style={styles.calorieCircleContainer}>
+        <View style={styles.gaugeWrapper}>
             <Svg width={size} height={size}>
-                <Circle
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
+                <Defs>
+                    <LinearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="0">
+                        <Stop offset="0%" stopColor="#f97316" />
+                        <Stop offset="100%" stopColor="#ef4444" />
+                    </LinearGradient>
+                </Defs>
+                <Path
+                    d={backgroundPath}
                     stroke="rgba(255,255,255,0.2)"
                     strokeWidth={strokeWidth}
-                    fill="rgba(0,0,0,0.4)"
-                />
-                <Circle
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    stroke="#fbbf24" // Amber
-                    strokeWidth={strokeWidth}
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
+                    fill="none"
                     strokeLinecap="round"
-                    fill="transparent"
-                    transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                />
+                <Path
+                    d={progressPath}
+                    stroke="url(#gaugeGradient)"
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                    strokeLinecap="round"
                 />
             </Svg>
-            <View style={styles.calorieTextWrapper}>
-                <Text style={styles.calorieValue}>{calories.toFixed(0)}</Text>
-                <Text style={styles.calorieUnit}>KCAL</Text>
+            
+            <View style={styles.gaugeInnerContent}>
+                <Flame size={24} color="#f97316" fill="#f97316" />
+                <Text style={styles.gaugeValue}>{calories.toFixed(0)}</Text>
+                <Text style={styles.gaugeUnit}>kcal</Text>
+                <Text style={styles.gaugeTotalLabel}>Total Calories</Text>
             </View>
         </View>
     );
@@ -103,29 +115,64 @@ export const CalorieCircle = ({ calories }: { calories: number }) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginTop: 8,
+    paddingTop: 30,
+    marginTop: -40,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
-  calorieCircleContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    width: 90,
-    height: 90,
+  badgeRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    gap: 12,
+    marginBottom: 24,
   },
-  calorieTextWrapper: {
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  gaugeWrapper: {
+    width: 160,
+    height: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gaugeInnerContent: {
     position: 'absolute',
     alignItems: 'center',
+    justifyContent: 'center',
+    top: 35,
   },
-  calorieValue: {
-    color: '#fff',
-    fontSize: 20,
+  gaugeValue: {
+    fontSize: 42,
     fontWeight: '900',
+    color: '#fff',
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
-  calorieUnit: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 10,
+  gaugeUnit: {
+    fontSize: 16,
     fontWeight: '800',
-  }
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: -4,
+  },
+  gaugeTotalLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 4,
+  },
 });

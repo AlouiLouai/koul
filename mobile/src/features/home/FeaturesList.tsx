@@ -6,7 +6,7 @@ import { useTheme } from '../../theme/ThemeContext';
 
 const FEATURES = [
   { id: '1', title: 'Sawar w 7alel', sub: 'Macros f\'thania', icon: Camera, color: '#2563eb' },
-  { id: '2', title: 'AI 100% Tounsi', sub: 'Ya3ref l\'Kousksi', icon: Zap, color: '#f59e0b' },
+  { id: '2', title: 'AI 100% Tounsi', sub: 'Ya3ref l\'Kousksi, l\'Lablabi, w 7atta l\'Mloukhia.', icon: Zap, color: '#f59e0b' },
   { id: '3', title: 'Khousousia Safia', sub: 'Data mkhabya', icon: Shield, color: '#10b981' },
   { id: '4', title: 'Sa7tek Labes', sub: 'Ahdef tounes', icon: Heart, color: '#e11d48' },
 ];
