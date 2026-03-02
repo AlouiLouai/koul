@@ -10,42 +10,52 @@ export const AIVerdict = () => {
   const { todayStats } = useStatsStore();
 
   const getVerdict = () => {
-    if (todayStats.calories === 0) return "AI Dietician: Haya, scanni awwil wajba bech na3tik rayi! 🧠";
-    if (todayStats.protein < 30) return "Rayi: Mekeltik na9sa protein barcha! Zid chwaya l'7am wala 7out bech badnik yitbna. 💪";
-    if (todayStats.calories > 1800) return "Rayi: Rod belek, l'mizén yitla3! Na9es l'khobz w el 3jin l'youm. 🥖";
-    return "Rayi: Jawwik mrigel l'youm! Kamel haka w matansech techrob el maa. 🌟";
+    if (todayStats.calories === 0) return "AI yestanna fik bech tscanni awwil wajba l'youm! 🧠";
+    
+    const quotes = [
+      "Mekeltik mrigla, kamel haka w matensech techrob el maa! 🌟",
+      "Zid chwaya protein bech badnik yitbna kima t7eb. 💪",
+      "Rod belek mil khobz w el 3jin barcha l'youm, khalliha light! 🥗",
+      "Sa7fa lik! Jawik mrigel 100% tounsi m3a KOUL. ✨",
+      "Mekla healthy w makhdouma mli7, ya m3allem! 🔥"
+    ];
+
+    if (todayStats.protein < 30 && todayStats.calories > 0) return quotes[1];
+    if (todayStats.calories > 1800) return quotes[2];
+    
+    // Deterministic quote based on calories
+    return quotes[Math.floor((todayStats.calories / 200) % quotes.length)];
   };
 
   return (
-    <GlassView style={styles.container} intensity={50} borderRadius={32}>
+    <GlassView style={styles.container} intensity={40} borderRadius={24}>
       <View style={styles.header}>
-        <View style={styles.iconBox}>
-           <Brain size={16} color={colors.primary} />
+        <View style={[styles.iconBox, { backgroundColor: colors.primary + '15' }]}>
+           <Sparkles size={14} color={colors.primary} />
         </View>
         <Text style={[styles.title, { color: colors.text }]}>Ray l'Expert</Text>
       </View>
 
       <View style={styles.content}>
         <Text style={[styles.text, { color: colors.textSecondary }]}>
-          {getVerdict()}
+          "{getVerdict()}"
         </Text>
       </View>
 
       <View style={styles.footer}>
-         <Sparkles size={12} color={colors.primary} />
-         <Text style={[styles.footerText, { color: colors.primary }]}>AI 100% TOUNSI</Text>
+         <Text style={[styles.footerText, { color: colors.textSecondary }]}>Powered by Gemini CLI</Text>
       </View>
     </GlassView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, height: 148, justifyContent: 'space-between' },
+  container: { padding: 16, height: 160, justifyContent: 'space-between' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  iconBox: { backgroundColor: 'rgba(37, 99, 235, 0.1)', padding: 6, borderRadius: 10 },
-  title: { fontSize: 14, fontWeight: '900' },
-  content: { flex: 1, justifyContent: 'center' },
+  iconBox: { padding: 6, borderRadius: 10 },
+  title: { fontSize: 13, fontWeight: '900', letterSpacing: 0.5 },
+  content: { flex: 1, justifyContent: 'center', paddingVertical: 10 },
   text: { fontSize: 13, fontWeight: '700', lineHeight: 18, fontStyle: 'italic' },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: 6, opacity: 0.6 },
-  footerText: { fontSize: 9, fontWeight: '900', letterSpacing: 1 }
+  footer: { borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.05)', paddingTop: 8 },
+  footerText: { fontSize: 9, fontWeight: '800', opacity: 0.4, letterSpacing: 0.5 }
 });

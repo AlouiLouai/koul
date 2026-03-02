@@ -37,14 +37,14 @@ export const ScanLoading = () => {
             
             <View style={styles.content}>
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
-                    <GlassView intensity={40} borderRadius={40} style={styles.loaderCircle}>
-                        <Salad size={40} color={colors.primary} />
+                    <GlassView intensity={40} borderRadius={50} style={styles.loaderCircle}>
+                        <Salad size={50} color={colors.primary} />
                     </GlassView>
                 </Animated.View>
 
                 <View style={styles.textContainer}>
-                    <Text style={[styles.title, { color: colors.text }]}>9a3ed n'thabet...</Text>
-                    <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{hintMessage}</Text>
+                    <Text style={[styles.title, { color: colors.text, fontSize: 24 }]}>9a3ed n'thabet...</Text>
+                    <Text style={[styles.subtitle, { color: colors.textSecondary, fontSize: 16 }]}>{hintMessage}</Text>
                 </View>
             </View>
         </View>
@@ -53,9 +53,9 @@ export const ScanLoading = () => {
 
 const styles = StyleSheet.create({
     container: { ...StyleSheet.absoluteFillObject, zIndex: 999, justifyContent: 'center', alignItems: 'center' },
-    content: { alignItems: 'center', gap: 24 },
-    loaderCircle: { width: 80, height: 80, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
-    textContainer: { alignItems: 'center', gap: 8 },
-    title: { fontSize: 20, fontWeight: '900' },
-    subtitle: { fontSize: 14, fontWeight: '600', opacity: 0.8, textAlign: 'center', paddingHorizontal: 40 },
+    content: { alignItems: 'center', gap: 32 },
+    loaderCircle: { width: 100, height: 100, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
+    textContainer: { alignItems: 'center', gap: 12 },
+    title: { fontWeight: '900' },
+    subtitle: { fontWeight: '600', opacity: 0.8, textAlign: 'center', paddingHorizontal: 40 },
 });

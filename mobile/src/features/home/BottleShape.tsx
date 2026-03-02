@@ -18,10 +18,10 @@ export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel,
     const waveAnim = useRef(new Animated.Value(0)).current;
     const waveIntensity = useRef(new Animated.Value(0)).current;
 
-    const bodyHeight = height * 0.8;
-    const neckHeight = height * 0.12;
-    const capHeight = height * 0.08;
-    const bottleWidth = height * 0.4;
+    const bodyHeight = height * 0.85;
+    const neckHeight = height * 0.1;
+    const capHeight = height * 0.05;
+    const bottleWidth = height * 0.55;
 
     useImperativeHandle(ref, () => ({
         triggerWave: () => {
@@ -94,11 +94,10 @@ export const BottleShape = forwardRef<BottleRef, BottleShapeProps>(({ fillLevel,
                     </Animated.View>
                 </View>
 
-                {/* Hayet Label */}
+                {/* 3L Label (Eticket Style) */}
                 <View style={styles.labelContainer}>
                     <View style={styles.hayetBlueStrip}>
-                        <Text style={[styles.hayetText, { fontSize: bottleWidth * 0.16 }]}>HAYET</Text>
-                        <Text style={[styles.volumeText, { fontSize: bottleWidth * 0.08 }]}>3L</Text>
+                        <Text style={[styles.volumeText, { fontSize: bottleWidth * 0.22 }]}>3L</Text>
                     </View>
                     <View style={styles.hayetRedStrip} />
                 </View>
@@ -157,7 +156,7 @@ const styles = StyleSheet.create({
     },
     hayetBlueStrip: {
         backgroundColor: '#1e40af',
-        paddingVertical: 4,
+        paddingVertical: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -165,14 +164,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#e11d48',
         height: 6,
     },
-    hayetText: {
-        color: 'white',
-        fontWeight: '900',
-        letterSpacing: 1.5,
-    },
     volumeText: {
         color: 'white',
-        fontWeight: '700',
-        marginTop: -2,
+        fontWeight: '900',
+        letterSpacing: 2,
     }
 });

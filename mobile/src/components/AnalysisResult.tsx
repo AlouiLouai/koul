@@ -88,7 +88,7 @@ export const CalorieCircle = ({ calories }: { calories: number }) => {
                 </Defs>
                 <Path
                     d={backgroundPath}
-                    stroke="rgba(255,255,255,0.2)"
+                    stroke="rgba(0,0,0,0.15)"
                     strokeWidth={strokeWidth}
                     fill="none"
                     strokeLinecap="round"
@@ -106,7 +106,7 @@ export const CalorieCircle = ({ calories }: { calories: number }) => {
                 <Flame size={24} color="#f97316" fill="#f97316" />
                 <Text style={styles.gaugeValue}>{calories.toFixed(0)}</Text>
                 <Text style={styles.gaugeUnit}>kcal</Text>
-                <Text style={styles.gaugeTotalLabel}>Total Calories</Text>
+                <Text style={styles.gaugeTotalLabel}>S'3rat el-Koulia</Text>
             </View>
         </View>
     );
@@ -147,6 +147,8 @@ const styles = StyleSheet.create({
     height: 160,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    borderRadius: 80,
   },
   gaugeInnerContent: {
     position: 'absolute',
@@ -157,22 +159,20 @@ const styles = StyleSheet.create({
   gaugeValue: {
     fontSize: 42,
     fontWeight: '900',
-    color: '#fff',
+    color: '#000',
     marginTop: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   gaugeUnit: {
     fontSize: 16,
     fontWeight: '800',
-    color: 'rgba(255,255,255,0.8)',
+    color: '#000',
     marginTop: -4,
   },
   gaugeTotalLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.6)',
+    color: '#000',
     marginTop: 4,
+    opacity: 0.7,
   },
 });

@@ -41,9 +41,9 @@ export const WaterTracker = () => {
             )}
           </View>
           <View>
-            <Text style={[styles.title, { color: isComplete ? '#fff' : colors.text }]}>Hayet</Text>
+            <Text style={[styles.title, { color: isComplete ? '#fff' : colors.text }]}>3L</Text>
             <Text style={[styles.statsValue, { color: isComplete ? 'rgba(255,255,255,0.8)' : colors.textSecondary }]}>
-               {(cups * 0.25).toFixed(1)}L / 3L
+               {(cups * 0.25).toFixed(1)}L l'Youm
             </Text>
           </View>
         </View>
@@ -53,26 +53,28 @@ export const WaterTracker = () => {
           <BottleShape 
             ref={bottleRef} 
             fillLevel={fillLevel} 
-            height={160} 
+            height={200} 
             color={isComplete ? '#fff' : undefined}
           />
+          
+          {!isComplete && (
+            <TouchableOpacity
+              style={[styles.smallAddButton, { backgroundColor: colors.primary }]}
+              onPress={addWater}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.addBtnIcon}>+</Text>
+            </TouchableOpacity>
+          )}
       </View>
 
       <View style={styles.bottomSection}>
-        {isComplete ? (
+        {isComplete && (
           <View style={styles.successBanner}>
             <Text style={styles.successText}>
               Badnik mrigel 100%! ✨
             </Text>
           </View>
-        ) : (
-          <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.primary }]}
-            onPress={addWater}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.addBtnText}>+0.5L</Text>
-          </TouchableOpacity>
         )}
       </View>
     </GlassView>
@@ -81,8 +83,8 @@ export const WaterTracker = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    height: 330,
+    padding: 16,
+    height: 352,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 4,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -117,25 +120,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
+    position: 'relative',
+    width: '100%',
+  },
+  smallAddButton: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  addBtnIcon: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '400',
+    marginTop: -2,
   },
   bottomSection: {
     width: '100%',
-  },
-  addButton: {
-    width: '100%',
-    height: 48,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  addBtnText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '900',
+    minHeight: 20,
   },
   successBanner: {
     paddingVertical: 12,

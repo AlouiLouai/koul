@@ -15,8 +15,15 @@ function ContentWrapper({ children }: PropsWithChildren) {
     const { currentImage, loading } = useScanState()
     const containerHeight = useRef(new Animated.Value(width)).current;
     useEffect(() => {
+        let toValue = 480; // Default for Hero
+        if (loading) {
+            toValue = 580; // Taller for loading
+        } else if (currentImage) {
+            toValue = 380; // Shorter for result
+        }
+
         Animated.spring(containerHeight, {
-            toValue: (currentImage && !loading) ? 380 : 480, 
+            toValue, 
             useNativeDriver: false,
             friction: 8,
             tension: 30
