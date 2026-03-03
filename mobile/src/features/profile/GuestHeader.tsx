@@ -16,13 +16,13 @@ export function GuestHeader() {
     if (!isGuest) return null;
     return (
         <View style={styles.guestHeader}>
-            <View style={[styles.guestIconCircle, { backgroundColor: colors.primary + '10' }]}>
-                <UserIcon size={48} color={colors.primary} strokeWidth={1.5} />
+            <View style={[styles.guestIconCircle, { backgroundColor: colors.primary + '15' }]}>
+                <UserIcon size={52} color={colors.primary} strokeWidth={1.5} />
             </View>
             <View style={styles.guestTextSection}>
                 <Text style={[styles.guestTitle, { color: colors.text }]}>Mar7ba Bik! 👋</Text>
                 <Text style={[styles.guestSubtitle, { color: colors.textSecondary }]}>
-                    Connecti bch tkhabi makeltek w ttaba3 progress-ek.
+                    Connecti bch tkhabi makeltek w ttaba3 progress-ek l'youm.
                 </Text>
             </View>
             <TouchableOpacity
@@ -35,7 +35,7 @@ export function GuestHeader() {
             </TouchableOpacity>
             <View style={styles.secureBadge}>
                 <ShieldCheck size={12} color={colors.success} />
-                <Text style={[styles.secureText, { color: colors.success }]}>Data mte3ek mahfoutha</Text>
+                <Text style={[styles.secureText, { color: colors.success }]}>Data mte3ek mahfoutha m3ana</Text>
             </View>
         </View>
     );
@@ -46,56 +46,59 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     guestIconCircle: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     guestTextSection: {
         alignItems: 'center',
-        marginBottom: 24,
-        gap: 8,
+        marginBottom: 32,
+        gap: 10,
     },
     guestTitle: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: '900',
+        letterSpacing: -0.5,
     },
     guestSubtitle: {
         fontSize: 14,
         textAlign: 'center',
-        lineHeight: 20,
-        paddingHorizontal: 20,
-        fontWeight: '600',
+        lineHeight: 22,
+        paddingHorizontal: 10,
+        fontWeight: '700',
+        opacity: 0.7,
     },
     connectBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 24,
-        paddingVertical: 14,
-        borderRadius: 20,
+        paddingVertical: 16,
+        borderRadius: 24,
         gap: 12,
         width: '100%',
         justifyContent: 'center',
-        marginBottom: 16,
+        marginBottom: 20,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
+        elevation: 8,
     },
     connectBtnText: {
         fontSize: 16,
-        fontWeight: '800',
+        fontWeight: '900',
     },
     secureBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
+        opacity: 0.8,
     },
     secureText: {
         fontSize: 11,
-        fontWeight: '700',
+        fontWeight: '800',
     },
 })

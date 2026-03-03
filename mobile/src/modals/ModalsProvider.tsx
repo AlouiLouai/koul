@@ -65,6 +65,7 @@ export const ModalsProvider = ({ children }: PropsWithChildren) => {
         [QUOTA_EXCEEDED_MODAL_NAME]: quotaExceededModal,
     };
 
+    /*
     // when the user is on the stats tab, we present the premium required modal
     useEffect(() => {
         const modal = premiumRequiredModal.current
@@ -79,6 +80,7 @@ export const ModalsProvider = ({ children }: PropsWithChildren) => {
             }
         }
     }, [segments]);
+    */
 
     return (
         <BottomSheetModalProvider>

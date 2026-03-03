@@ -12,32 +12,39 @@ export function PremiumBanner() {
     return (
         <TouchableOpacity onPress={() => router.push('/upgrade')} activeOpacity={0.9}>
             <GlassView
-                style={[styles.proCard, { backgroundColor: mode === 'dark' ? '#111827' : '#18181bE6' }]}
-                intensity={80}
+                style={[styles.proCard, { borderColor: colors.warning + '40', borderWidth: 1 }]}
+                intensity={mode === 'dark' ? 60 : 40}
                 borderRadius={32}
             >
                 <View style={styles.proCardContent}>
                     <View style={styles.proTextSection}>
                         <View style={styles.proHeader}>
-                            <Sparkles size={20} color={colors.warning} fill={colors.warning} />
-                            <Text style={[styles.proTitle, { color: '#fff' }]}>KOUL PREMIUM 💎</Text>
+                            <View style={[styles.proIconBox, { backgroundColor: colors.warning + '20' }]}>
+                                <Sparkles size={18} color={colors.warning} fill={colors.warning} />
+                            </View>
+                            <Text style={[styles.proTitle, { color: colors.text }]}>KOUL PREMIUM 💎</Text>
                         </View>
-                        <Text style={[styles.proSubtitle, { color: '#a1a1aa' }]}>Unlock absolute food tracking power</Text>
+                        <Text style={[styles.proSubtitle, { color: colors.textSecondary }]}>Saye7 el-W7ach eli fik l'youm</Text>
 
                         <View style={styles.proBulletList}>
-                            <Text style={styles.proBullet}>• AI Scanning illimité</Text>
-                            <Text style={styles.proBullet}>• Analyses approfondies</Text>
+                            <View style={styles.bulletItem}>
+                                <View style={[styles.bulletDot, { backgroundColor: colors.primary }]} />
+                                <Text style={[styles.proBullet, { color: colors.textSecondary }]}>AI Scanning illimité</Text>
+                            </View>
+                            <View style={styles.bulletItem}>
+                                <View style={[styles.bulletDot, { backgroundColor: colors.primary }]} />
+                                <Text style={[styles.proBullet, { color: colors.textSecondary }]}>Analyses makhdouma mli7</Text>
+                            </View>
                         </View>
                     </View>
 
                     <View style={styles.priceSection}>
-                        <Text style={[styles.priceVal, { color: colors.accent }]}>5 TND</Text>
+                        <Text style={[styles.priceVal, { color: colors.primary }]}>5 TND</Text>
                         <View style={[styles.unlockBtn, { backgroundColor: colors.primary }]}>
-                            <Text style={styles.unlockText}>Unlock</Text>
+                            <Text style={styles.unlockText}>ABONNI</Text>
                         </View>
                     </View>
                 </View>
-                <View style={styles.proDeco} />
             </GlassView>
         </TouchableOpacity>
     );
@@ -45,7 +52,7 @@ export function PremiumBanner() {
 const styles = StyleSheet.create({
     proCard: {
         width: '100%',
-        padding: 24,
+        padding: 22,
         marginBottom: 32,
         position: 'relative',
         overflow: 'hidden',
@@ -53,67 +60,74 @@ const styles = StyleSheet.create({
     proCardContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        zIndex: 10,
+        alignItems: 'center',
     },
     proTextSection: {
         flex: 1,
+        gap: 8,
     },
     proHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginBottom: 4,
+        gap: 10,
+    },
+    proIconBox: {
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     proTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '900',
+        letterSpacing: 0.5,
     },
     proSubtitle: {
         fontSize: 12,
-        fontWeight: '600',
-        marginBottom: 12,
+        fontWeight: '700',
+        opacity: 0.6,
     },
     proBulletList: {
-        gap: 4,
+        gap: 6,
+        marginTop: 4,
+    },
+    bulletItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    bulletDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
     },
     proBullet: {
-        color: '#d4d4d8',
         fontSize: 11,
-        fontWeight: '500',
+        fontWeight: '800',
     },
     priceSection: {
         alignItems: 'flex-end',
-        justifyContent: 'center',
+        gap: 10,
     },
     priceVal: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '900',
-    },
-    priceSub: {
-        color: '#71717a',
-        fontSize: 10,
-        fontWeight: 'bold',
-        marginTop: -4,
-        marginBottom: 12,
+        letterSpacing: -1,
     },
     unlockBtn: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 14,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 4,
     },
     unlockText: {
         color: '#fff',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '900',
-        textTransform: 'uppercase',
-    },
-    proDeco: {
-        position: 'absolute',
-        right: -20,
-        top: -20,
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        letterSpacing: 1,
     },
 })

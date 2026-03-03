@@ -9,13 +9,16 @@ import { useTheme } from '@/theme/ThemeContext';
 import { useAuthState } from '../auth/AuthState';
 
 const StatItem = ({ label, value, icon: Icon, color, locked }: any) => {
-    const { colors } = useTheme();
+    const { colors, mode } = useTheme();
+    const lockedColor = mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
+    const lockedBg = mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
     return (
-        <GlassView style={styles.statItem} intensity={30} borderRadius={24}>
-            <View style={[styles.statIconCircle, { backgroundColor: locked ? '#71717a15' : color + '15' }]}>
-                {locked ? <Lock size={16} color="#71717a" /> : <Icon size={18} color={color} strokeWidth={2.5} />}
+        <GlassView style={styles.statItem} intensity={30} borderRadius={28}>
+            <View style={[styles.statIconCircle, { backgroundColor: locked ? lockedBg : color + '15' }]}>
+                {locked ? <Lock size={16} color={lockedColor} /> : <Icon size={20} color={color} fill={color + '20'} />}
             </View>
-            <Text style={[styles.statValue, { color: locked ? '#71717a' : colors.text }]}>
+            <Text style={[styles.statValue, { color: locked ? lockedColor : colors.text }]}>
                 {locked ? '--' : value}
             </Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
@@ -38,29 +41,36 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        marginBottom: 24,
+        marginBottom: 32,
+        paddingHorizontal: 2,
     },
     statItem: {
-        padding: 16,
+        paddingVertical: 20,
+        paddingHorizontal: 12,
         alignItems: 'center',
         width: '31%',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
     },
     statIconCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8,
+        marginBottom: 10,
     },
     statValue: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '900',
+        letterSpacing: -0.5,
     },
     statLabel: {
-        fontSize: 10,
-        fontWeight: 'bold',
+        fontSize: 9,
+        fontWeight: '900',
         textTransform: 'uppercase',
-        marginTop: 2,
+        letterSpacing: 1,
+        marginTop: 4,
+        opacity: 0.6,
     }
 })

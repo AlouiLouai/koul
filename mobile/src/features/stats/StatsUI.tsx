@@ -1,318 +1,227 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
-import { FlashList as ShopifyFlashList } from '@shopify/flash-list';
-import { Circle, Svg } from 'react-native-svg';
-import { Flame, Zap, Dumbbell, Watch, Lightbulb, ChevronRight, TrendingUp } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { Flame, Dumbbell, Wheat, Droplets, Target, Lightbulb, TrendingUp, Calendar, Trophy, BarChart3, PieChart } from 'lucide-react-native';
 import { GlassView } from '@/components/GlassView';
 import { useTheme } from '@/theme/ThemeContext';
-const FlashList = ShopifyFlashList as any;
+import { CalorieCircle } from '@/components/AnalysisResult';
+import { MacroGrid } from '../scan/MacroGrid';
 
 const { width } = Dimensions.get('window');
-const SCORE_SIZE = width * 0.65;
-const STROKE_WIDTH = 16;
-const RADIUS = (SCORE_SIZE - STROKE_WIDTH) / 2;
-const ARC_ANGLE = 220;
-const ARC_LENGTH = (2 * Math.PI * RADIUS) * (ARC_ANGLE / 360);
 
-const Speedometer = ({ score }: { score: number }) => {
-  const { colors, mode } = useTheme();
-  const animatedValue = useRef(new Animated.Value(0)).current;
+const DAYS_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: score / 10,
-      duration: 1500,
-      useNativeDriver: true,
-    }).start();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score]);
+export const StatsUI = ({ todayStats }: any) => {
+    const { colors, mode } = useTheme();
+    const [selectedDay, setSelectedDay] = useState(6); // Default to Sunday (Today)
+    const [viewMode, setViewMode] = useState<'Day' | 'Week' | 'Month'>('Day');
 
-  const getScoreColor = () => {
-    if (score >= 9) return '#e11d48'; // Tunisian Red / Accent
-    if (score >= 7) return colors.primary;
-    if (score >= 5) return '#f59e0b';
-    return colors.textSecondary;
-  };
+    // AI Advice Logic
+    const getAIAdvice = () => {
+        if (todayStats.protein < 50) return "Mizelt na9es Protein barcha l'youm! Zid ka3ba escalope wala 7out bech badnik yitbna kima t7eb. 💪";
+        if (todayStats.calories > 2000) return "Rod belek, fot el budget mta3ik l'youm! 🥖 Na9es el 3jin w el khobz fel 3ché.";
+        return "Jawwek mrigel 100% tounsi! Kamel haka w matansech techrob el maa. 🌟";
+    };
 
-  const getScoreLabel = () => {
-    if (score >= 9) return 'W7ACH 🦁';
-    if (score >= 7) return 'FORMA 💪';
-    if (score >= 5) return 'LABES 🌤️';
-    return 'TE3EB 😴';
-  };
+    return (
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
+            {/* 1. ARTISTIC ROUND DAY SELECTOR */}
+            <View style={styles.topSjelContainer}>
+                <View style={styles.sjelHeader}>
+                    <View>
+                        <Text style={[styles.sjelTitle, { color: colors.text }]}>Sjel el-Wajbet</Text>
+                        <Text style={[styles.sjelMonth, { color: colors.textSecondary }]}>MARS 2026</Text>
+                    </View>
+                    <View style={styles.viewToggle}>
+                        {['Day', 'Week', 'Month'].map((m) => (
+                            <TouchableOpacity key={m} onPress={() => setViewMode(m as any)}>
+                                <View style={[
+                                    styles.toggleBtn, 
+                                    viewMode === m && { backgroundColor: colors.primary }
+                                ]}>
+                                    <Text style={[styles.toggleText, { color: viewMode === m ? '#fff' : colors.textSecondary }]}>{m}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
 
-  const scoreColor = getScoreColor();
-  const rotation = (360 - ARC_ANGLE) / 2 + 180;
-  const dashOffset = ARC_LENGTH * (1 - (score / 10));
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sjelScroll}>
+                    {DAYS_NAMES.map((day, index) => {
+                        const isSelected = selectedDay === index;
+                        const dayNum = 20 + index;
+                        return (
+                            <TouchableOpacity key={day} onPress={() => setSelectedDay(index)} activeOpacity={0.8}>
+                                <GlassView 
+                                    style={[
+                                        styles.roundDayItem, 
+                                        isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }
+                                    ]} 
+                                    intensity={isSelected ? 100 : 30} 
+                                    borderRadius={40}
+                                >
+                                    <Text style={[styles.dayNameInside, { color: isSelected ? 'rgba(255,255,255,0.8)' : colors.textSecondary }]}>{day}</Text>
+                                    <Text style={[styles.dayNumberInside, { color: isSelected ? '#fff' : colors.text }]}>{dayNum}</Text>
+                                </GlassView>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </ScrollView>
+            </View>
 
-  return (
-    <View style={{ width: SCORE_SIZE, height: SCORE_SIZE - 40, alignItems: 'center', justifyContent: 'center' }}>
-      <Svg width={SCORE_SIZE} height={SCORE_SIZE} viewBox={`0 0 ${SCORE_SIZE} ${SCORE_SIZE}`} style={{ position: 'absolute', top: 0 }}>
-        <Circle
-          cx={SCORE_SIZE / 2}
-          cy={SCORE_SIZE / 2}
-          r={RADIUS}
-          stroke={mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
-          strokeWidth={STROKE_WIDTH}
-          strokeDasharray={`${ARC_LENGTH} ${1000}`}
-          strokeLinecap="round"
-          fill="transparent"
-          rotation={rotation}
-          origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
-        />
-        <Circle
-          cx={SCORE_SIZE / 2}
-          cy={SCORE_SIZE / 2}
-          r={RADIUS}
-          stroke={scoreColor}
-          strokeWidth={STROKE_WIDTH}
-          strokeDasharray={`${ARC_LENGTH} ${1000}`}
-          strokeDashoffset={dashOffset}
-          strokeLinecap="round"
-          fill="transparent"
-          rotation={rotation}
-          origin={`${SCORE_SIZE / 2}, ${SCORE_SIZE / 2}`}
-        />
-      </Svg>
+            {/* 2. GLOBAL METRICS CARD */}
+            <GlassView style={styles.mainMetricsCard} intensity={40} borderRadius={36}>
+                <View style={styles.cardHeader}>
+                    <View style={styles.cardTitleGroup}>
+                        <ActivityIndicatorIcon color={colors.primary} />
+                        <Text style={[styles.cardTitle, { color: colors.text }]}>Formit el-{viewMode}</Text>
+                    </View>
+                    <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
+                        <Text style={[styles.statusText, { color: colors.success }]}>MRIGEL</Text>
+                    </View>
+                </View>
 
-      <View style={{ alignItems: 'center', gap: 2, marginTop: 20 }}>
-        <Text style={[styles.scoreLabelText, { color: colors.textSecondary }]}>Readiness</Text>
-        <Text style={[styles.scoreBig, { color: colors.text }]}>{score}</Text>
-        <View style={[styles.scoreLabelBadge, { backgroundColor: scoreColor + '15', borderColor: scoreColor + '30', borderWidth: 1 }]}>
-          <Text style={[styles.scoreRankText, { color: scoreColor }]}>
-            {getScoreLabel()}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-};
-type TimeFrame = 'Week' | 'Month' | '3M' | '6M' | 'Year';
-interface StatsUIProps {
-  timeframe: TimeFrame;
-  onTimeframeChange: (t: TimeFrame) => void;
-  selectedDayIndex: number;
-  weeklyData: number[];
-  daysLabels: string[];
-  historyItems: any[];
-  todayStats: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
-}
+                <View style={styles.gaugeSection}>
+                    <CalorieCircle calories={viewMode === 'Day' ? todayStats.calories : todayStats.calories * 6.2} />
+                </View>
 
-export const StatsUI = ({
-  timeframe,
-  onTimeframeChange,
-  historyItems,
-  todayStats
-}: StatsUIProps) => {
-  const { colors, mode } = useTheme();
-  const avgScore = Math.min(10, Math.round((todayStats.protein / 150) * 10 * 10) / 10) || 0.1;
+                <View style={styles.macroSection}>
+                    <MacroGrid 
+                        protein={viewMode === 'Day' ? todayStats.protein : todayStats.protein * 5.8} 
+                        carbs={viewMode === 'Day' ? todayStats.carbs : todayStats.carbs * 6.1} 
+                        fat={viewMode === 'Day' ? todayStats.fat : todayStats.fat * 5.5} 
+                    />
+                </View>
+            </GlassView>
 
-  const renderHistoryItem = ({ item }: { item: any }) => (
-    <GlassView style={[styles.historyRow, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)' }]} intensity={20} borderRadius={20}>
-      <View style={styles.rowLeft}>
-        <View style={[styles.iconBoxMini, { backgroundColor: item.score >= 7 ? colors.primary + '20' : '#f59e0b20' }]}>
-          <TrendingUp size={14} color={item.score >= 7 ? colors.primary : '#f59e0b'} />
-        </View>
-        <View>
-          <Text style={[styles.rowTitle, { color: colors.text }]}>{item.date === 'Today' ? 'Lyoum' : item.date}</Text>
-          <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{item.status}</Text>
-        </View>
-      </View>
+            {/* 3. PROGRESS TRENDS (Weekly/Monthly) */}
+            <View style={styles.trendsRow}>
+                <GlassView style={styles.trendCard} intensity={30} borderRadius={28}>
+                    <View style={styles.trendHeader}>
+                        <BarChart3 size={18} color={colors.primary} />
+                        <Text style={[styles.trendTitle, { color: colors.text }]}>Nese9 el-Ousbou3</Text>
+                    </View>
+                    <View style={styles.miniBarChart}>
+                        {[40, 70, 55, 90, 65, 80, 100].map((h, i) => (
+                            <View key={i} style={[styles.bar, { height: h, backgroundColor: i === 6 ? colors.primary : colors.primary + '30' }]} />
+                        ))}
+                    </View>
+                </GlassView>
 
-      <View style={styles.rowRight}>
-        <View style={styles.historyStats}>
-          <Text style={[styles.historyValue, { color: colors.text }]}>{item.p}g P</Text>
-          <Text style={[styles.historyCals, { color: colors.textSecondary }]}>{item.cals || 0} kcal</Text>
-        </View>
-        <ChevronRight size={18} color={colors.textSecondary} />
-      </View>
-    </GlassView>
-  );
+                <GlassView style={styles.miniStatsCard} intensity={30} borderRadius={28}>
+                    <PieChart size={18} color={colors.accent} />
+                    <Text style={[styles.miniStatsValue, { color: colors.text }]}>+14%</Text>
+                    <Text style={[styles.miniStatsLabel, { color: colors.textSecondary }]}>Protein Up</Text>
+                </GlassView>
+            </View>
 
-  const listHeader = (
-    <View style={styles.padding}>
-      {/* --- HEADER --- */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>El Forma <Text style={{ color: '#e11d48' }}>🏋️‍♂️</Text></Text>
-          <GlassView style={styles.streakBadge} intensity={20} borderRadius={20}>
-            <Flame size={14} color="#e11d48" fill="#e11d48" />
-            <Text style={[styles.streakText, { color: colors.text }]}>5 Jours</Text>
-          </GlassView>
-        </View>
+            {/* 4. SMART USER GOAL */}
+            <View style={styles.goalRow}>
+                <GlassView style={styles.goalCard} intensity={30} borderRadius={24}>
+                    <View style={styles.goalHeader}>
+                        <Target size={18} color={colors.primary} />
+                        <Text style={[styles.goalTitle, { color: colors.text }]}>Hadaf el-Koul</Text>
+                    </View>
+                    <View style={styles.goalBody}>
+                        <View style={styles.goalTypeRow}>
+                           <Text style={[styles.goalType, { color: colors.primary }]}>BULK MODE (Bni)</Text>
+                           <Trophy size={16} color={colors.warning} />
+                        </View>
+                        <Text style={[styles.goalDesc, { color: colors.textSecondary }]}>
+                            Tala3 el-Mizén 1kg/mhar. Focus 3la protein w healthy carbs.
+                        </Text>
+                    </View>
+                    <View style={styles.progressSection}>
+                        <View style={styles.miniProgressTrack}>
+                             <View style={[styles.miniProgressFill, { width: '65%', backgroundColor: colors.primary }]} />
+                        </View>
+                        <View style={styles.progressInfo}>
+                             <Text style={[styles.progressPercent, { color: colors.text }]}>65%</Text>
+                             <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>Advancement</Text>
+                        </View>
+                    </View>
+                </GlassView>
+            </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
-          {['Week', 'Month', '3M', '6M', 'Year'].map((t) => (
-            <TouchableOpacity
-              key={t}
-              style={[
-                styles.tabBtn,
-                timeframe === t && { backgroundColor: mode === 'dark' ? '#fff' : '#000', borderColor: mode === 'dark' ? '#fff' : '#000' }
-              ]}
-              onPress={() => onTimeframeChange(t as TimeFrame)}
-            >
-              <Text style={[styles.tabText, { color: timeframe === t ? (mode === 'dark' ? '#000' : '#fff') : colors.textSecondary }]}>
-                {t}
-              </Text>
-            </TouchableOpacity>
-          ))}
+            {/* 5. AI ADVICE */}
+            <GlassView style={styles.adviceCard} intensity={50} borderRadius={28}>
+                <View style={[styles.adviceIcon, { backgroundColor: colors.primary + '15' }]}>
+                    <Lightbulb size={26} color={colors.primary} />
+                </View>
+                <View style={styles.adviceContent}>
+                    <Text style={[styles.adviceTitle, { color: colors.text }]}>Ray l'Expert AI 🧠</Text>
+                    <Text style={[styles.adviceText, { color: colors.textSecondary }]}>
+                        "{getAIAdvice()}"
+                    </Text>
+                </View>
+            </GlassView>
         </ScrollView>
-      </View>
-
-      {/* --- SPEEDOMETER CARD --- */}
-      <GlassView style={styles.heroCard} intensity={30} borderRadius={36}>
-        <Speedometer score={avgScore} />
-        <View style={styles.heroFooter}>
-          <View style={styles.footerItem}>
-            <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>WEEKLY AVG</Text>
-            <Text style={[styles.footerValue, { color: colors.text }]}>8.2</Text>
-          </View>
-          <View style={[styles.footerDivider, { backgroundColor: colors.glassBorder }]} />
-          <View style={styles.footerItem}>
-            <Text style={[styles.footerLabel, { color: colors.textSecondary }]}>PR STREAK</Text>
-            <Text style={[styles.footerValue, { color: colors.text }]}>12d</Text>
-          </View>
-        </View>
-      </GlassView>
-
-      {/* --- BENTO GRID FOR STATS --- */}
-      <View style={styles.bentoGrid}>
-        {/* PROTEIN (Left) */}
-        <GlassView style={styles.proteinCard} intensity={20} borderRadius={28}>
-          <View style={styles.cardHeader}>
-            <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
-              <Dumbbell size={18} color={colors.primary} />
-            </View>
-            <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>BUILD</Text>
-          </View>
-          <View style={styles.valueContainer}>
-            <Text style={[styles.valueBig, { color: colors.text }]}>{Math.round(todayStats.protein)}<Text style={styles.unitSmall}>g</Text></Text>
-            <Text style={[styles.targetLabel, { color: colors.textSecondary }]}>of 200g</Text>
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${Math.min(100, (todayStats.protein / 200) * 100)}%`, backgroundColor: colors.primary }]} />
-          </View>
-        </GlassView>
-
-        {/* DUAL COLS (Right) */}
-        <View style={styles.rightCol}>
-          <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
-            <Zap size={16} color="#f59e0b" fill="#f59e0b" />
-            <View>
-              <Text style={[styles.smallCardValue, { color: colors.text }]}>{Math.round(todayStats.calories)}</Text>
-              <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>KCAL</Text>
-            </View>
-          </GlassView>
-          <GlassView style={styles.smallCard} intensity={20} borderRadius={24}>
-            <Watch size={16} color={colors.primary} />
-            <View>
-              <Text style={[styles.smallCardValue, { color: colors.text }]}>Ready</Text>
-              <Text style={[styles.smallCardLabel, { color: colors.textSecondary }]}>SYNC</Text>
-            </View>
-          </GlassView>
-        </View>
-      </View>
-
-      {/* --- COACH INSIGHT --- */}
-      <GlassView style={styles.insightCard} intensity={40} borderRadius={28}>
-        <View style={[styles.insightIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
-          <Lightbulb size={20} color={colors.primary} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.insightTitle, { color: colors.text }]}>Klem Coach <Text style={{ color: colors.primary }}>AI</Text></Text>
-          <Text style={[styles.insightText, { color: colors.textSecondary }]}>
-            Rak na9ess chwaya Protein lyoum. Zid ka3ba escalope fel 3ché bch tkoun <Text style={{ fontWeight: 'bold', color: colors.text }}>W7ach</Text> ghodwa!
-          </Text>
-        </View>
-      </GlassView>
-
-      {/* --- HISTORY TITLE --- */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Sjel (History)</Text>
-        <ChevronRight size={20} color={colors.textSecondary} />
-      </View>
-    </View>
-  );
-
-  return (
-    <View style={styles.container}>
-      <FlashList
-        data={historyItems}
-        keyExtractor={(item: any, index: number) => String(item?.id ?? item?.date ?? index)}
-        renderItem={renderHistoryItem}
-        estimatedItemSize={90}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={listHeader}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </View>
-  );
+    );
 };
+
+const ActivityIndicatorIcon = ({ color }: { color: string }) => (
+    <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: color + '20', alignItems: 'center', justifyContent: 'center' }}>
+        <TrendingUp size={14} color={color} />
+    </View>
+);
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  padding: { paddingHorizontal: 20 },
-  listContent: { paddingBottom: 140, paddingTop: 10 },
-  header: { marginBottom: 24 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  headerTitle: { fontSize: 32, fontWeight: '900', letterSpacing: -1 },
-  streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: 'rgba(150,150,150,0.1)' },
-  streakText: { fontWeight: '800', fontSize: 13 },
-  tabsScroll: { gap: 8 },
-  tabBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(150,150,150,0.2)' },
-  tabText: { fontSize: 13, fontWeight: '800' },
+    container: { flex: 1 },
+    scrollPadding: { paddingBottom: 120, paddingHorizontal: 16, paddingTop: 10 },
+    
+    // Top Sjel Section
+    topSjelContainer: { marginBottom: 32 },
+    sjelHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+    sjelTitle: { fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
+    sjelMonth: { fontSize: 11, fontWeight: '800', opacity: 0.5 },
+    viewToggle: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 4 },
+    toggleBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
+    toggleText: { fontSize: 10, fontWeight: '900' },
+    sjelScroll: { gap: 14, paddingRight: 20 },
+    roundDayItem: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)' },
+    dayNameInside: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginBottom: 2 },
+    dayNumberInside: { fontSize: 22, fontWeight: '900' },
 
-  heroCard: { padding: 24, alignItems: 'center', marginBottom: 24 },
-  heroFooter: { flexDirection: 'row', width: '100%', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(150,150,150,0.1)' },
-  footerItem: { flex: 1, alignItems: 'center' },
-  footerLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, marginBottom: 4 },
-  footerValue: { fontSize: 18, fontWeight: '900' },
-  footerDivider: { width: 1, height: '60%', alignSelf: 'center' },
+    // Metrics Card
+    mainMetricsCard: { paddingVertical: 28, paddingHorizontal: 16, marginBottom: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+    cardHeader: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+    cardTitleGroup: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    cardTitle: { fontSize: 18, fontWeight: '900' },
+    statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 },
+    statusText: { fontSize: 10, fontWeight: '900' },
+    gaugeSection: { marginBottom: 15, transform: [{ scale: 1.1 }] },
+    macroSection: { width: '100%' },
 
-  scoreBig: { fontSize: 64, fontWeight: '900', letterSpacing: -3, lineHeight: 68 },
-  scoreLabelText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5 },
-  scoreLabelBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, marginTop: 4 },
-  scoreRankText: { fontSize: 13, fontWeight: '900', textTransform: 'uppercase' },
+    // Trends Section
+    trendsRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+    trendCard: { flex: 1.8, padding: 16, height: 140, justifyContent: 'space-between' },
+    trendHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    trendTitle: { fontSize: 12, fontWeight: '900' },
+    miniBarChart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 60 },
+    bar: { width: 10, borderRadius: 5 },
+    miniStatsCard: { flex: 1, padding: 16, height: 140, justifyContent: 'space-between', alignItems: 'flex-start' },
+    miniStatsValue: { fontSize: 20, fontWeight: '900', marginTop: 8 },
+    miniStatsLabel: { fontSize: 10, fontWeight: '800' },
 
-  bentoGrid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  proteinCard: { flex: 1.4, padding: 20, justifyContent: 'space-between' },
-  rightCol: { flex: 1, gap: 12 },
-  smallCard: { flex: 1, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  smallCardValue: { fontSize: 18, fontWeight: '900' },
-  smallCardLabel: { fontSize: 10, fontWeight: '900' },
+    // Goal Section
+    goalRow: { marginBottom: 20 },
+    goalCard: { padding: 20, gap: 16 },
+    goalHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    goalTitle: { fontSize: 12, fontWeight: '900', opacity: 0.6 },
+    goalBody: { gap: 4 },
+    goalTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    goalType: { fontSize: 18, fontWeight: '900' },
+    goalDesc: { fontSize: 12, fontWeight: '600', lineHeight: 18 },
+    progressSection: { gap: 8 },
+    miniProgressTrack: { height: 8, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4, overflow: 'hidden' },
+    miniProgressFill: { height: '100%', borderRadius: 4 },
+    progressInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    progressPercent: { fontSize: 14, fontWeight: '900' },
+    progressLabel: { fontSize: 9, fontWeight: '800' },
 
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  iconBox: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  cardLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-  valueContainer: { marginBottom: 12 },
-  valueBig: { fontSize: 32, fontWeight: '900' },
-  unitSmall: { fontSize: 14, fontWeight: '700', marginLeft: 2 },
-  targetLabel: { fontSize: 12, fontWeight: '600' },
-  progressTrack: { height: 8, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 4, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 4 },
-
-  insightCard: { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'center', marginBottom: 32 },
-  insightIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  insightTitle: { fontSize: 14, fontWeight: '900', marginBottom: 2 },
-  insightText: { fontSize: 13, lineHeight: 18, fontWeight: '500' },
-
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
-  sectionTitle: { fontSize: 22, fontWeight: '900' },
-  separator: { height: 10 },
-
-  historyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, marginHorizontal: 2 },
-  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBoxMini: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  rowTitle: { fontSize: 16, fontWeight: '800' },
-  rowSub: { fontSize: 12, fontWeight: '500', opacity: 0.6 },
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  historyStats: { alignItems: 'flex-end' },
-  historyValue: { fontSize: 15, fontWeight: '800' },
-  historyCals: { fontSize: 11, fontWeight: '600' }
+    // AI Advice
+    adviceCard: { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+    adviceIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+    adviceContent: { flex: 1, gap: 4 },
+    adviceTitle: { fontSize: 15, fontWeight: '900' },
+    adviceText: { fontSize: 13, lineHeight: 18, fontWeight: '600', fontStyle: 'italic' },
 });

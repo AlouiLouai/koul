@@ -10,7 +10,7 @@ import { useAuthState } from '@/features/auth/AuthState';
 import { useModals } from '@/modals/ModalsProvider';
 
 const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switchValue, onSwitchChange, disabled }: any) => {
-    const { colors } = useTheme();
+    const { colors, mode } = useTheme();
     const iconColor = color || colors.text;
 
     return (
@@ -21,8 +21,8 @@ const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switc
             disabled={isSwitch || disabled}
         >
             <View style={styles.settingLeft}>
-                <View style={[styles.settingIcon, { backgroundColor: colors.background[1] + '80' }]}>
-                    <Icon size={20} color={iconColor} />
+                <View style={[styles.settingIcon, { backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.05)' : colors.background[1] + '80' }]}>
+                    <Icon size={20} color={iconColor} strokeWidth={2} />
                 </View>
                 <Text style={[styles.settingLabel, { color: colors.text }]}>{label}</Text>
             </View>
@@ -37,7 +37,7 @@ const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switc
                 ) : (
                     <>
                         {value && <Text style={[styles.settingValue, { color: colors.textSecondary }]}>{value}</Text>}
-                        <ChevronRight size={16} color={colors.textSecondary} />
+                        <ChevronRight size={16} color={colors.textSecondary} opacity={0.5} />
                     </>
                 )}
             </View>
@@ -45,12 +45,12 @@ const SettingItem = ({ icon: Icon, label, value, color, onPress, isSwitch, switc
     );
 };
 export function SettingsList() {
-    const { colors } = useTheme();
+    const { colors, mode } = useTheme();
     const { isAuthenticated, isGuest } = useAuthState();
     const { presentModal } = useModals();
     return (
         <View style={styles.settingsGroup}>
-            <Text style={styles.groupTitle}>PARAMETRES</Text>
+            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>PARAMETRES</Text>
             <GlassView style={styles.settingsList} intensity={40} borderRadius={32}>
                 <SettingItem
                     icon={UserIcon}
@@ -85,58 +85,51 @@ export function SettingsList() {
 const styles = StyleSheet.create({
     settingsGroup: {
         width: '100%',
+        marginBottom: 20,
     },
     groupTitle: {
         fontSize: 11,
         fontWeight: '900',
-        color: '#a1a1aa',
         letterSpacing: 1.5,
         marginBottom: 12,
-        marginLeft: 4,
+        marginLeft: 8,
+        opacity: 0.6,
     },
     settingsList: {
         padding: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
     },
     settingItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 14,
+        padding: 12,
     },
     settingLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: 14,
     },
     settingIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
     },
     settingLabel: {
         fontSize: 15,
-        fontWeight: '700',
+        fontWeight: '800',
     },
     settingRight: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
     },
     settingValue: {
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: '700',
+        opacity: 0.7,
     },
-    divider: {
-        height: 1,
-        marginHorizontal: 16,
-        marginVertical: 4,
-    },
-    versionText: {
-        marginTop: 32,
-        textAlign: 'center',
-        fontSize: 11,
-        fontWeight: 'bold',
-    }
 });
